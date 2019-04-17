@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="FRPPData">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="1" ref="Type35Building"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Type35Building">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="RealPropertyType" type="xs:string"/>
+                <xs:element name="RealPropertyUse" type="xs:string"/>
+                <xs:element name="FieldOffice" type="xs:string"/>
+                <xs:element name="FieldOfficeCollocation" type="xs:string"/>
+                <xs:element name="LegalInterestIndicator" type="xs:string"/>
+                <xs:element name="LeaseAuthorityIndicator" type="xs:string"/>
+                <xs:element name="StatusIndicator" type="xs:string"/>
+                <xs:element name="SurplusDeclarationDate" type="xs:string"/>
+                <xs:element name="ReportOfExcessSubmittedDate" type="xs:string"/>
+                <xs:element name="ReportOfExcessAcceptedDate" type="xs:string"/>
+                <xs:element name="DeterminationToDisposeDate" type="xs:string"/>
+                <xs:element name="CannotCurrentlyBeDisposedDate" type="xs:string"/>
+                <xs:element name="OutgrantIndicator" type="xs:string"/>
+                <xs:element name="CannotCurrentlyBeDisposed" type="xs:string"/>
+                <xs:element name="HistoricalStatus" type="xs:string"/>
+                <xs:element name="ReportingAgency" type="xs:string"/>
+                <xs:element name="UsingOrganization" type="xs:string"/>
+                <xs:element name="LeaseExpirationDate" type="xs:string"/>
+                <xs:element name="LeaseStartDate" type="xs:string"/>
+                <xs:element name="LeaseOccupancyDate" type="xs:string"/>
+                <xs:element name="SquareFeet" type="xs:string"/>
+                <xs:element name="SquareFeetUnitOfMeasure" type="xs:string"/>
+                <xs:element name="YearAssetReportedUnderutilized" type="xs:string"/>
+                <xs:element name="ReplacementValue" type="xs:string"/>
+                <xs:element name="RepairNeeds" type="xs:string"/>
+                <xs:element name="HistoricalCapitalExpenditures" type="xs:string"/>
+                <xs:element name="EstimatedFutureCapitalExpenditures" type="xs:string"/>
+                <!-- Field deprecated for 2018 -->
+                <!--xs:element name="OAndOMOperatingCost" type="xs:string"/-->
+                <xs:element name="OwnedandOtherwiseManagedAnnualOperatingCosts" type="xs:string"/>
+                <xs:element name="OwnedandOtherwiseManagedAnnualMaintenanceCosts" type="xs:string"/>
+                <!-- Field deprecated for 2018 -->
+                <xs:element name="LeasedAnnualOperatingCosts" type="xs:string"/>
+                <xs:element name="LeasedAnnualMaintenanceCosts" type="xs:string"/>
+                <xs:element name="LeaseAnnualRent" type="xs:string"/>
+                <xs:element name="TotalRecurringMaintRepairCost" type="xs:string"/>
+                <xs:element name="ElevatorCost" type="xs:string"/>
+                <xs:element name="HVACCost" type="xs:string"/>
+                <xs:element name="PlumbingCost" type="xs:string"/>
+                <xs:element name="TotalUtilitiesCost" type="xs:string"/>
+                <xs:element name="WaterSewageCost" type="xs:string"/>
+                <xs:element name="ElectricityCost" type="xs:string"/>
+                <xs:element name="GasCost" type="xs:string"/>
+                <xs:element name="SteamCost" type="xs:string"/>
+                <xs:element name="CleaningJanitorialCost" type="xs:string"/>
+                <xs:element name="RoadsGroundsKeepingCost" type="xs:string"/>
+                <xs:element name="StreetAddress" type="xs:string"/>
+                <xs:element name="Latitude" type="xs:string"/>
+                <xs:element name="Longitude" type="xs:string"/>
+                <xs:element name="RealPropertyUniqueIdentifier" type="xs:string"/>
+                <xs:element name="City" type="xs:string"/>
+                <xs:element name="State" type="xs:string"/>
+                <xs:element name="Country" type="xs:string"/>
+                <xs:element name="County" type="xs:string"/>
+                <xs:element name="CongressionalDistricts" type="xs:string"/>
+                <xs:element name="Zipcode" type="xs:string"/>
+                <xs:element name="InstallationName" type="xs:string"/>
+                <xs:element name="InstallationIdentifier" type="xs:string"/>
+                <xs:element name="SubInstallationIdentifier" type="xs:string"/>
+                <xs:element name="Utilization" type="xs:string"/>
+                <xs:element name="FederalEmployees" type="xs:string"/>
+                <xs:element name="FederalContractors" type="xs:string"/>
+                <xs:element name="IsAssetExcluded" type="xs:string"/>
+                <xs:element name="ReasonForExclusion" type="xs:string"/>
+                <xs:element name="YearOfAssetConstruction" type="xs:string"/>
+                <xs:element name="CanNumberOfFederalEmployeesBeDetermined" type="xs:string"/>
+                <xs:element name="CanNumberOfFederalContractorsBeDetermined" type="xs:string"/>
+                <xs:element name="IsSustainable" type="xs:string"/>
+                <xs:element name="DispositionMethod" type="xs:string"/>
+                <xs:element name="DispositionDate" type="xs:string"/>
+                <xs:element name="DispositionValue" type="xs:string"/>
+                <xs:element name="NetProceeds" type="xs:string"/>
+                <xs:element name="RealProperty" type="xs:string"/>
+                <xs:element name="FOIAExemption" type="xs:string"/>
+                <xs:element name="StatutoryCitation" type="xs:string"/>
+            </xs:sequence>
+            <xs:attribute name="FY" type="xs:short"/>
+            <xs:attribute name="ACTION" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

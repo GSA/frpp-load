@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FRPPData ACTION="ADD" AGENCYCODE="89" FY="2018"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FRPP2018XSDv2.xsd">
+    <Type35Building>
+        <RealPropertyType>35</RealPropertyType>
+        <RealPropertyUse>10</RealPropertyUse>
+        <FieldOffice>FO</FieldOffice>
+        <FieldOfficeCollocation>Y</FieldOfficeCollocation>
+        <LegalInterest>
+            <LegalInterestIndicator>L</LegalInterestIndicator>
+            <LeaseAuthorityIndicator>CS</LeaseAuthorityIndicator>
+        </LegalInterest>
+        <Status>
+            <StatusIndicator>A</StatusIndicator>
+            <OutgrantIndicator>N</OutgrantIndicator>
+        </Status>
+        <ReportingAgency>8900</ReportingAgency>
+        <UsingOrganization>8900</UsingOrganization>
+        <LeaseExpirationDate>01/31/2019</LeaseExpirationDate>
+        <LeaseStartDate>02/01/2014</LeaseStartDate>
+        <IsAssetExcluded>Y</IsAssetExcluded>
+        <ReasonForExclusion>ABE</ReasonForExclusion>
+        <CanNumberOfFederalEmployeesBeDetermined>N</CanNumberOfFederalEmployeesBeDetermined>
+        <CanNumberOfFederalContractorsBeDetermined>N</CanNumberOfFederalContractorsBeDetermined>
+        <Size>
+            <SquareFeet>132</SquareFeet>
+            <SquareFeetUnitOfMeasure>G</SquareFeetUnitOfMeasure>
+        </Size>
+        <Personnel/>
+        <RepairNeeds>0</RepairNeeds>
+        <AnnualOperatingCosts>
+            <OwnedandOtherwiseManagedAnnualMaintenanceCosts>500</OwnedandOtherwiseManagedAnnualMaintenanceCosts>
+            <OwnedandOtherwiseManagedAnnualOperatingCosts>200</OwnedandOtherwiseManagedAnnualOperatingCosts>
+            <!--LeasedAnnualOperatingCosts>500</LeasedAnnualOperatingCosts-->
+            <!-- LeasedAnnualMaintenanceCosts>200</LeasedAnnualMaintenanceCosts-->
+            <!-- LeaseAnnualRent>3000</LeaseAnnualRent-->
+        </AnnualOperatingCosts>
+        <MainLocation>
+            <StreetAddress>Post Office Box 100</StreetAddress>
+        </MainLocation>
+        <RealPropertyUniqueIdentifier>1000000</RealPropertyUniqueIdentifier>
+        <City>2455</City>
+        <State>28</State>
+        <Country>840</Country>
+        <County>151</County>
+        <CongressionalDistricts>02</CongressionalDistricts>
+        <Zipcode>38776</Zipcode>
+        <InstallationAndSubInstallationIdentifier>
+            <InstallationName>Test Installation 1</InstallationName>
+            <InstallationIdentifier>10000</InstallationIdentifier>
+            <SubInstallationIdentifier>20000</SubInstallationIdentifier>
+        </InstallationAndSubInstallationIdentifier>
+        <Utilization>6</Utilization>
+        <DispositionData/>
+        <RealProperty>Y</RealProperty>
+        <FOIAExemption>03</FOIAExemption>
+        <StatutoryCitation>This is Statutory Citation</StatutoryCitation>
+    </Type35Building>
+    <Type35Building>
+        <RealPropertyType>35</RealPropertyType>
+        <RealPropertyUse>10</RealPropertyUse>
+        <FieldOffice>FO</FieldOffice>
+        <FieldOfficeCollocation>Y</FieldOfficeCollocation>
+        <LegalInterest>
+            <LegalInterestIndicator>L</LegalInterestIndicator>
+            <LeaseAuthorityIndicator>CS</LeaseAuthorityIndicator>
+        </LegalInterest>
+        <Status>
+            <StatusIndicator>A</StatusIndicator>
+            <OutgrantIndicator>N</OutgrantIndicator>
+        </Status>
+        <ReportingAgency>8900</ReportingAgency>
+        <UsingOrganization>8900</UsingOrganization>
+        <LeaseExpirationDate>02/31/2019</LeaseExpirationDate>
+        <LeaseStartDate>03/01/2014</LeaseStartDate>
+        <IsAssetExcluded>Y</IsAssetExcluded>
+        <ReasonForExclusion>ABE</ReasonForExclusion>
+        <CanNumberOfFederalEmployeesBeDetermined>N</CanNumberOfFederalEmployeesBeDetermined>
+        <CanNumberOfFederalContractorsBeDetermined>N</CanNumberOfFederalContractorsBeDetermined>
+        <Size>
+            <SquareFeet>132</SquareFeet>
+            <SquareFeetUnitOfMeasure>G</SquareFeetUnitOfMeasure>
+        </Size>
+        <Personnel/>
+        <RepairNeeds>0</RepairNeeds>
+        <AnnualOperatingCosts>
+            <OwnedandOtherwiseManagedAnnualMaintenanceCosts>500</OwnedandOtherwiseManagedAnnualMaintenanceCosts>
+            <OwnedandOtherwiseManagedAnnualOperatingCosts>200</OwnedandOtherwiseManagedAnnualOperatingCosts>
+            <!--LeasedAnnualOperatingCosts>500</LeasedAnnualOperatingCosts-->
+            <!-- LeasedAnnualMaintenanceCosts>200</LeasedAnnualMaintenanceCosts-->
+            <!-- LeaseAnnualRent>3000</LeaseAnnualRent-->
+        </AnnualOperatingCosts>
+        <MainLocation>
+            <StreetAddress>Post Office Box 100</StreetAddress>
+        </MainLocation>
+        <RealPropertyUniqueIdentifier>1000001</RealPropertyUniqueIdentifier>
+        <City>2455</City>
+        <State>28</State>
+        <Country>840</Country>
+        <County>151</County>
+        <CongressionalDistricts>02</CongressionalDistricts>
+        <Zipcode>38776</Zipcode>
+        <InstallationAndSubInstallationIdentifier>
+            <InstallationName>Test Installation 2</InstallationName>
+            <InstallationIdentifier>10001</InstallationIdentifier>
+            <SubInstallationIdentifier>20001</SubInstallationIdentifier>
+        </InstallationAndSubInstallationIdentifier>
+        <Utilization>6</Utilization>
+        <DispositionData/>
+        <RealProperty>Y</RealProperty>
+        <FOIAExemption>03</FOIAExemption>
+        <StatutoryCitation>This is Statutory Citation</StatutoryCitation>
+    </Type35Building>
+    <Type35Building>
+        <RealPropertyType>35</RealPropertyType>
+        <RealPropertyUse>10</RealPropertyUse>
+        <FieldOffice>FO</FieldOffice>
+        <FieldOfficeCollocation>Y</FieldOfficeCollocation>
+        <LegalInterest>
+            <LegalInterestIndicator>L</LegalInterestIndicator>
+            <LeaseAuthorityIndicator>CS</LeaseAuthorityIndicator>
+        </LegalInterest>
+        <Status>
+            <StatusIndicator>A</StatusIndicator>
+            <OutgrantIndicator>N</OutgrantIndicator>
+        </Status>
+        <ReportingAgency>8900</ReportingAgency>
+        <UsingOrganization>8900</UsingOrganization>
+        <LeaseExpirationDate>03/31/2019</LeaseExpirationDate>
+        <LeaseStartDate>04/01/2014</LeaseStartDate>
+        <IsAssetExcluded>Y</IsAssetExcluded>
+        <ReasonForExclusion>ABE</ReasonForExclusion>
+        <CanNumberOfFederalEmployeesBeDetermined>N</CanNumberOfFederalEmployeesBeDetermined>
+        <CanNumberOfFederalContractorsBeDetermined>N</CanNumberOfFederalContractorsBeDetermined>
+        <Size>
+            <SquareFeet>132</SquareFeet>
+            <SquareFeetUnitOfMeasure>G</SquareFeetUnitOfMeasure>
+        </Size>
+        <Personnel/>
+        <RepairNeeds>0</RepairNeeds>
+        <AnnualOperatingCosts>
+            <OwnedandOtherwiseManagedAnnualMaintenanceCosts>500</OwnedandOtherwiseManagedAnnualMaintenanceCosts>
+            <OwnedandOtherwiseManagedAnnualOperatingCosts>200</OwnedandOtherwiseManagedAnnualOperatingCosts>
+            <!--LeasedAnnualOperatingCosts>500</LeasedAnnualOperatingCosts-->
+            <!-- LeasedAnnualMaintenanceCosts>200</LeasedAnnualMaintenanceCosts-->
+            <!-- LeaseAnnualRent>3000</LeaseAnnualRent-->
+        </AnnualOperatingCosts>
+        <MainLocation>
+            <StreetAddress>Post Office Box 100</StreetAddress>
+        </MainLocation>
+        <RealPropertyUniqueIdentifier>1000002</RealPropertyUniqueIdentifier>
+        <City>2455</City>
+        <State>28</State>
+        <Country>840</Country>
+        <County>151</County>
+        <CongressionalDistricts>02</CongressionalDistricts>
+        <Zipcode>38776</Zipcode>
+        <InstallationAndSubInstallationIdentifier>
+            <InstallationName>Test Installation 3</InstallationName>
+            <InstallationIdentifier>10002</InstallationIdentifier>
+            <SubInstallationIdentifier>20002</SubInstallationIdentifier>
+        </InstallationAndSubInstallationIdentifier>
+        <Utilization>6</Utilization>
+        <DispositionData/>
+        <RealProperty>Y</RealProperty>
+        <FOIAExemption>03</FOIAExemption>
+        <StatutoryCitation>This is Statutory Citation</StatutoryCitation>
+    </Type35Building>
+</FRPPData>

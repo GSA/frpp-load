@@ -1,0 +1,20 @@
+{
+  "sampleData": {
+    "825f03fd-952e-46b6-80b8-9ce408ffe029": {
+      "payload": "sample_data/FRPPData_3.xml"
+    },
+    "0774c309-6645-4e41-b845-33df4e0dc642": {
+      "payload": "sample_data/FRPPData_2.xml"
+    },
+    "0db0f0e7-3bca-4b93-abda-2421c1fe8df2": {
+      "payload": "sample_data/list_unknown.dwl"
+    },
+    "66586f65-111c-4c20-845d-e6c712752160": {
+      "vars-sfBuildingResponse": "sample_data/list_Result.dwl",
+      "vars-sfBuildingPayload": "sample_data/list_json.json"
+    },
+    "d26f9b9d-d6b8-4a5c-833a-18ba8b349393": {
+      "vars-schemaValidationError": "sample_data/defaultstringtype.dwl"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xml-module="http://www.mulesoft.org/schema/mule/xml-module" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mule/xml-module/current/mule-xml-module.xsd">
+	<http:listener-config name="HTTP_Listener_config_Global" doc:name="HTTP Listener config" doc:id="01adcf84-c296-4938-9f37-5c75695a038b" >
+		<http:listener-connection host="${http.host}" port="${http.port}" />
+	</http:listener-config>
+	<salesforce:sfdc-config name="SalesforceGeoFL3_Global" doc:name="Salesforce Config" doc:id="926c6457-5648-4e66-ab53-86adc1b759b4" >
+		<salesforce:basic-connection username="${sfdc.username}" password="${sfdc.password}" securityToken="${sfdc.token}" url="${sfdc.url}">
+			<reconnection failsDeployment="true" >
+				<reconnect />
+			</reconnection>
+		</salesforce:basic-connection>
+	</salesforce:sfdc-config>
+	<global-property doc:name="Global Property" doc:id="fb69de6a-e02e-4d92-b62b-d8bf3dbf7b11" name="mule.env" value="dev" />
+	<configuration-properties doc:name="Configuration properties" doc:id="2769cbcf-b0b9-49d6-bba7-762cf7d9fe4d" file="frpp-load-${mule.env}.properties" />
+	<xml-module:config name="XML_Config" doc:name="XML Config" doc:id="d4482ad6-e9f6-4075-b448-bf6924eb5f66" />
+</mule>

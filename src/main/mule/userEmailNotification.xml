@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="userEmailNotificationFlow" doc:id="e29bd1bd-ada9-46eb-9a08-eb6d9cbc1247" >
+		<salesforce:query doc:name="Query - User" doc:id="1565eedc-b3f4-4f29-bc2a-41e9c0c03744" config-ref="SalesforceGeoFL3_Global" target="userId">
+						<salesforce:salesforce-query>Select Id from User where Email= ':createdByEml' limit 1</salesforce:salesforce-query>
+						<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	"createdByEml" : vars.file.CreatedBy.Email
+}]]]></salesforce:parameters>
+					</salesforce:query>
+		<ee:transform doc:name="email Payload" doc:id="a6a7cc18-7f02-4fc8-816d-55091ab17747">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="emailPayload"><![CDATA[%dw 2.0
+output application/json
+---
+{
+	body: {
+		fromEmail: p('email.fromEmail'),
+		templateName: vars.useTemplateName,
+		whatId: vars.file.Id,
+		userId: vars.userId[0].Id,
+		attachmentName: p('email.attachmentName'),
+		errors: vars.errorMsg
+			
+			}
+}
+]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+		<salesforce:invoke-apex-rest-method doc:name="Invoke FRPP_notifyUser" doc:id="5aab8179-695e-4046-8d3d-14c663bfcb13" config-ref="SalesforceGeoFL3_Global" target="SFdoEmailResp" className="FRPP_notifyUser" methodName="doEmail^/OGPsendEmail/^HttpPost^String^">
+			<salesforce:request ><![CDATA[#[vars.emailPayload]]]></salesforce:request>
+		</salesforce:invoke-apex-rest-method>
+		<choice doc:name="Choice" doc:id="6392b159-65fc-41e6-b5bf-4c14534adde7" >
+			<when expression="#[vars.SFdoEmailResp.doEmailOutput != 'Success']">
+				<logger level="INFO" doc:name="Log Error" doc:id="a3c29829-7f52-4296-8d41-5365d57db0c7" message='File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; xx. ERROR: User Email Send Failure: #[vars.SFdoEmailResp.doEmailOutput]   User Email Payload:  #[vars.emailPayload]'/>
+				<ee:transform doc:name="set error Msg" doc:id="5604f7ea-3a29-4a37-8eaf-b3df1e95e72a">
+					<ee:message>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="errorMsg" ><![CDATA[%dw 2.0
+output application/java
+---
+[
+	vars.SFdoEmailResp.doEmailOutput
+]]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<set-variable value='#["There was error sending email to the User for File ID: " ++ vars.file.Id ++ ", File Name: " ++ vars.fileName ++  "\r\n\nPlease check Mule Logs for details."]' doc:name="set emailBody" doc:id="1be9c6e3-8d0b-4cdc-a071-b86301b81002" variableName="emailBody"/>
+				<flow-ref doc:name="supportEmailNotificationFlow" doc:id="83eb80ad-c0d9-444d-b48d-1df1c4da14cc" name="supportEmailNotificationFlow"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="User Email Sent." doc:id="d28edcca-3382-409d-b050-95b848ea237e" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; xx. User Email Sent for : #[vars.useTemplateName]"/>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="supportEmailNotificationFlow" doc:id="df91f344-e892-47ae-bbfd-d3a98c7c969c" >
+		<salesforce:query doc:name="Query - User" doc:id="b54218aa-b398-4afe-bc69-fde6df810f91" config-ref="SalesforceGeoFL3_Global" target="userId">
+						<salesforce:salesforce-query>Select Id from User where Email= ':supportEmail' limit 1</salesforce:salesforce-query>
+						<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	"supportEmail" : p('email.supportEmail')
+}]]]></salesforce:parameters>
+					</salesforce:query>
+		<ee:transform doc:name="email Payload" doc:id="d03111f2-dcb7-415d-8fdb-76ada6f815c0">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="emailPayload"><![CDATA[%dw 2.0
+output application/json
+---
+{
+	body: {
+		fromEmail: p('email.fromEmail'),
+		emailBody: vars.emailBody,
+		userId: vars.userId[0].Id,
+		attachmentName: p('email.attachmentName'),
+		errors: vars.errorMsg
+			}
+}
+]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+		<salesforce:invoke-apex-rest-method doc:name="Invoke FRPP_notifyUser" doc:id="fed465e7-a02a-46b8-bec0-f590b8e92875" config-ref="SalesforceGeoFL3_Global" target="SFdoEmailResp" className="FRPP_notifyUser" methodName='doEmail^/OGPsendEmail/^HttpPost^String^'>
+			<salesforce:request ><![CDATA[#[vars.emailPayload]]]></salesforce:request>
+		</salesforce:invoke-apex-rest-method>
+		<choice doc:name="Choice" doc:id="5b51e774-b56e-4375-8b04-c1bc4d9f552e" >
+			<when expression="#[vars.SFdoEmailResp.doEmailOutput != 'Success']">
+				<logger level="INFO" doc:name="Log Email Failure" doc:id="6602221c-2393-4e2a-8942-55efede9219a" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; xx. ERROR: Support Email Failure: #[vars.SFdoEmailResp.doEmailOutput]  Support Email Payload:  #[vars.emailPayload]"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="User Email Sent." doc:id="ecee2a12-46cc-448f-94e7-afad98faa838" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; xx. Support Email Sent for : #[vars.useTemplateName]"/>
+			</otherwise>
+		</choice>
+	</sub-flow>
+</mule>

@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Type35Building>
+  <RealPropertyType>35</RealPropertyType>
+  <RealPropertyUse>10</RealPropertyUse>
+  <FieldOffice>FO</FieldOffice>
+  <FieldOfficeCollocation>Y</FieldOfficeCollocation>
+  <LegalInterest>
+    <LegalInterestIndicator>L</LegalInterestIndicator>
+    <LeaseAuthorityIndicator>CS</LeaseAuthorityIndicator>
+  </LegalInterest>
+  <Status>
+    <StatusIndicator>A</StatusIndicator>
+    <OutgrantIndicator>N</OutgrantIndicator>
+  </Status>
+  <ReportingAgency>8900</ReportingAgency>
+  <UsingOrganization>8900</UsingOrganization>
+  <LeaseExpirationDate>01/31/2019</LeaseExpirationDate>
+  <LeaseStartDate>02/01/2014</LeaseStartDate>
+  <IsAssetExcluded>Y</IsAssetExcluded>
+  <ReasonForExclusion>ABE</ReasonForExclusion>
+  <CanNumberOfFederalEmployeesBeDetermined>N</CanNumberOfFederalEmployeesBeDetermined>
+  <CanNumberOfFederalContractorsBeDetermined>N</CanNumberOfFederalContractorsBeDetermined>
+  <Size>
+    <SquareFeet>132</SquareFeet>
+    <SquareFeetUnitOfMeasure>G</SquareFeetUnitOfMeasure>
+  </Size>
+  <RepairNeeds>0</RepairNeeds>
+  <AnnualOperatingCosts>
+    <OwnedandOtherwiseManagedAnnualMaintenanceCosts>500</OwnedandOtherwiseManagedAnnualMaintenanceCosts>
+    <OwnedandOtherwiseManagedAnnualOperatingCosts>200</OwnedandOtherwiseManagedAnnualOperatingCosts>
+  </AnnualOperatingCosts>
+  <MainLocation>
+    <StreetAddress>Post Office Box 100</StreetAddress>
+  </MainLocation>
+  <RealPropertyUniqueIdentifier>1000000</RealPropertyUniqueIdentifier>
+  <City>2455</City>
+  <State>28</State>
+  <Country>840</Country>
+  <County>151</County>
+  <CongressionalDistricts>02</CongressionalDistricts>
+  <Zipcode>38776</Zipcode>
+  <InstallationAndSubInstallationIdentifier>
+    <InstallationName>Test Installation 1</InstallationName>
+    <InstallationIdentifier>10000</InstallationIdentifier>
+    <SubInstallationIdentifier>20000</SubInstallationIdentifier>
+  </InstallationAndSubInstallationIdentifier>
+  <Utilization>6</Utilization>
+  <RealProperty>Y</RealProperty>
+  <FOIAExemption>03</FOIAExemption>
+  <StatutoryCitation>This is Statutory Citation</StatutoryCitation>
+</Type35Building>

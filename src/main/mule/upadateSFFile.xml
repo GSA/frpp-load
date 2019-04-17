@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<sub-flow name="SetStatuses" doc:id="1cf8ee05-07c6-4b5b-97e8-787c41f5abd9" >
+		
+		
+		
+	<!-- 	<ee:transform doc:name="XXXXXXXX  Samir" doc:id="da585380-ef87-4f25-933e-326b6b1ccda9" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="updateStatusReq" ><![CDATA[%dw 2.0
+output application/json
+
+[{
+	Id: vars.file.Id,
+	Status__c: p('status0')   //Processing
+}
+]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>     -->
+		<salesforce:update type="FRPP_FILE__c" doc:name="Update_FRPP_FILE" doc:id="20ca5652-7126-4eaa-b4b3-fb15863f1fa5" config-ref="SalesforceGeoFL3_Global" target="updateStatusResp">
+			<salesforce:records ><![CDATA[#[vars.updateStatusReq]]]></salesforce:records>
+		</salesforce:update>
+		<remove-variable doc:name="Remove Variable - updateStatusReq" doc:id="b331a919-f583-4f7b-9c06-a9558bc9ff6a" variableName="updateStatusReq"/>
+		<remove-variable doc:name="Remove Variable - updateStatusResp" doc:id="485694ca-bb19-4992-abb3-543620ca8aa4" variableName="updateStatusResp"/>
+	</sub-flow>
+</mule>

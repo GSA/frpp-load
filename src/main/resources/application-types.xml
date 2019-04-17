@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="oldStatus" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+    <types:type name="buildingXml" format="xml">
+      <types:example format="xml" element="FRPPData" location="examples/Three_Buildings_2018.xml"/>
+    </types:type>
+    <types:type name="BuildingFlat" format="xml">
+      <types:example format="xml" element="FRPPData" location="examples/BuildingFlatSample.xml"/>
+    </types:type>
+    <types:type name="sfBuildingPayload" format="json">
+      <types:shape format="weave" example="examples/sfBuildingPayload.json"><![CDATA[%dw 2.0
+type sfBuildingPayload = Array<{|
+  Asset_Type_Code__c: String, 
+  RealPropertyUseCode__c: String, 
+  Field_Office_Code__c: String, 
+  Field_Office_Collocation_Code__c: String, 
+  LegalInterestCode__c: String, 
+  LeaseAuthorityCode__c: String, 
+  AssetStatusCode__c: String, 
+  SurplusDeclarationDate__c: Null, 
+  ReportofExcessSubmittedDate__c: Null, 
+  ReportofExcessAcceptedDate__c: Null, 
+  DeterminationtoDisposeDate__c: Null, 
+  Cannot_Currently_Be_Disposed_of_Date__c: Null, 
+  OutGrantIndicator__c: String, 
+  CannotCurrentlyBeDisposed_Code__c: Null, 
+  HistoricalStatusCode__c: Null, 
+  ReportingAgencyCode__c: String, 
+  ReportingBureauCode__c: String, 
+  UsingAgencyCode__c: String, 
+  UsingBureauCode__c: String, 
+  LeaseExpirationDate__c: String, 
+  Lease_Start_Date__c: String, 
+  Lease_Occupancy_Date__c: Null, 
+  SquareFeet__c: String, 
+  SquareFeetUnitOfMeasure_Code__c: String, 
+  Year_Asset_Reported_Underutilized__c: Null, 
+  ReplacementValue__c: Null, 
+  RepairNeeds__c: String, 
+  Historical_Capital_Expenditures__c: Null, 
+  Estimated_Future_Capital_Expenditures__c: Null, 
+  Owned_and_Managed_Annual_Operations_Cost__c: Null, 
+  Owned_and_Managed_Maintenance_Cost__c: Null, 
+  Leased_Annual_Operations_Costs__c: String, 
+  Leased_Annual_Maintenance_Costs__c: String, 
+  AnnualRent__c: String, 
+  RecurringCost__c: Null, 
+  ElevatorCost__c: Null, 
+  HVACCost__c: Null, 
+  PlumbingCost__c: Null, 
+  TotalUtilitiesCost__c: Null, 
+  WaterSewageCost__c: Null, 
+  ElectricityCost__c: Null, 
+  GasCost__c: Null, 
+  SteamCost__c: Null, 
+  CleaningCost__c: Null, 
+  RoadsCost__c: Null, 
+  StreetAddress__c: String, 
+  Latitude__c: Null, 
+  Longitude__c: Null, 
+  RealPropertyUniqueId__c: String, 
+  CityCode__c: String, 
+  StateCode__c: String, 
+  CountryCode__c: String, 
+  CountyCode__c: String, 
+  CongressionalDistrict__c: String, 
+  ZipCode__c: String, 
+  InstallationName__c: String, 
+  InstallationId__c: String, 
+  SubInstallationId__c: String, 
+  UtilizationCode__c: String, 
+  FederalEmployees__c: Null, 
+  FederalContractors__c: Null, 
+  IsAsset_Excluded_Code__c: String, 
+  Exclusion_Reason_Code__c: String, 
+  Year_of_Construction__c: Null, 
+  Determine_Number_of_Fed_Employees_Code__c: String, 
+  Determine_Number_of_Fed_Contractors_Code__c: String, 
+  SustainabilityCode__c: Null, 
+  DispositionMethodCode__c: Null, 
+  DispositionDate__c: Null, 
+  DispositionValue__c: Null, 
+  NetProceeds__c: Null, 
+  Real_Property_Code__c: String, 
+  FOIA_Exemption_Code__c: Null, 
+  Statutory_Citation__c: String, 
+  ActionType__c: String, 
+  FILE_ID__c: String
+|}> {"MetadataFormat": "json",
+"example": "[{\"Asset_Type_Code__c\":\"35\",\"RealPropertyUseCode__c\":\"10\",\"Field_Office_Code__c\":\"FO\",\"Field_Office_Collocation_Code__c\":\"Y\",\"LegalInterestCode__c\":\"L\",\"LeaseAuthorityCode__c\":\"CS\",\"AssetStatusCode__c\":\"A\",\"SurplusDeclarationDate__c\":null,\"ReportofExcessSubmittedDate__c\":null,\"ReportofExcessAcceptedDate__c\":null,\"DeterminationtoDisposeDate__c\":null,\"Cannot_Currently_Be_Disposed_of_Date__c\":null,\"OutGrantIndicator__c\":\"N\",\"CannotCurrentlyBeDisposed_Code__c\":null,\"HistoricalStatusCode__c\":null,\"ReportingAgencyCode__c\":\"89\",\"ReportingBureauCode__c\":\"00\",\"UsingAgencyCode__c\":\"89\",\"UsingBureauCode__c\":\"00\",\"LeaseExpirationDate__c\":\"2019-01-31\",\"Lease_Start_Date__c\":\"2014-02-01\",\"Lease_Occupancy_Date__c\":null,\"SquareFeet__c\":\"132\",\"SquareFeetUnitOfMeasure_Code__c\":\"R\",\"Year_Asset_Reported_Underutilized__c\":null,\"ReplacementValue__c\":null,\"RepairNeeds__c\":\"0\",\"Historical_Capital_Expenditures__c\":null,\"Estimated_Future_Capital_Expenditures__c\":null,\"Owned_and_Managed_Annual_Operations_Cost__c\":null,\"Owned_and_Managed_Maintenance_Cost__c\":null,\"Leased_Annual_Operations_Costs__c\":\"500\",\"Leased_Annual_Maintenance_Costs__c\":\"200\",\"AnnualRent__c\":\"3000\",\"RecurringCost__c\":null,\"ElevatorCost__c\":null,\"HVACCost__c\":null,\"PlumbingCost__c\":null,\"TotalUtilitiesCost__c\":null,\"WaterSewageCost__c\":null,\"ElectricityCost__c\":null,\"GasCost__c\":null,\"SteamCost__c\":null,\"CleaningCost__c\":null,\"RoadsCost__c\":null,\"StreetAddress__c\":\"Post Office Box 129\",\"Latitude__c\":null,\"Longitude__c\":null,\"RealPropertyUniqueId__c\":\"1074820\",\"CityCode__c\":\"2455\",\"StateCode__c\":\"28\",\"CountryCode__c\":\"840\",\"CountyCode__c\":\"151\",\"CongressionalDistrict__c\":\"02\",\"ZipCode__c\":\"38776\",\"InstallationName__c\":\"US Army Engineer District, Vicksburg\",\"InstallationId__c\":\"19911\",\"SubInstallationId__c\":\"168530\",\"UtilizationCode__c\":\"6\",\"FederalEmployees__c\":null,\"FederalContractors__c\":null,\"IsAsset_Excluded_Code__c\":\"Y\",\"Exclusion_Reason_Code__c\":\"ABE\",\"Year_of_Construction__c\":null,\"Determine_Number_of_Fed_Employees_Code__c\":\"N\",\"Determine_Number_of_Fed_Contractors_Code__c\":\"N\",\"SustainabilityCode__c\":null,\"DispositionMethodCode__c\":null,\"DispositionDate__c\":null,\"DispositionValue__c\":null,\"NetProceeds__c\":null,\"Real_Property_Code__c\":\"Y\",\"FOIA_Exemption_Code__c\":null,\"Statutory_Citation__c\":\"This is Statutory Citation\",\"ActionType__c\":\"ADD\",\"FILE_ID__c\":\"a03r0000002uVHWAA2\"},{\"Asset_Type_Code__c\":\"35\",\"RealPropertyUseCode__c\":\"10\",\"Field_Office_Code__c\":\"FO\",\"Field_Office_Collocation_Code__c\":\"Y\",\"LegalInterestCode__c\":\"L\",\"LeaseAuthorityCode__c\":\"CS\",\"AssetStatusCode__c\":\"A\",\"SurplusDeclarationDate__c\":null,\"ReportofExcessSubmittedDate__c\":null,\"ReportofExcessAcceptedDate__c\":null,\"DeterminationtoDisposeDate__c\":null,\"Cannot_Currently_Be_Disposed_of_Date__c\":null,\"OutGrantIndicator__c\":\"N\",\"CannotCurrentlyBeDisposed_Code__c\":null,\"HistoricalStatusCode__c\":null,\"ReportingAgencyCode__c\":\"89\",\"ReportingBureauCode__c\":\"00\",\"UsingAgencyCode__c\":\"89\",\"UsingBureauCode__c\":\"00\",\"LeaseExpirationDate__c\":\"2019-01-31\",\"Lease_Start_Date__c\":\"2014-02-01\",\"Lease_Occupancy_Date__c\":null,\"SquareFeet__c\":\"132\",\"SquareFeetUnitOfMeasure_Code__c\":\"R\",\"Year_Asset_Reported_Underutilized__c\":null,\"ReplacementValue__c\":null,\"RepairNeeds__c\":\"0\",\"Historical_Capital_Expenditures__c\":null,\"Estimated_Future_Capital_Expenditures__c\":null,\"Owned_and_Managed_Annual_Operations_Cost__c\":null,\"Owned_and_Managed_Maintenance_Cost__c\":null,\"Leased_Annual_Operations_Costs__c\":\"500\",\"Leased_Annual_Maintenance_Costs__c\":\"400\",\"AnnualRent__c\":\"4000\",\"RecurringCost__c\":null,\"ElevatorCost__c\":null,\"HVACCost__c\":null,\"PlumbingCost__c\":null,\"TotalUtilitiesCost__c\":null,\"WaterSewageCost__c\":null,\"ElectricityCost__c\":null,\"GasCost__c\":null,\"SteamCost__c\":null,\"CleaningCost__c\":null,\"RoadsCost__c\":null,\"StreetAddress__c\":\"Post Office Box 130\",\"Latitude__c\":null,\"Longitude__c\":null,\"RealPropertyUniqueId__c\":\"1074820\",\"CityCode__c\":\"2455\",\"StateCode__c\":\"28\",\"CountryCode__c\":\"840\",\"CountyCode__c\":\"151\",\"CongressionalDistrict__c\":\"02\",\"ZipCode__c\":\"38776\",\"InstallationName__c\":\"US Army Engineer District, Vicksburg\",\"InstallationId__c\":\"19911\",\"SubInstallationId__c\":\"168530\",\"UtilizationCode__c\":\"6\",\"FederalEmployees__c\":null,\"FederalContractors__c\":null,\"IsAsset_Excluded_Code__c\":\"Y\",\"Exclusion_Reason_Code__c\":\"ABE\",\"Year_of_Construction__c\":null,\"Determine_Number_of_Fed_Employees_Code__c\":\"N\",\"Determine_Number_of_Fed_Contractors_Code__c\":\"N\",\"SustainabilityCode__c\":null,\"DispositionMethodCode__c\":null,\"DispositionDate__c\":null,\"DispositionValue__c\":null,\"NetProceeds__c\":null,\"Real_Property_Code__c\":\"Y\",\"FOIA_Exemption_Code__c\":null,\"Statutory_Citation__c\":\"This is Statutory Citation\",\"ActionType__c\":\"ADD\",\"FILE_ID__c\":\"a03r0000002uVHWAA2\"}]"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#0774c309-6645-4e41-b845-33df4e0dc642">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="buildingXml"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#a5e645d1-e8ba-4076-bb22-74fbf5dc587c">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="buildingXml"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#825f03fd-952e-46b6-80b8-9ce408ffe029">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="BuildingFlat"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#1d37e189-dd7c-4538-8b97-a50cb35f0787"/>
+  <types:enrichment select="#66586f65-111c-4c20-845d-e6c712752160">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:variables>
+          <types:variable name="sfBuildingPayload" type="sfBuildingPayload"/>
+        </types:variables>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#82d7ab70-158e-4fa7-b36b-052b0a95e92a"/>
+  <types:enrichment select="#d8c728e0-77c6-43f4-8608-d7f05f70584f"/>
+  <types:enrichment select="#cc08f173-9abe-4af5-8cca-331d13707559"/>
+  <types:enrichment select="#a6a7cc18-7f02-4fc8-816d-55091ab17747"/>
+  <types:enrichment select="#b4953ad6-b490-4717-a8b2-ed695608cddf"/>
+  <types:enrichment select="#b5e74bcc-d5a9-4d3f-bc56-afc3dc25aa62"/>
+</types:mule>
