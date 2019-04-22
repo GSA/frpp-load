@@ -44,6 +44,12 @@
             <version>1.1.2</version>
             <classifier>mule-plugin</classifier>
         </dependency>
+        <!-- manually added to support XML dependency -->
+        <dependency>
+    		<groupId>javax.xml.xquery</groupId>
+    		<artifactId>xqj-api</artifactId>
+    		<version>1.0</version>
+		</dependency>  
 		<dependency>
             <groupId>com.mulesoft.connectors</groupId>
             <artifactId>mule-salesforce-connector</artifactId>
@@ -82,6 +88,15 @@
             <name>MuleSoft Releases Repository</name>
             <url>https://repository.mulesoft.org/releases/</url>
             <layout>default</layout>
+        </repository>
+     <!--  repository manually added to support XML dependency -->   
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/libs-milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
     <pluginRepositories>
