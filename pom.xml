@@ -91,12 +91,10 @@
         </repository>
      <!--  repository manually added to support XML dependency -->   
         <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/libs-milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <id>mvn-repository</id>
+            <name>MVN Repository</name>
+            <url>https://mvnrepository.com/artifact/</url>
+            <layout>default</layout>
         </repository>
     </repositories>
     <pluginRepositories>
