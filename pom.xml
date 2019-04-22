@@ -93,7 +93,7 @@
         <repository>
             <id>mvn-repository</id>
             <name>MVN Repository</name>
-            <url>https://mvnrepository.com/artifact/</url>
+            <url>http://xqj.net/maven/</url>
             <layout>default</layout>
         </repository>
     </repositories>
