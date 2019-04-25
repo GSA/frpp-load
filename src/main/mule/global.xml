@@ -16,7 +16,7 @@ http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mu
 			</reconnection>
 		</salesforce:basic-connection>
 	</salesforce:sfdc-config>
-	<global-property doc:name="Global Property" doc:id="fb69de6a-e02e-4d92-b62b-d8bf3dbf7b11" name="mule.env" value="dev" />
+	<global-property doc:name="Global Property" doc:id="fb69de6a-e02e-4d92-b62b-d8bf3dbf7b11" name="mule.env" value="local" />
 	<configuration-properties doc:name="Configuration properties" doc:id="2769cbcf-b0b9-49d6-bba7-762cf7d9fe4d" file="frpp-load-${mule.env}.properties" />
 	<xml-module:config name="XML_Config" doc:name="XML Config" doc:id="d4482ad6-e9f6-4075-b448-bf6924eb5f66" />
 </mule>
