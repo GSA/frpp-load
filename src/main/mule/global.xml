@@ -12,7 +12,7 @@ http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mu
 	<salesforce:sfdc-config name="SalesforceGeoFL3_Global" doc:name="Salesforce Config" doc:id="926c6457-5648-4e66-ab53-86adc1b759b4" >
 		<salesforce:basic-connection username="${sfdc.username}" password="${sfdc.password}" securityToken="${sfdc.token}" url="${sfdc.url}">
 			<reconnection failsDeployment="true" >
-				<reconnect />
+				  <reconnect frequency="10000" count="3"/>
 			</reconnection>
 		</salesforce:basic-connection>
 	</salesforce:sfdc-config>
