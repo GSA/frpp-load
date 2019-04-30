@@ -139,4 +139,6 @@ type sfBuildingPayload = Array<{|
   <types:enrichment select="#a6a7cc18-7f02-4fc8-816d-55091ab17747"/>
   <types:enrichment select="#b4953ad6-b490-4717-a8b2-ed695608cddf"/>
   <types:enrichment select="#b5e74bcc-d5a9-4d3f-bc56-afc3dc25aa62"/>
+  <types:enrichment select="#dee27802-fb5f-414d-8673-e729439eb4ea"/>
+  <types:enrichment select="#a287fb2a-6dea-40a0-a11d-623f2c1b20f3"/>
 </types:mule>
