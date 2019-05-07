@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<flow name="updateFileStatus_Temp" doc:id="0272740c-e480-4d1b-86d1-807ca841b07d" >
+		<http:listener doc:name="Listener" doc:id="3aeaf66e-303c-4068-9cc0-70a6d20b4d8e" config-ref="HTTP_Listener_config_Global" path="/updateFileStatus"/>
+		<ee:transform doc:name="Create Update File Message" doc:id="727cef46-1b75-4bdb-bc96-cbf66ec707ea">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+[{
+	Id: attributes.queryParams.id,
+	//FILE_NAME__c : attributes.queryParams.id,
+	Status__c: attributes.queryParams.status
+}]]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="test"><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<salesforce:update doc:name="Update" doc:id="b70093ba-869f-4cfd-b47e-fade2c05e8a5" config-ref="SalesforceGeoFL3_Global" type="FRPP_FILE__c"/>
+		<ee:transform doc:name="Transform Message" doc:id="7e907ed3-ea42-464f-826a-ece755ca2e6f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	
+	</flow>
+</mule>

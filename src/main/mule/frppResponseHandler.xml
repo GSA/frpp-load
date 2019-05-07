@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	
+	
+	<sub-flow name="ProcessAllBatchReponses" doc:id="d528f9d2-8f2e-4f98-a078-216aff05f9a8" >
+		<logger level="INFO" doc:name="Log Start Processing Response" doc:id="1d053462-f81b-44fe-bd31-b3859eec2a8b" message="Started processing responses" />
+		<set-variable value="#[p('thread.maxThreads') - vars.threadPoolSize]" doc:name="Set Response Counter" doc:id="dcf12ca0-abb7-46f5-a628-d169489b47a3" variableName="responseCounter" />
+		<flow-ref doc:name="ProcessThreadResponse" doc:id="ddedf858-369e-46a5-889d-802827238bfa" name="ProcessThreadResponse" />
+		<logger level="INFO" doc:name="Log Response Processing  Complete" doc:id="7feb0ad0-763a-40b6-b051-fb508bb3befe" message="Completed Processing Responses" />
+		<set-variable value="#[p('thread.maxThreads')]" doc:name="Reset Thread Pool" doc:id="a11cf086-d921-4e12-987f-30cd594b4f3c" variableName="threadPoolSize" />
+	</sub-flow>
+	
+	
+	
+	<sub-flow name="ProcessThreadResponse" doc:id="98da51e4-51e5-44bd-abd1-8ca79d117ac0" >
+		<choice doc:name="Choice" doc:id="3095ac7b-7fb8-44a4-96c9-2aa256d903f7" >
+			<when expression="#[vars.responseCounter &gt; 0]">
+				<vm:consume queueName="response" doc:name="Consume" target="vmResponse" doc:id="6bc57cff-9e27-4dbd-b57b-9bdf30787506" config-ref="VM_Batch_Config" timeout="120"/>
+				<salesforce:query doc:name="Get Count of SF processed assets" doc:id="78e6f31e-7dd7-4b64-97ea-a6661bcf8242" config-ref="SalesforceGeoFL3_Global" target="countSFProcessedAssets">
+					<salesforce:salesforce-query >select ID, Number_of_processed_assets__c from FRPP_File__c where ID = ':field'</salesforce:salesforce-query>
+					<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	"field" : vars.file.Id
+}]]]></salesforce:parameters>
+				</salesforce:query>
+				<ee:transform doc:name="update Counts" doc:id="d194ce3e-85ec-4f52-8274-30f5961dc31e">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="updateStatusReq"><![CDATA[%dw 2.0
+output application/json
+---
+[{
+	Id: vars.file.Id,
+	Number_of_processed_assets__c: (vars.countSFProcessedAssets[0].Number_of_processed_assets__c) + (vars.vmResponse.countRecordSuccessAdded) + (vars.vmResponse.countRecordErrorAdded)
+}
+]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+				<flow-ref doc:name="SetStatuses" doc:id="f6dd4033-2049-4075-85fe-8dcf0fce9122" name="SetStatuses" />
+				<logger level="INFO" doc:name="Logger" doc:id="3934cdca-4846-41e8-aed7-9bb029f61887" message="Response from Thread : #[vars.vmResponse.threadId]  Success Record Added: #[vars.vmResponse.countRecordSuccessAdded] Failure Record Added: #[vars.vmResponse.countRecordErrorAdded]" />
+				<set-variable value="#[vars.responseCounter -1]" doc:name="ReduceResponseCounter" doc:id="9456172a-76db-4565-99f4-fb0758f84fd4" variableName="responseCounter"/>
+				<flow-ref doc:name="ContinueProcessingResponse" doc:id="2a5a2395-4595-4316-ac94-ee9ffe5ccba6" name="ProcessThreadResponse"/>
+			</when>
+		</choice>
+	</sub-flow>
+	
+	
+</mule>
