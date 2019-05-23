@@ -5,8 +5,8 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-	<sub-flow name="userEmailNotificationFlow" doc:id="6615e394-fb7f-4936-bbf5-e8661934492b" >
-		<salesforce:query doc:name="Query - User" doc:id="97d97573-df27-47fc-ad44-f01467b4b914" config-ref="SalesforceGeoFL3_Global" target="userId">
+	<sub-flow name="userEmailNotificationFlow" doc:id="bd92b320-5cab-40f7-8f97-a81f0a5aea66" >
+		<salesforce:query doc:name="Query - User" doc:id="b205a0b3-feb7-48d0-97de-c1160c6823a0" config-ref="SalesforceGeoFL3_Global" target="userId">
 						<salesforce:salesforce-query>Select Id from User where Email= ':createdByEml' limit 1</salesforce:salesforce-query>
 						<salesforce:parameters><![CDATA[#[output application/java
 ---
@@ -14,7 +14,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	"createdByEml" : vars.file.CreatedBy.Email
 }]]]></salesforce:parameters>
 					</salesforce:query>
-		<ee:transform doc:name="email Payload" doc:id="c5381e46-e327-4f30-a3fc-20465c3203ae">
+		<ee:transform doc:name="email Payload" doc:id="8e6bfad0-3ca8-489e-b4d5-13bb2ea96657">
 						<ee:message>
 						</ee:message>
 						<ee:variables>
@@ -35,13 +35,13 @@ output application/json
 ]]></ee:set-variable>
 						</ee:variables>
 					</ee:transform>
-		<salesforce:invoke-apex-rest-method doc:name="Invoke FRPP_notifyUser" doc:id="7aa889c9-2286-4d5c-83e1-d0ebf9b46ce6" config-ref="SalesforceGeoFL3_Global" target="SFdoEmailResp" className="FRPP_notifyUser" methodName="doEmail^/OGPsendEmail/^HttpPost^String^">
+		<salesforce:invoke-apex-rest-method doc:name="Invoke FRPP_notifyUser" doc:id="3018ffde-8d35-447c-93dd-f7d9fd09084e" config-ref="SalesforceGeoFL3_Global" target="SFdoEmailResp" className="FRPP_notifyUser" methodName="doEmail^/OGPsendEmail/^HttpPost^String^">
 			<salesforce:request ><![CDATA[#[vars.emailPayload]]]></salesforce:request>
 		</salesforce:invoke-apex-rest-method>
-		<choice doc:name="Choice" doc:id="64bf18d6-3e47-402a-947f-760d3d2ec7fb" >
+		<choice doc:name="Choice" doc:id="75a7f262-8701-4a35-84db-5a83dcaae465" >
 			<when expression="#[vars.SFdoEmailResp.doEmailOutput != 'Success']">
-				<logger level="INFO" doc:name="Log Error" doc:id="8e7c4932-b2a5-421d-acb5-d43880e1a105" message='File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; xx. ERROR: User Email Send Failure: #[vars.SFdoEmailResp.doEmailOutput]   User Email Payload:  #[vars.emailPayload]'/>
-				<ee:transform doc:name="set error Msg" doc:id="9da3d2bc-60b9-4a98-a207-2cad430a157d">
+				<logger level="INFO" doc:name="Log Error" doc:id="c3b26602-383e-4f99-acd2-87650aaef278" message='File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; xx. ERROR: User Email Send Failure: #[vars.SFdoEmailResp.doEmailOutput]   User Email Payload:  #[vars.emailPayload]'/>
+				<ee:transform doc:name="set error Msg" doc:id="0ab9c14e-5d46-43a3-a046-f845679e19fa">
 					<ee:message>
 					</ee:message>
 					<ee:variables >
@@ -53,16 +53,16 @@ output application/java
 ]]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<set-variable value='#["There was error sending email to the User for File ID: " ++ vars.file.Id ++ ", File Name: " ++ vars.fileName ++  "\r\n\nPlease check Mule Logs for details."]' doc:name="set emailBody" doc:id="ce7d863c-ac7d-44e3-a42e-ff5a64fcc089" variableName="emailBody"/>
-				<flow-ref doc:name="supportEmailNotificationFlow" doc:id="fe945095-ce04-4a68-a927-11dc23a1e045" name="supportEmailNotificationFlow"/>
+				<set-variable value='#["There was error sending email to the User for File ID: " ++ vars.file.Id ++ ", File Name: " ++ vars.fileName ++  "\r\n\nPlease check Mule Logs for details."]' doc:name="set emailBody" doc:id="3721fbf9-90f3-4ccd-b5f2-91b7f3153183" variableName="emailBody"/>
+				<flow-ref doc:name="supportEmailNotificationFlow" doc:id="04fb3d48-2664-4d8e-8f7b-86514845fbb2" name="supportEmailNotificationFlow"/>
 			</when>
 			<otherwise >
-				<logger level="INFO" doc:name="User Email Sent." doc:id="00ee8671-ea23-41e2-a541-7c83226f0dc8" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; xx. User Email Sent for : #[vars.useTemplateName]"/>
+				<logger level="INFO" doc:name="User Email Sent." doc:id="ec01e88e-06f1-49c9-b4eb-a3cbe3734df7" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; xx. User Email Sent for template : #[vars.useTemplateName]"/>
 			</otherwise>
 		</choice>
 	</sub-flow>
-	<sub-flow name="supportEmailNotificationFlow" doc:id="ace34332-9440-4cd4-9191-709378bbfca9" >
-		<salesforce:query doc:name="Query - User" doc:id="7790cf10-c3ce-40b0-b121-a62c63e68bdf" config-ref="SalesforceGeoFL3_Global" target="userId">
+	<sub-flow name="supportEmailNotificationFlow" doc:id="b0f96239-def9-4b35-90f8-065ecb406032" >
+		<salesforce:query doc:name="Query - User" doc:id="364f80d0-16be-4fcb-9101-1651a1b36bc6" config-ref="SalesforceGeoFL3_Global" target="userId">
 						<salesforce:salesforce-query>Select Id from User where Email= ':supportEmail' limit 1</salesforce:salesforce-query>
 						<salesforce:parameters><![CDATA[#[output application/java
 ---
@@ -70,7 +70,7 @@ output application/java
 	"supportEmail" : p('email.supportEmail')
 }]]]></salesforce:parameters>
 					</salesforce:query>
-		<ee:transform doc:name="email Payload" doc:id="e9144aa4-b74a-46f6-877f-cd06e7055c4e">
+		<ee:transform doc:name="email Payload" doc:id="9600d43c-2536-48cc-ba4f-91d05d0a2e9c">
 						<ee:message>
 						</ee:message>
 						<ee:variables>
@@ -89,15 +89,15 @@ output application/json
 ]]></ee:set-variable>
 						</ee:variables>
 					</ee:transform>
-		<salesforce:invoke-apex-rest-method doc:name="Invoke FRPP_notifyUser" doc:id="b5e3ac37-51e7-428c-af68-3f9c44182a83" config-ref="SalesforceGeoFL3_Global" target="SFdoEmailResp" className="FRPP_notifyUser" methodName='doEmail^/OGPsendEmail/^HttpPost^String^'>
+		<salesforce:invoke-apex-rest-method doc:name="Invoke FRPP_notifyUser" doc:id="d81bd583-518a-446a-b7c1-a0ea07907e05" config-ref="SalesforceGeoFL3_Global" target="SFdoEmailResp" className="FRPP_notifyUser" methodName='doEmail^/OGPsendEmail/^HttpPost^String^'>
 			<salesforce:request ><![CDATA[#[vars.emailPayload]]]></salesforce:request>
 		</salesforce:invoke-apex-rest-method>
-		<choice doc:name="Choice" doc:id="dd85877c-e66e-4067-b147-9a4470f883fc" >
+		<choice doc:name="Choice" doc:id="a6d80baf-932a-4831-9d39-dc52e771439e" >
 			<when expression="#[vars.SFdoEmailResp.doEmailOutput != 'Success']">
-				<logger level="INFO" doc:name="Log Email Failure" doc:id="48d6f16f-8800-4aca-8aa9-f6e691fb01f2" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; xx. ERROR: Support Email Failure: #[vars.SFdoEmailResp.doEmailOutput]  Support Email Payload:  #[vars.emailPayload]"/>
+				<logger level="INFO" doc:name="Log Email Failure" doc:id="10bf281a-19f4-4055-99af-c4e4c7427556" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; xx. ERROR: Support Email Failure: #[vars.SFdoEmailResp.doEmailOutput]  Support Email Payload:  #[vars.emailPayload]"/>
 			</when>
 			<otherwise >
-				<logger level="INFO" doc:name="User Email Sent." doc:id="ac174bdc-d99a-4dd6-bcef-b842f7b944bb" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; xx. Support Email Sent for : #[vars.useTemplateName]"/>
+				<logger level="INFO" doc:name="User Email Sent." doc:id="08de9eff-0115-42e9-a695-9574de47c81a" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; xx. Support Email Sent."/>
 			</otherwise>
 		</choice>
 	</sub-flow>

@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
 	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
 	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw"
 	xmlns:xml-module="http://www.mulesoft.org/schema/mule/xml-module"
 	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd 
 http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd 
 http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
@@ -12,9 +14,9 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mule/xml-module/current/mule-xml-module.xsd
 http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
-	<flow name="fileSplitter_main" doc:id="cf067773-cc74-4f23-bfdc-10438110b0dc">
-		<logger level="INFO" doc:name="1.Process Started" doc:id="13bd62ef-3c86-4dfc-9b5c-a06a5c51627d" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 1.Process Started"/>
-		<ee:transform doc:name="Set Status To Processing" doc:id="79e9322b-4703-42a6-825b-4b28a88a14fa" >
+	<flow name="fileSplitter_main" doc:id="dad71611-db2a-40ba-b291-9171d97497a1">
+		<logger level="INFO" doc:name="1.Process Started" doc:id="164bfbc1-6282-4105-9c94-277bc3931873" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 1.Process Started"/>
+		<ee:transform doc:name="Set Status To Processing" doc:id="97104a32-ba93-4af7-88df-5838b7ad8032" >
 			<ee:message >
 			</ee:message>
 			<ee:variables >
@@ -28,8 +30,8 @@ output application/json
 ]]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<flow-ref doc:name="SetFileStatus" doc:id="1c673190-ed2a-4841-b83f-5122815d28fb" name="SetStatuses"/>
-		<salesforce:query doc:name="Read File Attachment" doc:id="26b49587-4b32-40e5-b0b6-b7f31af796d8" config-ref="SalesforceGeoFL3_Global">
+		<flow-ref doc:name="SetFileStatus" doc:id="6bb08838-84fd-4231-85be-613003b78d56" name="SetStatuses"/>
+		<salesforce:query doc:name="Read File Attachment" doc:id="8438c8e4-b112-4db6-bb75-bfeb659fa926" config-ref="SalesforceGeoFL3_Global">
 			<salesforce:salesforce-query>SELECT Id, Body FROM Attachment where Id= ':attachmentId'</salesforce:salesforce-query>
 			<salesforce:parameters><![CDATA[#[output application/java
 ---
@@ -37,8 +39,351 @@ output application/json
 	"attachmentId" : vars.file.Attachment_ID__c
 }]]]></salesforce:parameters>
 		</salesforce:query>
- <set-payload value="#[payload[0].Body]" doc:name="Read XML Payload" doc:id="8016f572-3514-49a9-b3c3-6fb48c29d73c" mimeType="text/xml" />
-		<ee:transform doc:name="Transform Input To XML(2)" doc:id="d5adb62a-a975-4e10-9cc5-c4d913b0e8f3">
+ 
+ <choice doc:name="Choice" doc:id="5fa04b1b-14be-4293-bea9-1244bce4e917" >
+			<when expression="#[vars.file.File_Extension__c == 'CSV']">
+				<set-payload value="#[payload[0].Body]" doc:name="Read CSV  Payload" doc:id="6ec24957-d911-4e7a-a094-23cb500bae81" mimeType="application/csv" />
+				<ee:transform doc:name="get assetType" doc:id="27c6ade4-cfb3-4395-8b45-a0a118bbdf5f">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="assetType"><![CDATA[%dw 2.0
+ output application/json 
+ var astType = {(payload default [] map  {
+          (($[0] default "" splitBy "|")[0]) : (($[0] default "" splitBy "|")[0])
+     } 
+ )}
+ ---
+ 
+   astType[0]
+ 
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+				<ee:transform doc:name="CSV TO XML" doc:id="e388946b-65c9-4804-bf4b-a22e7215f26a">
+			<ee:message>
+			</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="assetPayload" ><![CDATA[%dw 2.0
+ output application/xml inlineCloseOn="nonEmpty",encoding="UTF-8"
+ ---
+ using (keyPair = (payload[0] pluck $$ default "")[0] splitBy "|" ){
+  FRPPData  @(AGENCYCODE: keyPair[3],ACTION:keyPair[2],FY:keyPair[1]) : {(payload default [] map  {
+          (($[0] default "" splitBy "|")[0]) : 
+             {(($[0] default "" splitBy "|")[1 to -1] default [] map {
+              ("Field" ++ ($$+1)) : $
+          })} 
+     }
+ )}
+ }
+]]></ee:set-variable>
+					</ee:variables>
+		</ee:transform>
+				<choice doc:name="Choice" doc:id="d1f43ed1-fca1-4a68-b2af-e4d720bbb254">
+					<when expression='#[vars.assetType == "BLDG"]'>
+						<ee:transform doc:name="BLDG" doc:id="de42402f-f70e-4086-ae9a-bbb49baedfbd" >
+							<ee:message >
+								<ee:set-payload ><![CDATA[%dw 2.0
+ output application/xml inlineCloseOn="nonEmpty",encoding="UTF-8", skipNullOn="everything"
+ ---
+ {
+ FRPPData @(AGENCYCODE:vars.assetPayload.FRPPData.@AGENCYCODE, ACTION:vars.assetPayload.FRPPData.@ACTION, FY:vars.assetPayload.FRPPData.@FY) : [
+ 	Type35Building: vars.assetPayload.FRPPData.*BLDG map (asset, index) ->  {
+		RealPropertyType: "35",
+		(RealPropertyUse  :  asset.Field1) if (asset.Field1 != null),
+		(FieldOffice : asset.Field2) if (asset.Field2 != null),
+		(FieldOfficeCollocation : asset.Field3) if (asset.Field2 != null),
+		
+		(LegalInterest: {
+			(LegalInterestIndicator : asset.Field4) if (asset.Field4 != null),
+			(LeaseAuthorityIndicator : asset.Field5) if (asset.Field5 != null)
+			}) if (asset.Field4 != null or asset.Field5 != null),
+		
+		(Status: {
+			(StatusIndicator : asset.Field6) if (asset.Field6 != null),
+			(SurplusDeclarationDate : asset.Field7) if (asset.Field7 != null),
+			(ReportOfExcessSubmittedDate : asset.Field8) if (asset.Field8 != null),
+			(ReportOfExcessAcceptedDate : asset.Field9) if (asset.Field9 != null),
+			(DeterminationToDisposeDate : asset.Field10) if (asset.Field10 != null),
+			(CannotCurrentlyBeDisposedDate : asset.Field11) if (asset.Field11 != null),
+			(OutgrantIndicator : asset.Field12) if (asset.Field12 != null),
+			(CannotCurrentlyBeDisposed : asset.Field13) if (asset.Field13 != null),	
+			}) if (asset.Field6 != null or asset.Field7 != null or asset.Field8 != null or asset.Field9 != null or asset.Field10 != null or asset.Field11 != null or asset.Field12 != null or asset.Field13 != null),
+		
+		(RealProperty : asset.Field14) if (asset.Field14 != null),
+		(FOIAExemption : asset.Field15) if (asset.Field15 != null),
+		(StatutoryCitation : asset.Field16) if (asset.Field16 != null),
+		(HistoricalStatus : asset.Field17) if (asset.Field17 != null),
+		(ReportingAgency : asset.Field18) if (asset.Field18 != null),
+		(UsingOrganization : asset.Field19) if (asset.Field19 != null),
+		(LeaseExpirationDate : asset.Field20) if (asset.Field20 != null),
+		(LeaseStartDate : asset.Field21) if (asset.Field21 != null),
+		(LeaseOccupancyDate : asset.Field22) if (asset.Field22 != null),
+		(IsAssetExcluded : asset.Field23) if (asset.Field23 != null),
+		(ReasonForExclusion : asset.Field24) if (asset.Field24 != null),				
+		(YearOfAssetConstruction : asset.Field25) if (asset.Field25 != null),
+		(CanNumberOfFederalEmployeesBeDetermined : asset.Field26) if (asset.Field26 != null),
+		(CanNumberOfFederalContractorsBeDetermined : asset.Field27) if (asset.Field27 != null),
+		
+		(Personnel:{
+			(FederalEmployees : asset.Field28) if (asset.Field28 != null),
+			(FederalContractors : asset.Field29) if (asset.Field29 != null)
+			}) if (asset.Field28 != null or asset.Field29 != null),
+			
+		(YearAssetReportedUnderutilized : asset.Field30) if (asset.Field30 != null),
+		
+		(Size:{
+			(SquareFeet : asset.Field31) if (asset.Field31 != null),
+			(SquareFeetUnitOfMeasure : asset.Field32) if (asset.Field32 != null)
+			}) if (asset.Field31 != null or asset.Field32 != null),
+			
+		(ReplacementValue : asset.Field33) if (asset.Field33 != null),
+		(RepairNeeds : asset.Field34) if (asset.Field34 != null),
+		(HistoricalCapitalExpenditures : asset.Field35) if (asset.Field35 != null),
+		(EstimatedFutureCapitalExpenditures : asset.Field36) if (asset.Field36 != null),
+		
+		(AnnualOperatingCosts:{
+			(LeasedAnnualOperatingCosts : asset.Field37) if (asset.Field37 != null),
+			(LeasedAnnualMaintenanceCosts : asset.Field38) if (asset.Field38 != null),
+			(LeaseAnnualRent : asset.Field39) if (asset.Field39 != null),
+			(OwnedandOtherwiseManagedAnnualOperatingCosts : asset.Field40) if (asset.Field40 != null),
+			(OwnedandOtherwiseManagedAnnualMaintenanceCosts : asset.Field41) if (asset.Field41 != null)
+			}) if (asset.Field37 != null or asset.Field38 != null or asset.Field39 != null or asset.Field40 != null or asset.Field41 != null),
+		
+		(MainLocation:{
+			(StreetAddress : asset.Field42) if (asset.Field42 != null),
+			(Latitude : asset.Field43) if (asset.Field43 != null),
+			(Longitude : asset.Field44) if (asset.Field44 != null)
+			}) if (asset.Field42 != null or asset.Field43 != null or asset.Field44 != null),
+
+		(RealPropertyUniqueIdentifier : asset.Field45) if (asset.Field45 != null),
+		(City : asset.Field46) if (asset.Field46 != null),
+		(State : asset.Field47) if (asset.Field47 != null),
+		(Country : asset.Field48) if (asset.Field48 != null),
+		(County : asset.Field49) if (asset.Field49 != null),
+		(CongressionalDistricts : asset.Field50) if (asset.Field50 != null),
+		(Zipcode : asset.Field51) if (asset.Field51 != null),
+		
+		(InstallationAndSubInstallationIdentifier:{
+			(InstallationName : asset.Field52) if (asset.Field52 != null),
+			(InstallationIdentifier : asset.Field53) if (asset.Field53 != null),
+			(SubInstallationIdentifier : asset.Field54) if (asset.Field54 != null),
+			}) if (asset.Field52 != null or asset.Field53 != null or asset.Field54 != null),
+			
+		(Utilization : asset.Field55) if (asset.Field55 != null),
+		(IsSustainable : asset.Field56) if (asset.Field56 != null),
+		
+		(DispositionData:{
+			(DispositionMethod : asset.Field57) if (asset.Field57 != null),
+			(DispositionDate : asset.Field58) if (asset.Field58 != null),
+			(DispositionValue : asset.Field59) if (asset.Field59 != null),
+			(NetProceeds : asset.Field60) if (asset.Field60 != null),
+			}) if (asset.Field57 != null or asset.Field58 != null or asset.Field59 != null or asset.Field60 != null)
+	 	}
+ 	]
+ }
+ 	
+ 	]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+					</when>
+					<when expression='#[vars.assetType == "LAND"]'>
+						<ee:transform doc:name="LAND" doc:id="850c3e57-c44b-4fa8-a9fb-a97431c5afa3" >
+							<ee:message >
+								<ee:set-payload ><![CDATA[%dw 2.0
+ output application/xml inlineCloseOn="nonEmpty",encoding="UTF-8", skipNullOn="everything"
+ ---
+ {
+ FRPPData @(AGENCYCODE:vars.assetPayload.FRPPData.@AGENCYCODE, ACTION:vars.assetPayload.FRPPData.@ACTION, FY:vars.assetPayload.FRPPData.@FY) : [
+ 	Type20Land: vars.assetPayload.FRPPData.*LAND map (asset, index) ->  {
+		RealPropertyType: "20",
+		(RealPropertyUse  :  asset.Field1) if (asset.Field1 != null),
+		(LegalInterest: {
+			(LegalInterestIndicator : asset.Field2) if (asset.Field2 != null),
+			(LeaseAuthorityIndicator : asset.Field3) if (asset.Field3 != null)
+			}) if (asset.Field2 != null or asset.Field3 != null),
+		
+		(Status: {
+			(StatusIndicator : asset.Field4) if (asset.Field4 != null),
+			(SurplusDeclarationDate : asset.Field5) if (asset.Field5 != null),
+			(ReportOfExcessSubmittedDate : asset.Field6) if (asset.Field6 != null),
+			(ReportOfExcessAcceptedDate : asset.Field7) if (asset.Field7 != null),
+			(DeterminationToDisposeDate : asset.Field8) if (asset.Field8 != null),
+			(CannotCurrentlyBeDisposedDate : asset.Field9) if (asset.Field9 != null),
+			(OutgrantIndicator : asset.Field10) if (asset.Field10 != null),
+			(CannotCurrentlyBeDisposed : asset.Field11) if (asset.Field11 != null),	
+			}) if (asset.Field4 != null or asset.Field5 != null or asset.Field6 != null or asset.Field7 != null or asset.Field8 != null or asset.Field9 != null or asset.Field10 != null or asset.Field11 != null),
+
+		(RealProperty : asset.Field12) if (asset.Field12 != null),
+		(FOIAExemption : asset.Field13) if (asset.Field13 != null),
+		(StatutoryCitation : asset.Field14) if (asset.Field14 != null),
+		(HistoricalStatus : asset.Field15) if (asset.Field15 != null),
+		(ReportingAgency : asset.Field16) if (asset.Field16 != null),
+		(UsingOrganization : asset.Field17) if (asset.Field17 != null),
+		(LeaseExpirationDate : asset.Field18) if (asset.Field18 != null),
+		(LeaseStartDate : asset.Field19) if (asset.Field19 != null),
+		(LeaseOccupancyDate : asset.Field20) if (asset.Field20 != null),
+		(IsAssetExcluded : asset.Field21) if (asset.Field21 != null),
+		(ReasonForExclusion : asset.Field22) if (asset.Field22 != null),			
+			
+		(Size:{
+			(Acres : asset.Field23) if (asset.Field23 != null)
+			}) if (asset.Field23 != null),
+			
+		(AnnualOperatingCosts:{
+			(LeasedAnnualOperatingCosts : asset.Field24) if (asset.Field24 != null),
+			(LeasedAnnualMaintenanceCosts : asset.Field25) if (asset.Field25 != null),
+			(LeaseAnnualRent : asset.Field26) if (asset.Field26 != null),
+			(OwnedandOtherwiseManagedAnnualOperatingCosts : asset.Field27) if (asset.Field27 != null),
+			(OwnedandOtherwiseManagedAnnualMaintenanceCosts : asset.Field28) if (asset.Field28 != null)
+			}) if (asset.Field24 != null or asset.Field25 != null or asset.Field26 != null or asset.Field27 != null or asset.Field28 != null), 
+			
+		(MainLocation:{
+			(StreetAddress : asset.Field29) if (asset.Field29 != null),
+			(Latitude : asset.Field30) if (asset.Field30 != null),
+			(Longitude : asset.Field31) if (asset.Field31 != null)
+			}) if (asset.Field29 != null or asset.Field30 != null or asset.Field31 != null),
+	
+		(RealPropertyUniqueIdentifier : asset.Field32) if (asset.Field32 != null),
+		(City : asset.Field33) if (asset.Field33 != null),
+		(State : asset.Field34) if (asset.Field34 != null),
+		(Country : asset.Field35) if (asset.Field35 != null),
+		(County : asset.Field36) if (asset.Field36 != null),
+		(CongressionalDistricts : asset.Field37) if (asset.Field37 != null),
+		(Zipcode : asset.Field38) if (asset.Field38 != null),
+		
+		
+		
+		(InstallationAndSubInstallationIdentifier:{
+			(InstallationName : asset.Field39) if (asset.Field39 != null),
+			(InstallationIdentifier : asset.Field40) if (asset.Field40 != null),
+			(SubInstallationIdentifier : asset.Field41) if (asset.Field41 != null),
+			}) if (asset.Field39 != null or asset.Field40 != null or asset.Field41 != null),
+			
+		(Utilization : asset.Field42) if (asset.Field42 != null),	
+		
+		(DispositionData:{
+			(DispositionMethod : asset.Field43) if (asset.Field43 != null),
+			(DispositionDate : asset.Field44) if (asset.Field44 != null),
+			(DispositionValue : asset.Field45) if (asset.Field45 != null),
+			(NetProceeds : asset.Field46) if (asset.Field46 != null),
+			}) if (asset.Field43 != null or asset.Field44 != null or asset.Field45 != null or asset.Field46 != null)
+	 	}
+ 	]
+ }
+ 	
+ 	]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+					</when>
+					<when expression='#[vars.assetType == "STRUC"]'>
+						<ee:transform doc:name="STRUC" doc:id="d7685247-420d-40d9-a6f2-b53ad13e5984" >
+							<ee:message >
+								<ee:set-payload ><![CDATA[%dw 2.0
+ output application/xml inlineCloseOn="nonEmpty",encoding="UTF-8", skipNullOn="everything"
+ ---
+ {
+ FRPPData @(AGENCYCODE:vars.assetPayload.FRPPData.@AGENCYCODE, ACTION:vars.assetPayload.FRPPData.@ACTION, FY:vars.assetPayload.FRPPData.@FY) : [
+ 	Type40Structure: vars.assetPayload.FRPPData.*STRUC map (asset, index) ->  {
+		RealPropertyType: "40",
+		(RealPropertyUse  :  asset.Field1) if (asset.Field1 != null),
+		
+		(LegalInterest: {
+			(LegalInterestIndicator : asset.Field2) if (asset.Field2 != null),
+			(LeaseAuthorityIndicator : asset.Field3) if (asset.Field3 != null)
+			}) if (asset.Field2 != null or asset.Field3 != null),
+		
+		(Status: {
+			(StatusIndicator : asset.Field4) if (asset.Field4 != null),
+			(SurplusDeclarationDate : asset.Field5) if (asset.Field5 != null),
+			(ReportOfExcessSubmittedDate : asset.Field6) if (asset.Field6 != null),
+			(ReportOfExcessAcceptedDate : asset.Field7) if (asset.Field7 != null),
+			(DeterminationToDisposeDate : asset.Field8) if (asset.Field8 != null),
+			(CannotCurrentlyBeDisposedDate : asset.Field9) if (asset.Field9 != null),
+			(OutgrantIndicator : asset.Field10) if (asset.Field10 != null),
+			(CannotCurrentlyBeDisposed : asset.Field11) if (asset.Field11 != null),	
+			}) if (asset.Field4 != null or asset.Field5 != null or asset.Field6 != null or asset.Field7 != null or asset.Field8 != null or asset.Field9 != null or asset.Field10 != null or asset.Field11 != null),
+		
+		(RealProperty : asset.Field12) if (asset.Field12 != null),
+		(FOIAExemption : asset.Field13) if (asset.Field13 != null),
+		(StatutoryCitation : asset.Field14) if (asset.Field14 != null),
+		(HistoricalStatus : asset.Field15) if (asset.Field15 != null),
+		(ReportingAgency : asset.Field16) if (asset.Field16 != null),
+		(UsingOrganization : asset.Field17) if (asset.Field17 != null),
+		(LeaseExpirationDate : asset.Field18) if (asset.Field18 != null),
+		(LeaseStartDate : asset.Field19) if (asset.Field19 != null),
+		(LeaseOccupancyDate : asset.Field20) if (asset.Field20 != null),
+		(IsAssetExcluded : asset.Field21) if (asset.Field21 != null),
+		(ReasonForExclusion : asset.Field22) if (asset.Field22 != null),				
+		(YearOfAssetConstruction : asset.Field23) if (asset.Field23 != null),
+		
+		(Size:{
+			(StructuralUnit : asset.Field24) if (asset.Field24 != null),
+			(UnitOfMeasure : asset.Field25) if (asset.Field25 != null)
+			}) if (asset.Field24 != null or asset.Field25 != null),
+			
+		(ReplacementValue : asset.Field26) if (asset.Field26 != null),
+		(RepairNeeds : asset.Field27) if (asset.Field27 != null),
+		(HistoricalCapitalExpenditures : asset.Field28) if (asset.Field28 != null),
+		(EstimatedFutureCapitalExpenditures : asset.Field29) if (asset.Field29 != null),
+		
+		(AnnualOperatingCosts:{
+			(LeasedAnnualOperatingCosts : asset.Field30) if (asset.Field30 != null),
+			(LeasedAnnualMaintenanceCosts : asset.Field31) if (asset.Field31 != null),
+			(LeaseAnnualRent : asset.Field32) if (asset.Field32 != null),
+			(OwnedandOtherwiseManagedAnnualOperatingCosts : asset.Field33) if (asset.Field33 != null),
+			(OwnedandOtherwiseManagedAnnualMaintenanceCosts : asset.Field34) if (asset.Field34 != null)
+			}) if (asset.Field30 != null or asset.Field31 != null or asset.Field32 != null or asset.Field33 != null or asset.Field34 != null),
+		
+		(MainLocation:{
+			(StreetAddress : asset.Field35) if (asset.Field35 != null),
+			(Latitude : asset.Field36) if (asset.Field36 != null),
+			(Longitude : asset.Field37) if (asset.Field37 != null)
+			}) if (asset.Field35 != null or asset.Field36 != null or asset.Field37 != null),
+
+		(RealPropertyUniqueIdentifier : asset.Field38) if (asset.Field38 != null),
+		(City : asset.Field39) if (asset.Field39 != null),
+		(State : asset.Field40) if (asset.Field40 != null),
+		(Country : asset.Field41) if (asset.Field41 != null),
+		(County : asset.Field42) if (asset.Field42 != null),
+		(CongressionalDistricts : asset.Field43) if (asset.Field43 != null),
+		(Zipcode : asset.Field44) if (asset.Field44 != null),
+		
+		(InstallationAndSubInstallationIdentifier:{
+			(InstallationName : asset.Field45) if (asset.Field45 != null),
+			(InstallationIdentifier : asset.Field46) if (asset.Field46 != null),
+			(SubInstallationIdentifier : asset.Field47) if (asset.Field47 != null),
+			}) if (asset.Field45 != null or asset.Field46 != null or asset.Field47 != null),
+			
+		(Utilization : asset.Field48) if (asset.Field48 != null),
+		
+		(DispositionData:{
+			(DispositionMethod : asset.Field49) if (asset.Field49 != null),
+			(DispositionDate : asset.Field50) if (asset.Field50 != null),
+			(DispositionValue : asset.Field51) if (asset.Field51 != null),
+			(NetProceeds : asset.Field52) if (asset.Field52 != null),
+			}) if (asset.Field49 != null or asset.Field50 != null or asset.Field51 != null or asset.Field52 != null)
+	 	}
+ 	]
+ }
+ 	
+ 	]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+					</when>
+					<otherwise >
+						<logger level="INFO" doc:name="Logger" doc:id="46b32bf5-bed6-4258-9355-8b4ac1aa49c0" message="GOT CSV of invalid assetType. Must be BLDG, LAND or STRUC." />
+						<raise-error doc:name="Raise error" doc:id="ecce0b3f-4a25-4e2c-8d74-38bb018a1d16" type="CSV: INVALID_TYPE" description="GOT CSV of invalid assetType. Must be BLDG, LAND or STRUC."/>
+					</otherwise>
+				</choice>
+			</when>
+			<otherwise>
+				<set-payload value="#[payload[0].Body]" doc:name="Read XML Payload" doc:id="41bae00b-28d6-4320-946b-2dc6fa15f02e" mimeType="text/xml" />
+			</otherwise>
+		</choice>
+ 
+ 
+		<ee:transform doc:name="Transform Input To XML(2)" doc:id="26a653df-5ac6-4a05-b4d4-4301ba4dedc1">
 			<ee:message>
 			</ee:message>
 					<ee:variables>
@@ -52,38 +397,38 @@ output application/java
 sizeOf (payload.FRPPData)]]></ee:set-variable>
 					</ee:variables>
 		</ee:transform>
-		<flow-ref doc:name="authorizeToDelete" doc:id="4b3b5e81-e0a9-4d2f-9ac5-3224eeb7cd7f" name="authorizeToDelete" />
-		<flow-ref doc:name="Validate XML" doc:id="073f6199-5e77-43d6-a0a0-9cf935b788ba" name="schemaValidationFlow" />
-		<choice doc:name="Choice-Check Validations" doc:id="39726dc8-5d24-449a-9daa-2d9bd0369599" >
+		<flow-ref doc:name="authorizeToDelete" doc:id="3a5e9860-44ef-4003-b02a-8448a769e49c" name="authorizeToDelete" />
+		<flow-ref doc:name="Validate XML" doc:id="f6eada11-b7fa-4917-8061-72a9bd329576" name="schemaValidationFlow" />
+		<choice doc:name="Choice-Check Validations" doc:id="23eb21a7-eb79-416a-a968-9f9188a94241" >
 			<when expression='#[vars.validXML != "true"]'>
-				<logger level="INFO" doc:name="XML Validation Failed" doc:id="8ed5f8d8-0492-4a60-8a5b-1a643e1ae5e8" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR: XML Schema Validation Failed." />
-				<set-variable value="false" doc:name="Set final Status Flag" doc:id="afcfd288-1eb9-4bd8-8d44-fff281711380" variableName="setFinalStatus" />
-				<set-variable value="${InvalidXMLTemplateName}" doc:name="set useTemplateName" doc:id="98324958-7949-4b8b-b954-a4a071d3fd4c" variableName="useTemplateName" />
-				<flow-ref doc:name="userEmailNotificationFlow" doc:id="b84137dc-641c-45b0-91bd-3ff9092b30ed" name="userEmailNotificationFlow" />
+				<logger level="INFO" doc:name="XML Validation Failed" doc:id="ffd4cdb1-c264-4ab3-aa0c-73fb195ff3f2" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR: XML Schema Validation Failed." />
+				<set-variable value="false" doc:name="Set final Status Flag" doc:id="e775705a-db2d-4723-9e2b-3e162b8ed340" variableName="setFinalStatus" />
+				<set-variable value="${InvalidXMLTemplateName}" doc:name="set useTemplateName" doc:id="d19cb090-1127-416d-bbaa-4c80c998ff62" variableName="useTemplateName" />
+				<flow-ref doc:name="userEmailNotificationFlow" doc:id="2f5111c2-722d-4a4d-ab44-022d42dad407" name="userEmailNotificationFlow" />
 			</when>
 			<when expression="#['${current.fiscalYear}'  != vars.fullPayload.FRPPData.@FY]">
-				<logger level="INFO" doc:name="FY Invalid" doc:id="bd8d2633-ad9c-42b4-8829-536bff19bc53" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR: Fiscal Year Invalid." />
-				<set-variable value="false" doc:name="Set final Status Flag" doc:id="af02bbfa-222e-424f-8872-815d09db116d" variableName="setFinalStatus" />
-				<set-variable value="${InvalidXMLFYTemplateName}" doc:name="set useTemplateName" doc:id="fcfb2fd2-c0d2-4fd1-8a34-c438c4da1da5" variableName="useTemplateName" />
-				<flow-ref doc:name="userEmailNotificationFlow" doc:id="1dd0fb7c-8307-4e06-9373-d650db2dc475" name="userEmailNotificationFlow" />
+				<logger level="INFO" doc:name="FY Invalid" doc:id="31acc040-94c4-4dd7-88ce-9d0c82828c6e" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR: Fiscal Year Invalid." />
+				<set-variable value="false" doc:name="Set final Status Flag" doc:id="e3a7048c-6e05-4389-aaa2-a440ebc53039" variableName="setFinalStatus" />
+				<set-variable value="${InvalidXMLFYTemplateName}" doc:name="set useTemplateName" doc:id="eb95f55f-6355-4d70-af9d-a09fbfa205be" variableName="useTemplateName" />
+				<flow-ref doc:name="userEmailNotificationFlow" doc:id="db2fcd7a-e044-45a5-877f-448dd680f544" name="userEmailNotificationFlow" />
 			</when>
 			<when expression='#[vars.file.AGENCY_CODE__c  != vars.fullPayload.FRPPData.@AGENCYCODE]'>
-				<logger level="INFO" doc:name="AgencyCode Invalid" doc:id="42e690d2-cf5c-47be-9a5d-05d0a80ee844" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR: Agency Code Invalid." />
-				<set-variable value="false" doc:name="Set final Status Flag" doc:id="baa98dfd-8422-42e9-ac7a-8e9ecedd7205" variableName="setFinalStatus" />
-				<set-variable value="${InvalidXMLAgencyTemplateName}" doc:name="set useTemplateName" doc:id="34adf73f-36b6-4e49-b764-7237556b6ecd" variableName="useTemplateName" />
-				<flow-ref doc:name="userEmailNotificationFlow" doc:id="f1ded7a7-1257-436f-a69c-ad48b9952514" name="userEmailNotificationFlow" />
+				<logger level="INFO" doc:name="AgencyCode Invalid" doc:id="4a9129e0-8468-4b5b-896c-8037debc1f8c" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR: Agency Code Invalid." />
+				<set-variable value="false" doc:name="Set final Status Flag" doc:id="654049bb-1a13-4365-ab1a-4b4ff5afca2a" variableName="setFinalStatus" />
+				<set-variable value="${InvalidXMLAgencyTemplateName}" doc:name="set useTemplateName" doc:id="d7a19f21-65ea-4e3f-9dfb-c86526028e72" variableName="useTemplateName" />
+				<flow-ref doc:name="userEmailNotificationFlow" doc:id="6d377a46-f1ef-43a8-9354-11a84bc580d2" name="userEmailNotificationFlow" />
 			</when>
-			<when expression='#[(vars.fullPayload.FRPPData.@ACTION != "DELETE") and (vars.fullPayload.FRPPData.@ACTION !=  "ADD") and  (vars.fullPayload.FRPPData.@ACTION !=  "MODIFY")]' doc:id="26e6abd2-53da-4902-b19d-72aaf7de66b0">
-				<logger level="INFO" doc:name="Action Invalid" doc:id="ea529133-dd53-4736-8f47-7031962cf626" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR: Action Invalid." />
-				<set-variable value="false" doc:name="Set final Status Flag" doc:id="76828de9-4371-4099-a989-60bf3cce9711" variableName="setFinalStatus" />
-				<set-variable value="${InvalidXMLActionTemplateName}" doc:name="set useTemplateName" doc:id="ce6b0ba1-90e6-4c30-9ad5-6d70353d779f" variableName="useTemplateName" />
-				<flow-ref doc:name="userEmailNotificationFlow" doc:id="9d57d2a9-768f-4d06-af73-1a782f054570" name="userEmailNotificationFlow" />
+			<when expression='#[(vars.fullPayload.FRPPData.@ACTION != "DELETE") and (vars.fullPayload.FRPPData.@ACTION !=  "ADD") and  (vars.fullPayload.FRPPData.@ACTION !=  "MODIFY")]' doc:id="212ea926-0d2a-4605-8afa-98729a508258">
+				<logger level="INFO" doc:name="Action Invalid" doc:id="a7c3bb82-d56d-435f-84c6-648b236aa486" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR: Action Invalid." />
+				<set-variable value="false" doc:name="Set final Status Flag" doc:id="054bae87-bc69-4dd2-90b8-67e48a6dbb52" variableName="setFinalStatus" />
+				<set-variable value="${InvalidXMLActionTemplateName}" doc:name="set useTemplateName" doc:id="b048b665-634d-424e-ae95-a3bdd69d6080" variableName="useTemplateName" />
+				<flow-ref doc:name="userEmailNotificationFlow" doc:id="5c01b7de-de0d-4176-b636-63f73effc2eb" name="userEmailNotificationFlow" />
 			</when>
-			<when expression="#[(vars.&quot;authorizedToDelete?&quot; == 'false')]" doc:id="1d2dea19-e9ed-468c-8d68-769e5aade62b">
-				<logger level="INFO" doc:name="No Access To Delete" doc:id="170cf91f-b3c6-4e2b-a913-4eeb5a7d9e2d" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR: No Access to Delete." />
-				<set-variable value="none" doc:name="Set final Status Flag" doc:id="cf5b86a7-27ed-4a0b-807a-95605a289aa5" variableName="setFinalStatus" />
+			<when expression="#[(vars.&quot;authorizedToDelete?&quot; == 'false')]" doc:id="cfd59284-da8e-40d0-a92a-faa4c23fcb89">
+				<logger level="INFO" doc:name="No Access To Delete" doc:id="fc321335-a2c6-4b3a-bbd3-35c9b706d8b2" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR: No Access to Delete." />
+				<set-variable value="none" doc:name="Set final Status Flag" doc:id="494a6474-d00f-4cb8-997d-25e5394757d1" variableName="setFinalStatus" />
 				
-				<ee:transform doc:name="setFinalStatus" doc:id="a6235282-3f3b-4df8-829f-b8b2be08aee4">
+				<ee:transform doc:name="setFinalStatus" doc:id="3612b869-872d-4182-983c-b0c12098e43c">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
@@ -98,13 +443,13 @@ output application/json
 ]]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-				<flow-ref doc:name="SetFileStatus" doc:id="2e5474fe-fa37-4d1f-96f0-a74ff7268bd8" name="SetStatuses" />
+				<flow-ref doc:name="SetFileStatus" doc:id="c8de24c8-1455-42c1-a2ee-c24350334800" name="SetStatuses" />
 				
 			</when>
 			<otherwise >
-				<remove-variable doc:name="Remove Variable validXML" doc:id="13eeb7e5-23a3-496d-9b03-4445f66ca482" variableName="validXML" />
-				<logger level="INFO" doc:name="Valid XML" doc:id="8874fd66-f2f5-4a5b-9c09-9a2442817012" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 2.VALID XML Payload." />
-				<ee:transform doc:name="Set CIStatus to STARTED" doc:id="5ae3a7b8-4731-473e-a08c-f4c3ffb24f3c">
+				<remove-variable doc:name="Remove Variable validXML" doc:id="a722d169-095c-4c08-95e2-eda267c990c7" variableName="validXML" />
+				<logger level="INFO" doc:name="Valid XML" doc:id="e49b25f2-e464-4861-ae4e-194b16b87c2a" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 2.VALID XML Payload." />
+				<ee:transform doc:name="Set CIStatus to STARTED" doc:id="457649a2-668a-4de8-9183-3de99e707039">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
@@ -119,8 +464,8 @@ output application/json
 ]]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-				<flow-ref doc:name="SetFileStatus" doc:id="236770f2-807e-478e-8f89-0340378b5676" name="SetStatuses" />
-				<ee:transform doc:name="split Payloads (3)" doc:id="12a5ef4c-6d2a-484e-866e-c8444215d3da">
+				<flow-ref doc:name="SetFileStatus" doc:id="0ee1312a-0533-48b8-9747-b26eedb6068d" name="SetStatuses" />
+				<ee:transform doc:name="split Payloads (3)" doc:id="9174e953-48a9-4e07-9dad-d37c95983ada">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
@@ -150,12 +495,12 @@ output application/xml skipNullOn="everywhere", inlineCloseOn="empty"
 }]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-				<flow-ref doc:name="processAllBatches" doc:id="a25453e4-bc7a-461b-82d0-1bf213e9ee7e" name="processAllBatches" />
+				<flow-ref doc:name="processAllBatches" doc:id="6f5c10f5-de00-4823-86e9-89e04ad682bc" name="processAllBatches" />
 			</otherwise>
 		</choice>
-		<choice doc:name="Choice - Final Status" doc:id="63f0fe6e-4d97-4365-8132-5388eb78d113">
+		<choice doc:name="Choice - Final Status" doc:id="bb70e4de-a00f-4f54-b76f-a9ac6c776d12">
 					<when expression='#[vars.setFinalStatus != "false" and vars.setFinalStatus != "none"]'>
-						<ee:transform doc:name="setFinalStatus" doc:id="5bdbcbfb-3cd8-4812-b76f-0b39dc1bdab0">
+						<ee:transform doc:name="setFinalStatus" doc:id="d038b428-faf7-4af4-b203-0e175b5400a4">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
@@ -171,8 +516,8 @@ output application/json
 ]]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-				<flow-ref doc:name="SetFileStatus" doc:id="a135b1a3-294f-4ba9-9e07-7028c14f768f" name="SetStatuses" />
-				<salesforce:query doc:name="Query - SF Counts" doc:id="0f7f69bf-97ce-466c-a1a0-efaa054f12f5" config-ref="SalesforceGeoFL3_Global" target="countSFAssets">
+				<flow-ref doc:name="SetFileStatus" doc:id="b98f929c-5e2d-4724-911f-05d5c00439cf" name="SetStatuses" />
+				<salesforce:query doc:name="Query - SF Counts" doc:id="bd97e254-d8d2-4a90-b9fd-d0010d094d12" config-ref="SalesforceGeoFL3_Global" target="countSFAssets">
 				<salesforce:salesforce-query>Select ID, Number_of_assets_in_file__c, Number_of_processed_assets__c from FRPP_FILE__c where ID = ':fileId'</salesforce:salesforce-query>
 				<salesforce:parameters><![CDATA[#[output application/java
 ---
@@ -180,19 +525,19 @@ output application/json
 	"fileId" : vars.file.Id
 }]]]></salesforce:parameters>
 			</salesforce:query>
-				<choice doc:name="Choice - SF Count Check" doc:id="6be537ea-30e1-41ec-8331-fa203fda9208">
+				<choice doc:name="Choice - SF Count Check" doc:id="b3d9e574-f3b0-4f74-87be-13dc63935532">
 			<when expression="#[vars.countSFAssets[0].Number_of_assets_in_file__c == vars.countSFAssets[0].Number_of_processed_assets__c]">
-						<logger level="INFO" doc:name="Success Logger" doc:id="df523451-36df-43b0-a74b-0979295bd6e6" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 4a. fileSplitter completed processing successfully." />
+						<logger level="INFO" doc:name="Success Logger" doc:id="777cb5dd-5050-4cbd-9407-b4445852bd9b" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 4a. fileSplitter completed processing successfully." />
 			</when>
 			<otherwise>
-				<set-variable value="${InvalidFileDroppedRecordsUserEmail}" doc:name="set useTemplateName" doc:id="e70a3d1b-33e9-4101-81fd-75beed13ef66" variableName="useTemplateName" />
-				<flow-ref doc:name="userEmailNotificationFlow" doc:id="03c2a162-f731-4b1d-8246-8bdb7980da2b" name="userEmailNotificationFlow" />
-						<logger level="INFO" doc:name="Error Logger" doc:id="23407667-ce30-49ae-81d8-f1f891e5d772" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 4b. fileSplitter completed processing with Error: Count Mismatch." />
+				<set-variable value="${InvalidFileDroppedRecordsUserEmail}" doc:name="set useTemplateName" doc:id="8aa4f2d1-3c4c-4be9-9aa1-3b496f36fd1c" variableName="useTemplateName" />
+				<flow-ref doc:name="userEmailNotificationFlow" doc:id="13a231bd-06ea-4700-8cda-99f66ee1a05c" name="userEmailNotificationFlow" />
+						<logger level="INFO" doc:name="Error Logger" doc:id="a71889e0-571b-439b-a7a6-0f6c41a8bbdc" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 4b. fileSplitter completed processing with Error: Count Mismatch." />
 			</otherwise>
 		</choice>
 					</when>
 					<when expression='#[vars.setFinalStatus == "false"]'>
-				<ee:transform doc:name="setFinalStatus" doc:id="1facf9de-adfb-4ef3-a5b6-97561cc88b37">
+				<ee:transform doc:name="setFinalStatus" doc:id="ac25c931-7bb5-4a74-9bae-f0360dba0256">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
@@ -207,17 +552,19 @@ output application/json
 ]]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-				<flow-ref doc:name="SetFileStatus" doc:id="46e81c33-b57d-4b24-af0f-be4994e4feaa" name="SetStatuses" />
-				<logger level="INFO" doc:name="Error Logger" doc:id="cb1bd05a-ad22-403d-81a4-f24dc86f7529" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 4c. fileSplitter completed processing with ERRORS." />
+				<flow-ref doc:name="SetFileStatus" doc:id="07667766-fd18-40bd-96a9-fdd756ccddef" name="SetStatuses" />
+				<logger level="INFO" doc:name="Error Logger" doc:id="125fafcb-5dc8-458b-82b1-ed0bd19b8c1d" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 4c. fileSplitter completed processing with ERRORS." />
 					</when>
 			<otherwise>
-				<remove-variable doc:name="Remove Variable" doc:id="42810adc-41a4-4317-ada5-0b11e36abfb3" variableName="setFinalStatus" />
+				<remove-variable doc:name="Remove Variable" doc:id="d98a3038-372b-4d2f-93ae-fcbb135668c9" variableName="setFinalStatus" />
 					</otherwise>
 				</choice>
+		<flow-ref doc:name="releaseQueue" doc:id="ccc2116f-679d-4664-8273-b3a730ed8320" name="releaseQueue"/>
 		<error-handler >
-			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="e04c82f0-d61e-410d-99bc-6485698c31a8" >
-				<logger level="INFO" doc:name="Error Log" doc:id="3689f545-46e0-4d07-9f16-bfc8f5a40fd6" message="ERROR:  Error Type: #[error.errorType],  ErrorDescription: #[error.detailedDescription], ErrorCause: #[error.exception.cause]  for FileName:  #[vars.fileName]" />
-				<ee:transform doc:name="setFinalStatus" doc:id="8868a4d4-fc6c-40af-901d-b2ef5f0c9d6a">
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="8effd3c1-c483-4b0e-9f8d-ff52117b482a" >
+				<flow-ref doc:name="releaseQueue" doc:id="ad885b9e-7678-46ab-b5f3-7c33f64384d3" name="releaseQueue" />
+				<logger level="INFO" doc:name="Error Log" doc:id="13a51406-38e6-4eac-aa96-5b3fad265588" message="ERROR:  Error Type: #[error.errorType],  ErrorDescription: #[error.detailedDescription], ErrorCause: #[error.exception.cause]  for FileName:  #[vars.fileName]" />
+				<ee:transform doc:name="setFinalStatus" doc:id="3d2a027a-c936-49ea-80b4-7f2aa6997e6b">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
@@ -232,32 +579,32 @@ output application/json
 ]]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-						<flow-ref doc:name="SetFileStatus" doc:id="95011655-405c-466c-81f1-9a26c5250686" name="SetStatuses" />
-				<ee:transform doc:name="set error Msg" doc:id="c9a70deb-c3d3-4a43-b6af-e233c55b68b7">
+				<flow-ref doc:name="SetFileStatus" doc:id="30d1a300-1fc5-4676-b231-814d04aa8e9a" name="SetStatuses" />
+				<ee:transform doc:name="set error Msg" doc:id="595a3866-10e9-4e87-be9b-4bb8151287ba">
 					<ee:message>
 					</ee:message>
-					<ee:variables >
-						<ee:set-variable variableName="errorMsg" ><![CDATA[%dw 2.0
+					<ee:variables>
+						<ee:set-variable variableName="errorMsg"><![CDATA[%dw 2.0
 output application/java
 ---
 [
   ("ErrorType:   " ++ error.errorType.namespace ++ ":" ++ error.errorType.identifier), 	
   ("Description: " ++ error.detailedDescription),
-  ("ErrorCause: "  ++ error.exception.cause.exceptionCode ++ " - " ++ error.exception.cause.exceptionMessage)
+  ("ErrorCause: "  ++ error.exception.cause.exceptionCode ++ " - " ++ error.exception.cause.exceptionMessage) if (error.exception.cause.exceptionCode != null and error.exception.cause.exceptionMessage != null )
   
 ]
 
 ]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<set-variable value='#["Error occured during processing the File:  " ++ vars.fileName ++". \n\nPlease find attached error details."]' doc:name="email Body" doc:id="8a0bcc3f-f8c7-4fba-8525-6b40238217cd" variableName="emailBody"/>
-				<flow-ref doc:name="supportEmailNotificationFlow" doc:id="9e4911df-1b32-4f66-9c2f-8ee86947c188" name="supportEmailNotificationFlow" />
+				<set-variable value='#["Error occured during processing the File:  " ++ vars.fileName ++". \n\nPlease find attached error details."]' doc:name="email Body" doc:id="92205666-be69-4d95-b75f-bf7ab84f8314" variableName="emailBody"/>
+				<flow-ref doc:name="supportEmailNotificationFlow" doc:id="e3faf4eb-5dd9-4ad7-8846-5feb413a09a1" name="supportEmailNotificationFlow" />
 				
 			</on-error-continue>
 		</error-handler>
 	</flow>
-	<sub-flow name="processAllBatches" doc:id="529e1996-cf4e-4c41-8bae-322918c9d175" >
-		<ee:transform doc:name="Initialize Thread Variables" doc:id="c46026b7-1275-4904-afe3-9990020addb4" >
+	<sub-flow name="processAllBatches" doc:id="65bc8faa-242c-435b-a347-532394d9e4eb" >
+		<ee:transform doc:name="Initialize Thread Variables" doc:id="26ab8495-02db-4aa9-9d56-12a155145788" >
 			<ee:message >
 			</ee:message>
 			<ee:variables >
@@ -267,10 +614,10 @@ output application/java
 p('thread.maxThreads')]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<choice doc:name="BUILDING" doc:id="2d75d3d0-74d7-4d56-ae7d-9da56db27f41" >
+		<choice doc:name="BUILDING" doc:id="c95e1bcf-3eec-4358-9b79-f975468f2d8c" >
 			<when expression='#[vars.buildingPayload.FRPPData != null and vars.buildingPayload.FRPPData != ""]'>
-				<foreach doc:name="For Each - Building Batch Processing" doc:id="8f85f422-f3cf-463e-adf0-4c12360922b4" collection="#[vars.buildingPayload.FRPPData]" batchSize="${batch.size}">
-			<ee:transform doc:name="Initialize BUILDING Batch Processing (3)" doc:id="260dfb97-0eed-424b-92eb-17f5bfff1357">
+				<foreach doc:name="For Each - Building Batch Processing" doc:id="e718f4a2-14fb-4e31-acb9-f04d1ed9b3cc" collection="#[vars.buildingPayload.FRPPData]" batchSize="${batch.size}">
+			<ee:transform doc:name="Initialize BUILDING Batch Processing (3)" doc:id="dd5d02b8-0b8b-4501-abb0-4dcd818830d1">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
@@ -288,24 +635,24 @@ output application/java
 "Building"]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-					<async doc:name="Async" doc:id="723efa69-156f-4390-8835-3f199d97046e" >
-						<flow-ref doc:name="Process SingleBatch" doc:id="fbc1fad7-3d86-42fb-bc76-f6a42193792f" name="processSingleBatch" />
+					<async doc:name="Async" doc:id="3a32622d-56fa-43f3-b2c1-d3278532a88b" >
+						<flow-ref doc:name="Process SingleBatch" doc:id="23c61b54-a34c-4d90-be9b-0ec125a00212" name="processSingleBatch" />
 					</async>
-					<set-variable value="#[vars.threadPoolSize -1]" doc:name="Reduce Thread pool" doc:id="4fc84fa6-abf6-40bb-b69b-253a3e4653fc" variableName="threadPoolSize" />
-					<choice doc:name="Time to Process Responses?" doc:id="7461177c-7fc4-445a-8308-408ccfbbd70f">
+					<set-variable value="#[vars.threadPoolSize -1]" doc:name="Reduce Thread pool" doc:id="e3a5f5b4-6b05-44fb-b907-5739a63ad6be" variableName="threadPoolSize" />
+					<choice doc:name="Time to Process Responses?" doc:id="1ac32657-92e3-4673-a51b-11f2560a775b">
 						<when expression="#[(vars.threadPoolSize == 0) or ((vars.counter * p('batch.size')) &gt;= sizeOf(vars.buildingPayload.FRPPData) )]">
-							<flow-ref doc:name="Process Responses" doc:id="ec416efb-d3c4-43c1-9b99-7eb216b455c6" name="ProcessAllBatchReponses" />
+							<flow-ref doc:name="Process Responses" doc:id="dc76ab8c-7dd9-4b6c-9401-faed8d35f971" name="ProcessAllBatchReponses" />
 						</when>
 					</choice>
 			
 		</foreach>
 			</when>
 			<otherwise >
-				<logger level="INFO" doc:name="No Buildings" doc:id="0b5d9b4a-8bc4-4df8-baf7-1ded8b347163" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; No Building on the File."/>
+				<logger level="INFO" doc:name="No Buildings" doc:id="3f873ec6-c8c4-4d17-8992-669f91e031ab" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; No Building on the File."/>
 			</otherwise>
 		</choice>
 		
-		<ee:transform doc:name="Initialize Thread Variables" doc:id="b6958655-9b67-4ca5-bfeb-21eaf8cf6365" >
+		<ee:transform doc:name="Initialize Thread Variables" doc:id="09d4807d-b911-4f74-8ca6-be123fde9100" >
 			<ee:message >
 			</ee:message>
 			<ee:variables >
@@ -315,10 +662,10 @@ output application/java
 p('thread.maxThreads')]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<choice doc:name="LAND" doc:id="375b5c0c-6234-422b-a86e-d46dceaf09d7" >
+		<choice doc:name="LAND" doc:id="5c1257c4-11cc-477d-8802-9c5ba7b87542" >
 			<when expression='#[vars.landPayload.FRPPData != null and vars.landPayload.FRPPData != ""]'>
-				<foreach doc:name="For Each - Land Batch Processing" doc:id="ab8699b4-5df3-418a-9c94-f9d902388a79" collection="#[vars.landPayload.FRPPData]" batchSize="${batch.size}">
-					<ee:transform doc:name="Initialize LAND Batch Processing (3)" doc:id="c08e90f4-717d-4d98-ae1c-24530ff6a7a3">
+				<foreach doc:name="For Each - Land Batch Processing" doc:id="28736b78-4ffd-4d22-ae64-06a84b289918" collection="#[vars.landPayload.FRPPData]" batchSize="${batch.size}">
+					<ee:transform doc:name="Initialize LAND Batch Processing (3)" doc:id="2392c0b3-f1e8-418f-b6ab-12d8c575455c">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
@@ -336,24 +683,24 @@ output application/java
 "Land"]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-					<async doc:name="Async" doc:id="b1a5e714-20c1-45f5-b810-1ef5b071c01f">
-						<flow-ref doc:name="Process SingleBatch" doc:id="b12046e8-1dfe-45f9-9929-b51d879d51f6" name="processSingleBatch" />
+					<async doc:name="Async" doc:id="0a760f1f-6336-4a61-89c1-6359d6796ee0">
+						<flow-ref doc:name="Process SingleBatch" doc:id="7bfafbb7-4683-4d33-b469-abd5515229b9" name="processSingleBatch" />
 					</async>
-					<set-variable value="#[vars.threadPoolSize -1]" doc:name="Reduce Thread pool" doc:id="a1cbdf63-7345-4421-9dbf-b906fb9b8e75" variableName="threadPoolSize" />
-					<choice doc:name="Time to Process Responses?" doc:id="caa807c5-9abf-4276-bca5-0ca95b5d6560">
+					<set-variable value="#[vars.threadPoolSize -1]" doc:name="Reduce Thread pool" doc:id="9b17a8de-85a1-4dd2-bc4e-7815d7a09083" variableName="threadPoolSize" />
+					<choice doc:name="Time to Process Responses?" doc:id="d50c1ed4-c37c-4ac8-a65f-84c1e85b7908">
 						<when expression="#[(vars.threadPoolSize == 0) or ((vars.counter * p('batch.size')) &gt;= sizeOf(vars.landPayload.FRPPData) )]">
-							<flow-ref doc:name="Process Responses" doc:id="2188b8c9-6078-4f97-befc-2e9bbdb62e93" name="ProcessAllBatchReponses" />
+							<flow-ref doc:name="Process Responses" doc:id="360bdd9f-b126-48d1-b085-d74c07c7b33e" name="ProcessAllBatchReponses" />
 						</when>
 					</choice>
 			
 		</foreach>
 			</when>
 			<otherwise >
-				<logger level="INFO" doc:name="No Lands" doc:id="bde64582-72e2-488d-8c15-8458b203c0fe" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; No Land on the File." />
+				<logger level="INFO" doc:name="No Lands" doc:id="535ab1b3-0a75-4768-bfe2-1afde52498ce" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; No Land on the File." />
 			</otherwise>
 		</choice>
 		
-		<ee:transform doc:name="Initialize Thread Variables" doc:id="9629a1ed-1698-477b-8847-11001bddf824" >
+		<ee:transform doc:name="Initialize Thread Variables" doc:id="7be76a2a-16e5-494f-abb7-23169a3b3464" >
 			<ee:message >
 			</ee:message>
 			<ee:variables >
@@ -363,10 +710,10 @@ output application/java
 p('thread.maxThreads')]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<choice doc:name="STRUCTURE" doc:id="abd34858-da84-4584-8cb6-23d7923843a3" >
+		<choice doc:name="STRUCTURE" doc:id="230425f8-c370-4412-8882-433f5cebed11" >
 			<when expression='#[vars.structurePayload.FRPPData != null and vars.structurePayload.FRPPData != ""]'>
-				<foreach doc:name="For Each - Structure Batch Processing" doc:id="1f8f50f7-bb0b-442f-9f1c-a9d2d07b0040" collection="#[vars.structurePayload.FRPPData]" batchSize="${batch.size}">
-			<ee:transform doc:name="Initialize STRUCTURE   Batch Processing (3)" doc:id="cfbffb77-bc35-435c-bd55-1035b25b2a96">
+				<foreach doc:name="For Each - Structure Batch Processing" doc:id="7e0404ef-f1fd-4fa3-a30e-fcd5f10c1727" collection="#[vars.structurePayload.FRPPData]" batchSize="${batch.size}">
+			<ee:transform doc:name="Initialize STRUCTURE   Batch Processing (3)" doc:id="12e8113f-ae79-4d51-a5dc-c9ddceeab381">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
@@ -384,29 +731,29 @@ output application/java
 "Structure"]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-					<async doc:name="Async" doc:id="0d07a769-48e2-4259-a862-b74d2fa37347" >
-						<flow-ref doc:name="Process SingleBatch" doc:id="56ffd3bf-f0c1-47b5-8410-e6de685eab2c" name="processSingleBatch" />
+					<async doc:name="Async" doc:id="ff8e1b4b-0f09-4c4d-a57d-888e8621e811" >
+						<flow-ref doc:name="Process SingleBatch" doc:id="67d361ae-3f38-4567-a485-c91aeb5ef7c4" name="processSingleBatch" />
 					</async>
-					<set-variable value="#[vars.threadPoolSize -1]" doc:name="Reduce Thread pool" doc:id="272c2dc4-df98-498d-8860-8c003eea2c44" variableName="threadPoolSize" />
-					<choice doc:name="Time to Process Responses?" doc:id="72a7a916-73cf-4761-92c3-02aa70e2c014">
+					<set-variable value="#[vars.threadPoolSize -1]" doc:name="Reduce Thread pool" doc:id="38883116-5d8a-4652-93e3-fec075129dda" variableName="threadPoolSize" />
+					<choice doc:name="Time to Process Responses?" doc:id="f331b17d-bea9-4254-9887-e71f88ae44a4">
 						<when expression="#[(vars.threadPoolSize == 0) or ((vars.counter * p('batch.size')) &gt;= sizeOf(vars.structurePayload.FRPPData) )]">
-							<flow-ref doc:name="Process Responses" doc:id="fadc0713-7b87-41f4-8ef3-0d6beb47a4a3" name="ProcessAllBatchReponses" />
+							<flow-ref doc:name="Process Responses" doc:id="d63247f1-1c7e-46e7-bc9d-2331663f2852" name="ProcessAllBatchReponses" />
 						</when>
 					</choice>
 			
 		</foreach>
 			</when>
 			<otherwise >
-				<logger level="INFO" doc:name="No Structure" doc:id="11adad05-592b-4815-9968-8a577c83e9cc" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; No Structure on the File." />
+				<logger level="INFO" doc:name="No Structure" doc:id="ed7adeef-50b9-49d8-b4da-aee2ea5aa701" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; No Structure on the File." />
 			</otherwise>
 		</choice>
 
 	</sub-flow>
 	
-	<sub-flow name="processSingleBatch" doc:id="edac180d-cfad-4e6c-be9a-debaabd5ab6a">
-		<logger level="INFO" doc:name="Thread Started" doc:id="865f0a1a-b59b-4012-b9c1-241842c614a1" message="Thread:  #[p('thread.maxThreads') - vars.threadPoolSize + 1]  Started" />
-		<flow-ref doc:name="buildSFPayloads" doc:id="522124e6-f7b1-4b86-a6b5-2389dccb94d8" name="buildSFPayloads" />
-		<ee:transform doc:name="Transform Message" doc:id="dc3a6f89-57d1-452a-9f4f-bba91d81f197">
+	<sub-flow name="processSingleBatch" doc:id="62a0390a-e646-4ded-beb0-06359750f057">
+		<logger level="INFO" doc:name="Thread Started" doc:id="b6a36f59-6b9b-4e6a-8f05-f3ac8a005d27" message="Thread:  #[p('thread.maxThreads') - vars.threadPoolSize + 1]  Started" />
+		<flow-ref doc:name="buildSFPayloads" doc:id="4da30939-9215-4829-b792-99d1b4e7d90f" name="buildSFPayloads" />
+		<ee:transform doc:name="Transform Message" doc:id="29712213-75d9-4ee0-8a19-3062c706e0a2">
 					<ee:message>
 					</ee:message>
 					<ee:variables>
@@ -421,16 +768,16 @@ output application/java
 }]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-		<logger level="INFO" doc:name="Thread publishes" doc:id="acac30b9-987d-4f0f-8815-6b597415bb29" message="Thread: #[p('thread.maxThreads') - vars.threadPoolSize + 1]  Publishes: #[vars.vmResponse]" />
-		<vm:publish doc:name="Publish Thread Response" doc:id="8833566d-7970-4472-b2f2-8226798068dd" config-ref="VM_Batch_Config" sendCorrelationId="AUTO" queueName="response">
+		<logger level="INFO" doc:name="Thread publishes" doc:id="dfeb5187-5a43-4894-be5b-a1e17fe1800b" message="Thread: #[p('thread.maxThreads') - vars.threadPoolSize + 1]  Publishes: #[vars.vmResponse]" />
+		<vm:publish doc:name="Publish Thread Response" doc:id="5c1242ae-39f4-4cf3-911d-0f4e8a35d050" config-ref="VM_Batch_Config" sendCorrelationId="AUTO" queueName="#[vars.queueName]">
 			<vm:content><![CDATA[#[vars.vmResponse]]]></vm:content>
 				</vm:publish>
 	</sub-flow>
 		
-	<sub-flow name="buildSFPayloads" doc:id="ef15aed9-a99c-4c3c-add7-a343c7e2b05e" >
-		<choice doc:name="Buildings" doc:id="40f2d7d0-887d-4ac5-92a6-91234b74bb6a">
+	<sub-flow name="buildSFPayloads" doc:id="752af0dd-fbcc-47a9-af4d-52a224fa3b3f" >
+		<choice doc:name="Buildings" doc:id="2deed9ff-92ee-4bea-b475-40981e0c10ae">
 			<when expression="#[vars.'proceed?' == null]">
-				<ee:transform doc:name="Set CIStatus to STARTED" doc:id="bc790dbf-4585-4189-ac02-004f1bde9ed4">
+				<ee:transform doc:name="Set CIStatus to STARTED" doc:id="84ed3d03-cacf-41d1-83f0-c4ff64ead525">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
@@ -444,10 +791,10 @@ output application/json
 ]]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-				<flow-ref doc:name="SetFileStatus" doc:id="ddc57fde-a13a-4b69-8274-65ccc46eb1f9" name="SetStatuses" />
-				<choice doc:name="assetType" doc:id="f5c069d4-c7b0-49d0-b5d2-92b1be0d989b">
+				<flow-ref doc:name="SetFileStatus" doc:id="e0b080c2-a30f-47d7-9415-36f77a78b0a8" name="SetStatuses" />
+				<choice doc:name="assetType" doc:id="4746a491-a070-4971-b5b4-af526ddff569">
 					<when expression='#[vars.assetType == "Building"]'>
-						<ee:transform doc:name="BuildingSFPayload" doc:id="b70546e5-ec2d-4cfe-9475-bb4fe6377781">
+						<ee:transform doc:name="BuildingSFPayload" doc:id="319bab8c-f028-4324-8dd0-04ba718b5911">
 				<ee:message>
 				</ee:message>
 				<ee:variables>
@@ -480,7 +827,6 @@ payload.*Type35Building filter ($ != null) map {
 	Lease_Start_Date__c : if ($.LeaseStartDate != null) ($.LeaseStartDate as sfDate) else null,
 	Lease_Occupancy_Date__c : if ($.LeaseOccupancyDate != null) $.LeaseOccupancyDate as sfDate else null,
 	SquareFeet__c :  $.Size.SquareFeet,
-	//SquareFeet__c : if ($.Size.SquareFeet != null) $.Size.SquareFeet as Number else null,
 	SquareFeetUnitOfMeasure_Code__c : $.Size.SquareFeetUnitOfMeasure,
 	Year_Asset_Reported_Underutilized__c : $.YearAssetReportedUnderutilized,
 	ReplacementValue__c : $.ReplacementValue,
@@ -492,17 +838,6 @@ payload.*Type35Building filter ($ != null) map {
 	Leased_Annual_Operations_Costs__c : $.AnnualOperatingCosts.LeasedAnnualOperatingCosts,
 	Leased_Annual_Maintenance_Costs__c : $.AnnualOperatingCosts.LeasedAnnualMaintenanceCosts,
 	AnnualRent__c : $.AnnualOperatingCosts.LeaseAnnualRent,
-	//RecurringCost__c : $.AnnualOperatingCosts.ComponentCosts.TotalRecurringMaintRepairCost,
-	//ElevatorCost__c : $.AnnualOperatingCosts.ComponentCosts.ElevatorCost,
-	//HVACCost__c : $.AnnualOperatingCosts.ComponentCosts.HVACCost,
-	//PlumbingCost__c : $.AnnualOperatingCosts.ComponentCosts.PlumbingCost,
-	//TotalUtilitiesCost__c : $.AnnualOperatingCosts.ComponentCosts.TotalUtilitiesCost,
-	//WaterSewageCost__c : $.AnnualOperatingCosts.ComponentCosts.WaterSewageCost,
-	//ElectricityCost__c : $.AnnualOperatingCosts.ComponentCosts.ElectricityCost,
-	//GasCost__c : $.AnnualOperatingCosts.ComponentCosts.GasCost,
-	//SteamCost__c : $.AnnualOperatingCosts.ComponentCosts.SteamCost,
-	//CleaningCost__c : $.AnnualOperatingCosts.ComponentCosts.CleaningJanitorialCost,
-	//RoadsCost__c : $.AnnualOperatingCosts.ComponentCosts.RoadsGroundsKeepingCost,
 	StreetAddress__c : $.MainLocation.StreetAddress,
 	Latitude__c : $.MainLocation.Latitude,
 	Longitude__c : $.MainLocation.Longitude,
@@ -542,7 +877,7 @@ payload.*Type35Building filter ($ != null) map {
 			</ee:transform>
 					</when>
 					<when expression='#[vars.assetType == "Land"]'>
-						<ee:transform doc:name="LandSFPayload" doc:id="71f0b405-d268-4917-8c1e-1e5396cfe328">
+						<ee:transform doc:name="LandSFPayload" doc:id="4c592a83-a83f-40e0-aafa-52bea05fa00f">
 				<ee:message>
 				</ee:message>
 				<ee:variables>
@@ -580,17 +915,6 @@ payload.*Type20Land filter ($ != null) map {
 	Leased_Annual_Operations_Costs__c : $.AnnualOperatingCosts.LeasedAnnualOperatingCosts,
 	Leased_Annual_Maintenance_Costs__c : $.AnnualOperatingCosts.LeasedAnnualMaintenanceCosts,
 	AnnualRent__c : $.AnnualOperatingCosts.LeaseAnnualRent,
-	//RecurringCost__c : $.AnnualOperatingCosts.ComponentCosts.TotalRecurringMaintRepairCost,
-	//ElevatorCost__c : $.AnnualOperatingCosts.ComponentCosts.ElevatorCost,
-	//HVACCost__c : $.AnnualOperatingCosts.ComponentCosts.HVACCost,
-	//PlumbingCost__c : $.AnnualOperatingCosts.ComponentCosts.PlumbingCost,
-	//TotalUtilitiesCost__c : $.AnnualOperatingCosts.ComponentCosts.TotalUtilitiesCost,
-	//WaterSewageCost__c : $.AnnualOperatingCosts.ComponentCosts.WaterSewageCost,
-	//ElectricityCost__c : $.AnnualOperatingCosts.ComponentCosts.ElectricityCost,
-	//GasCost__c : $.AnnualOperatingCosts.ComponentCosts.GasCost,
-	//SteamCost__c : $.AnnualOperatingCosts.ComponentCosts.SteamCost,
-	//CleaningCost__c : $.AnnualOperatingCosts.ComponentCosts.CleaningJanitorialCost,
-	//RoadsCost__c : $.AnnualOperatingCosts.ComponentCosts.RoadsGroundsKeepingCost,
 	StreetAddress__c : $.MainLocation.StreetAddress,
 	Latitude__c : $.MainLocation.Latitude,
 	Longitude__c : $.MainLocation.Longitude,
@@ -605,12 +929,6 @@ payload.*Type20Land filter ($ != null) map {
 	InstallationId__c : $.InstallationAndSubInstallationIdentifier.InstallationIdentifier,
 	SubInstallationId__c : $.InstallationAndSubInstallationIdentifier.SubInstallationIdentifier,
 	UtilizationCode__c : $.Utilization,
-	FederalEmployees__c : $.Personnel.FederalEmployees,
-	FederalContractors__c : $.Personnel.FederalContractors,
-	Year_of_Construction__c : $.YearOfAssetConstruction,
-	Determine_Number_of_Fed_Employees_Code__c : $.CanNumberOfFederalEmployeesBeDetermined,
-	Determine_Number_of_Fed_Contractors_Code__c : $.CanNumberOfFederalContractorsBeDetermined,
-	SustainabilityCode__c : $.IsSustainable,
 	DispositionMethodCode__c : $.DispositionData.DispositionMethod,
 	DispositionDate__c : if ($.DispositionData.DispositionDate != null) $.DispositionData.DispositionDate as sfDate else null,
 	DispositionValue__c : $.DispositionData.DispositionValue,
@@ -628,7 +946,7 @@ payload.*Type20Land filter ($ != null) map {
 			</ee:transform>
 					</when>
 					<when expression='#[vars.assetType == "Structure"]'>
-						<ee:transform doc:name="StructureSFPayload" doc:id="03518c2a-4da7-4e2c-ab33-495f6d59125c">
+						<ee:transform doc:name="StructureSFPayload" doc:id="58f2618c-bd64-47b9-b715-cc75b2a8c090">
 				<ee:message>
 				</ee:message>
 				<ee:variables>
@@ -672,17 +990,6 @@ payload.*Type40Structure filter ($ != null) map {
 	Leased_Annual_Operations_Costs__c : $.AnnualOperatingCosts.LeasedAnnualOperatingCosts,
 	Leased_Annual_Maintenance_Costs__c : $.AnnualOperatingCosts.LeasedAnnualMaintenanceCosts,
 	AnnualRent__c : $.AnnualOperatingCosts.LeaseAnnualRent,
-	//RecurringCost__c : $.AnnualOperatingCosts.ComponentCosts.TotalRecurringMaintRepairCost,
-	//ElevatorCost__c : $.AnnualOperatingCosts.ComponentCosts.ElevatorCost,
-	//HVACCost__c : $.AnnualOperatingCosts.ComponentCosts.HVACCost,
-	//PlumbingCost__c : $.AnnualOperatingCosts.ComponentCosts.PlumbingCost,
-	//TotalUtilitiesCost__c : $.AnnualOperatingCosts.ComponentCosts.TotalUtilitiesCost,
-	//WaterSewageCost__c : $.AnnualOperatingCosts.ComponentCosts.WaterSewageCost,
-	//ElectricityCost__c : $.AnnualOperatingCosts.ComponentCosts.ElectricityCost,
-	//GasCost__c : $.AnnualOperatingCosts.ComponentCosts.GasCost,
-	//SteamCost__c : $.AnnualOperatingCosts.ComponentCosts.SteamCost,
-	//CleaningCost__c : $.AnnualOperatingCosts.ComponentCosts.CleaningJanitorialCost,
-	//RoadsCost__c : $.AnnualOperatingCosts.ComponentCosts.RoadsGroundsKeepingCost,
 	StreetAddress__c : $.MainLocation.StreetAddress,
 	Latitude__c : $.MainLocation.Latitude,
 	Longitude__c : $.MainLocation.Longitude,
@@ -713,23 +1020,23 @@ payload.*Type40Structure filter ($ != null) map {
 			</ee:transform>
 					</when>
 					<otherwise >
-						<logger level="INFO" doc:name="Logger" doc:id="30e10dff-f458-48cb-b4e9-ed876ce28afa" message="No AssetType Set.  "/>
+						<logger level="INFO" doc:name="Logger" doc:id="73481890-3bd2-4ca3-9972-3abffc1014c5" message="No AssetType Set.  "/>
 					</otherwise>
 				</choice>
-				<flow-ref doc:name="payload to SF" doc:id="3c389417-63c3-4271-a9e7-b6a628e94868" name="sendSFPayload" />
+				<flow-ref doc:name="payload to SF" doc:id="81b68b4c-3e0c-4334-8835-6559ac4e540f" name="sendSFPayload" />
 			</when>
 			<otherwise>
-				<logger level="INFO" doc:name="Logger" doc:id="40944b0d-963f-4d79-b58c-5fc0909eb547" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR: Had Errors other then Validation Errors. Exiting out." />
+				<logger level="INFO" doc:name="Logger" doc:id="8ee24b32-4c24-4c4e-9482-68c26ac9c013" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR: Had Errors other then Validation Errors. Exiting out." />
 			</otherwise>
 		</choice>
 	</sub-flow>
-	<sub-flow name="sendSFPayload" doc:id="10357f7b-962e-4244-a847-427f0129b322" >
-			<salesforce:create type="FRPP_ASSET__c" doc:name="Create Assets" doc:id="f52765e1-c0f7-4af7-8938-5b7296aa7702" config-ref="SalesforceGeoFL3_Global" target="sfResponse">
+	<sub-flow name="sendSFPayload" doc:id="38a682cb-98ea-4a1b-b244-160b10ff62e9" >
+			<salesforce:create type="FRPP_ASSET__c" doc:name="Create Assets" doc:id="76722aed-d9be-436a-8c03-da3fb05025b3" config-ref="SalesforceGeoFL3_Global" target="sfResponse">
 				<salesforce:records ><![CDATA[#[vars.sfAssetsPayload]]]></salesforce:records>
 			</salesforce:create>
-		<choice doc:name="Choice" doc:id="76cfcdc9-f80e-46ef-a6f5-b74b56dd3bee" >
+		<choice doc:name="Choice" doc:id="838a062c-a91d-43bf-b3a2-5f976d32a599" >
 				<when expression='sizeOf (flatten(vars.sfResponse.errors) filter ($.statusCode != "FIELD_CUSTOM_VALIDATION_EXCEPTION" )) &lt; 1'>
-				<ee:transform doc:name="ErrorAssets +ErrorCounts (2)" doc:id="3cb2418b-32b8-4536-8559-658c19f2cca6">
+				<ee:transform doc:name="ErrorAssets +ErrorCounts (2)" doc:id="d60cc18d-adeb-44b9-afaf-ffbd219c4370">
 				<ee:message>
 				</ee:message>
 				<ee:variables>
@@ -748,12 +1055,12 @@ vars.sfAssetsPayload filter (vars.sfResponse.id[$$] == null) map (
 ]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
-				<choice doc:name="Choice" doc:id="8ade656d-1330-41a9-839e-cbd369d75387">
+				<choice doc:name="Choice" doc:id="56a2c9e6-7ed5-4fa2-a509-5be12a110de4">
 					<when expression="#[sizeOf (vars.sfResponse.*id filter ($ == null)) &gt; 0]">
-						<salesforce:create doc:name="Create Error Assets" doc:id="8213d403-4b4d-4b37-b74e-4f5b3b317be5" config-ref="SalesforceGeoFL3_Global" type="FRPP_ASSET__c" target="sfErrorAssestsResponse">
+						<salesforce:create doc:name="Create Error Assets" doc:id="58633f6d-9bc4-4567-a8f5-7a40de9b232c" config-ref="SalesforceGeoFL3_Global" type="FRPP_ASSET__c" target="sfErrorAssestsResponse">
 					<salesforce:records><![CDATA[#[vars.sfErrorAssestsPayload]]]></salesforce:records>
 				</salesforce:create>
-						<ee:transform doc:name="Errors Mapping (2)" doc:id="b0fc2e22-e440-4ca0-ba6f-e2034c068bdb">
+						<ee:transform doc:name="Errors Mapping (2)" doc:id="d32a1811-72f0-4081-828b-c0c7c0fdbf76">
 					<ee:message>
 					</ee:message>
 					<ee:variables>
@@ -777,7 +1084,7 @@ output application/java
 (vars.countErrorASTAdded) + (sizeOf (vars.sfErrorAssestsResponse.*id filter ($ != null)))]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-						<ee:transform doc:name="flatten Payload" doc:id="63748fe7-5f73-4db5-b149-1ad5c616fbbd">
+						<ee:transform doc:name="flatten Payload" doc:id="89a03f59-5e12-42a6-82d3-65253e0f5826">
 					<ee:message>
 					</ee:message>
 					<ee:variables>
@@ -787,8 +1094,8 @@ output application/json
 flatten (vars.sfErrorsPayload.errors)]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-						<foreach doc:name="For Each 200 Batch" doc:id="c84071a8-5d34-4949-a06d-8fe74f5ca319" collection="#[vars.sfErrorsPayload]" batchSize="200">
-							<ee:transform doc:name="Transform To JSON" doc:id="e4553cf2-1283-4af6-98c5-a675aae3a99b" >
+						<foreach doc:name="For Each 200 Batch" doc:id="4549451f-f75b-4bb3-9ae3-c9b7db57f268" collection="#[vars.sfErrorsPayload]" batchSize="200">
+							<ee:transform doc:name="Transform To JSON" doc:id="a85baf06-433c-4666-af8d-99701a3bedca" >
 								<ee:message >
 									<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -796,16 +1103,16 @@ output application/json
 payload]]></ee:set-payload>
 								</ee:message>
 							</ee:transform>
-							<salesforce:create doc:name="Create Errors" doc:id="8c99ee4e-55da-4fca-9247-ae37498f8993" config-ref="SalesforceGeoFL3_Global" type="FRPP_ASSET_ERROR__c" target="sfErrorsResponse">
+							<salesforce:create doc:name="Create Errors" doc:id="055015dd-a187-464c-9a82-55ee006c098c" config-ref="SalesforceGeoFL3_Global" type="FRPP_ASSET_ERROR__c" target="sfErrorsResponse">
 				</salesforce:create>
 						</foreach>
-						<logger level="INFO" doc:name="Error Logger" doc:id="2929da6b-6c09-492b-afce-6fec7dfc4198" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 3b. #[vars.assetType] Batch No.: #[vars.counter] ALL Error records processed Succesfully."/>
+						<logger level="INFO" doc:name="Error Logger" doc:id="4607116b-3e7c-4b9f-89a9-7162055def5b" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 3b. #[vars.assetType] Batch No.: #[vars.counter] ALL Error records processed Succesfully."/>
 					</when>
 					<otherwise >
-						<logger level="INFO" doc:name="Success Logger" doc:id="0f8f80fa-b476-42dc-b553-9361736c0e08" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 3a. #[vars.assetType] Batch No.: #[vars.counter] ALL records processed Succesfully."/>
+						<logger level="INFO" doc:name="Success Logger" doc:id="35ce031f-0b0c-4df3-893d-5413bc1525c3" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 3a. #[vars.assetType] Batch No.: #[vars.counter] ALL records processed Succesfully."/>
 					</otherwise>
 				</choice>
-				<ee:transform doc:name="Set BatchCompletion Statuses" doc:id="089c1613-f4ca-4362-afd4-ef0540827914">
+				<ee:transform doc:name="Set BatchCompletion Statuses" doc:id="64590c98-2e1a-45d8-b8fa-500c7c140070">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
@@ -820,13 +1127,13 @@ output application/json
 ]]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-					<flow-ref doc:name="SetFileStatus" doc:id="a5786738-a32b-4e7f-8ff7-9f02dfbc7926" name="SetStatuses" />
+					<flow-ref doc:name="SetFileStatus" doc:id="d3c833a2-9f2c-4c73-b1d2-d13863f7ea75" name="SetStatuses" />
 				</when>
 				<otherwise >
-					<logger level="INFO" doc:name="Validation Errors" doc:id="36eb4097-17d2-40e7-a40e-2b87dcb89df7" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR:  Received SF error other then Validation Error.  Need to Exit."/>
-				<set-variable value="false" doc:name="Set proceed? to false" doc:id="cee8c2c1-2897-4f44-a650-1f5b56027ba7" variableName="proceed?" />
-				<set-variable value="${InvalidXMLFYTemplateName}" doc:name="set useTemplateName" doc:id="b1c0fae7-20d5-49da-b48f-66c0e991bb26" variableName="useTemplateName" />
-				<ee:transform doc:name="set error Msg" doc:id="0df647cc-54f9-4294-b381-c36b15bf4109">
+					<logger level="INFO" doc:name="Validation Errors" doc:id="be1023ce-276a-4871-b7eb-9fbf3939eefa" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR:  Received SF error other then Validation Error.  Need to Exit."/>
+				<set-variable value="false" doc:name="Set proceed? to false" doc:id="94c3b210-ae1e-40e0-a574-fbc011752837" variableName="proceed?" />
+				<set-variable value="${InvalidXMLFYTemplateName}" doc:name="set useTemplateName" doc:id="8775112e-7801-46ef-bba6-a262b1284eb2" variableName="useTemplateName" />
+				<ee:transform doc:name="set error Msg" doc:id="c5805efc-8fee-45d6-85c7-82924cd7ca0c">
 					<ee:message>
 					</ee:message>
 					<ee:variables >
@@ -836,8 +1143,8 @@ output application/java
 ["Fiscal Year does not match."]]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<flow-ref doc:name="userEmailNotificationFlow" doc:id="dc8eb778-b9c1-4526-a2c6-2b26fd8a5a55" name="userEmailNotificationFlow" />
-				<ee:transform doc:name="set error Msg" doc:id="3d972ccd-4b63-4a0d-ac93-5cbe16aa90f4">
+				<flow-ref doc:name="userEmailNotificationFlow" doc:id="d6f34b2b-7a2c-40ad-a2e4-e28ecc2ff111" name="userEmailNotificationFlow" />
+				<ee:transform doc:name="set error Msg" doc:id="6c753127-7166-4b05-bac0-bf23bacc3e0e">
 					<ee:message>
 					</ee:message>
 					<ee:variables >
@@ -847,8 +1154,8 @@ output application/java
 ["THis is is my Error 1", "This is my Error 2."]]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<set-variable value='This is the email body for the Support Email. ' doc:name="email Body" doc:id="4bfff975-d3f3-4ec7-879b-e513a6c7123b" variableName="emailBody"/>
-				<flow-ref doc:name="SupportEmail" doc:id="0e4c6d7a-85b8-403f-a0d2-e685d4ab48bd" name="supportEmailNotificationFlow" />
+				<set-variable value='This is the email body for the Support Email. ' doc:name="email Body" doc:id="7c0d3bef-a3dc-4cca-810b-8ea3fb8fb5f5" variableName="emailBody"/>
+				<flow-ref doc:name="SupportEmail" doc:id="d2797e3e-b460-4ec5-8883-65c789389e99" name="supportEmailNotificationFlow" />
 				
 				</otherwise>
 			</choice>

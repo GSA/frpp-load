@@ -5,10 +5,10 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
 http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mule/xml-module/current/mule-xml-module.xsd">
-	<sub-flow name="authorizeToDelete" doc:id="707ad715-14d3-4c80-a462-4e861c161807" >
-		<choice doc:name="Choice" doc:id="4b83f998-b6d6-4017-acb1-5d09fc5b22fd" >
+	<sub-flow name="authorizeToDelete" doc:id="be2899fa-90bd-47a2-a769-98b562df3dd5" >
+		<choice doc:name="Choice" doc:id="a9d01703-24d3-4fa4-a0fc-9168addaf28e" >
 			<when expression='(vars.fullPayload.FRPPData.@ACTION == "DELETE")'>
-				<salesforce:query doc:name="Query - PermissionSetId" doc:id="b99137cb-5789-49cc-b736-adb2e90ea386" config-ref="SalesforceGeoFL3_Global" target="permissionSetId">
+				<salesforce:query doc:name="Query - PermissionSetId" doc:id="da5e1f00-1b4e-41fa-b554-cec9e03b3acc" config-ref="SalesforceGeoFL3_Global" target="permissionSetId">
 					<salesforce:salesforce-query >select PermissionSetId FROM PermissionSetAssignment where AssigneeId in 
 	(select CreatedByID from FRPP_FILE__c where ID= ':fileID') 
     and PermissionSetId in (select ID from PermissionSet  where Name= ':superUserPermissionSet' )
@@ -20,26 +20,26 @@ http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mu
 	"superUserPermissionSet" : p('superUserPermissionSet')
 }]]]></salesforce:parameters>
 				</salesforce:query>
-				<choice doc:name="Choice" doc:id="769aeeaa-57a4-4ab6-9637-5ca011a14c2e" >
+				<choice doc:name="Choice" doc:id="2a6e302b-81d3-4813-8035-94cb9a965ac7" >
 					<when expression="#[sizeOf (vars.permissionSetId) &lt; 1]">
-						<set-variable value="false" doc:name="Set authorizedToDelete?" doc:id="e2cab742-e779-4f6b-9bef-af560380601c" variableName="authorizedToDelete?"/>
+						<set-variable value="false" doc:name="Set authorizedToDelete?" doc:id="8034e0e0-6c1d-418a-b83b-b7f5f2255bd8" variableName="authorizedToDelete?"/>
 					</when>
 				</choice>
 			</when>
 		</choice>
-		<remove-variable doc:name="Remove permissionSetId" doc:id="d1061d76-5eeb-4704-9a53-215f70c19d13" variableName="permissionSetId"/>
+		<remove-variable doc:name="Remove permissionSetId" doc:id="b1f9925a-c5b0-4c13-9e19-1c2c9b076dd9" variableName="permissionSetId"/>
 	</sub-flow>
 	
-	<sub-flow name="schemaValidationFlow" doc:id="7e99f8f1-920b-443b-8755-1278a33f8191" >
-		<try doc:name="Try" doc:id="305c7835-ec38-49e5-b28e-0fbeca0e7837">
-			<xml-module:validate-schema schemas="schemas/FRPPXMLvalidation.xsd"  doc:id="4db7c6c6-94db-4578-a9d0-aa374adfe322" config-ref="XML_Config">
+	<sub-flow name="schemaValidationFlow" doc:id="8737a356-f53d-428e-b649-09911601ee16" >
+		<try doc:name="Try" doc:id="583e0341-4feb-4625-8f94-e870c2722694">
+			<xml-module:validate-schema schemas="schemas/FRPPXMLvalidation.xsd"  doc:id="8be22d73-1fa6-41bf-b4e7-fc2d4aa1f4c2" config-ref="XML_Config">
 				<xml-module:content ><![CDATA[#[vars.fullPayload]]]></xml-module:content>
 			</xml-module:validate-schema>
-			<set-variable value="true" doc:name="set true" doc:id="4b05156f-cd86-4c28-9805-a97d68b9cfd8" variableName="validXML"/>
+			<set-variable value="true" doc:name="set true" doc:id="b5fba77d-0fb4-4941-b6ff-9a2c7eba3ac5" variableName="validXML"/>
 			<error-handler>
-				<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="dd835a48-7fc1-48b2-9c40-25a9fa00dc4e" type="ANY">
-					<set-variable value="false" doc:name="set validXML: false" doc:id="c5e2ddcb-7dc7-44fa-8a1e-be525d63cc9d" variableName="validXML" />
-					<set-variable value="#[error.errorMessage.payload.description]" doc:name="set Error Message" doc:id="75b2ba45-0f0f-481f-95cb-4839b1dc115f" variableName="errorMsg"/>
+				<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="927ca3f0-6b90-4496-98e0-063ed9944537" type="ANY">
+					<set-variable value="false" doc:name="set validXML: false" doc:id="54bf9ecf-985b-4139-9a95-5ebc1872936f" variableName="validXML" />
+					<set-variable value="#[error.errorMessage.payload.description]" doc:name="set Error Message" doc:id="a37de1e3-34d9-46a6-977c-2449b21ff36d" variableName="errorMsg"/>
 				</on-error-continue>
 			</error-handler>
 		</try>
@@ -56,13 +56,34 @@ http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mu
 	
 
 
-	<sub-flow name="SetStatuses" doc:id="49fa2fd3-e105-406e-831e-c7c3a11787cb" >
+	<sub-flow name="SetStatuses" doc:id="c2f2a64c-fb45-4d93-9b3f-160e0c91d15f" >
 		
-		<salesforce:update type="FRPP_FILE__c" doc:name="Update_FRPP_FILE" doc:id="0d897db7-108d-4e89-bafc-07250d824d2c" config-ref="SalesforceGeoFL3_Global" target="updateStatusResp">
+		<salesforce:update type="FRPP_FILE__c" doc:name="Update_FRPP_FILE" doc:id="84a08981-f265-4157-9c69-ac4c27924f53" config-ref="SalesforceGeoFL3_Global" target="updateStatusResp">
 			<salesforce:records ><![CDATA[#[vars.updateStatusReq]]]></salesforce:records>
 		</salesforce:update>
-		<remove-variable doc:name="Remove Variable - updateStatusReq" doc:id="fb0e147b-8b9a-447e-8716-35f8c0acd401" variableName="updateStatusReq"/>
-		<remove-variable doc:name="Remove Variable - updateStatusResp" doc:id="34c1eb2c-0433-4717-a8a3-b174d2802622" variableName="updateStatusResp"/>
+		<remove-variable doc:name="Remove Variable - updateStatusReq" doc:id="920a5f67-0576-4b0e-a4b7-2a68cfc987b8" variableName="updateStatusReq"/>
+		<remove-variable doc:name="Remove Variable - updateStatusResp" doc:id="e99bce0a-bcf7-4085-a1a4-ff2468dd15f7" variableName="updateStatusResp"/>
+	</sub-flow>
+	<sub-flow name="releaseQueue" doc:id="e8f95d25-3390-4c80-9857-c8009c7fe164" >
+		<choice doc:name="Choice" doc:id="1f9be9e7-4b07-4dcf-837e-bcb62ffa99f3" >
+			<when expression="#[vars.queueName != null]">
+				<set-payload value="#[{ body: {queuename: vars.queueName} }]" doc:name="Set Payload" doc:id="11b44873-6769-44a3-b4c1-7498267d387f" />
+				<salesforce:invoke-apex-rest-method className="FRPP_releaseMuleQueue" methodName="release^/OGPreleaseMuleQueue/^HttpPost^String^" doc:name="Release Queue" doc:id="21153f53-6f8b-4396-bbf9-31a26371a3de" config-ref="SalesforceGeoFL3_Global" />
+				<choice doc:name="Choice" doc:id="c2f4195c-545c-4d07-a3c7-6a2eff194bc1">
+			<when expression="#[payload[0] == 'Success']">
+				<logger level="INFO" doc:name="Logger" doc:id="d598313d-a90c-4dcb-bd8e-bf16af19dfa4" message="Queue:  #[vars.queueName]  released." />
+			</when>
+			<otherwise>
+				<set-variable value='#["Error occured during processing the File:  " ++ vars.fileName ++". \n\n Queue: " ++ vars.queueName ++ " cannot be Released. Please check SF and release manually."]' doc:name="email Body" doc:id="67856480-a247-4466-b448-567a4d793a47" variableName="emailBody" />
+				<flow-ref doc:name="supportEmailNotificationFlow" doc:id="6f25172d-0b97-4aca-8c05-b6e267bb65a5" name="supportEmailNotificationFlow" />
+				
+			</otherwise>
+		</choice>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="bb344766-6765-4784-b3eb-9a7fe2573045" message="Warning: No queueName available in pipeline to Release."/>
+			</otherwise>
+		</choice>
 	</sub-flow>
 		
 	

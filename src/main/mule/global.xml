@@ -8,22 +8,31 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
 http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mule/xml-module/current/mule-xml-module.xsd">
-	<http:listener-config name="HTTP_Listener_config_Global" doc:name="HTTP Listener config" doc:id="40a8bde4-23ac-4146-b10e-1e1fd8b173ec" >
+	<http:listener-config name="HTTP_Listener_config_Global" doc:name="HTTP Listener config" doc:id="c735332c-197b-4e7b-8956-d50f35cb4397" >
 		<http:listener-connection host="${http.host}" port="${http.port}" />
 	</http:listener-config>
-	<vm:config name="VM_Batch_Config" doc:name="VM_Batch_Config" doc:id="caf15072-766f-4a79-996a-a4608d180639" >
+	<vm:config name="VM_Batch_Config" doc:name="VM_Batch_Config" doc:id="3bb6b582-ec64-45c7-9762-bca33a8e5f3f" >
 		<vm:queues >
-			<vm:queue queueName="response" maxOutstandingMessages="15" />
+			<vm:queue queueName="response1" maxOutstandingMessages="15" />
+			<vm:queue queueName="response2" maxOutstandingMessages="15" />
+			<vm:queue queueName="response3" maxOutstandingMessages="15" />
+			<vm:queue queueName="response4" maxOutstandingMessages="15" />
+			<vm:queue queueName="response5" maxOutstandingMessages="15" />
+			<vm:queue queueName="response6" maxOutstandingMessages="15" />
+			<vm:queue queueName="response7" maxOutstandingMessages="15" />
+			<vm:queue queueName="response8" maxOutstandingMessages="15" />
+			<vm:queue queueName="response9" maxOutstandingMessages="15" />
+			<vm:queue queueName="response10" maxOutstandingMessages="15" />
 		</vm:queues>
 		</vm:config>
-	<salesforce:sfdc-config name="SalesforceGeoFL3_Global" doc:name="Salesforce Config" doc:id="3dac3f08-bad6-400f-b89b-8e8b8b5cdd84" >
+	<salesforce:sfdc-config name="SalesforceGeoFL3_Global" doc:name="Salesforce Config" doc:id="00c09476-473b-45c7-8005-ad29f4df9dc0" >
 		<salesforce:basic-connection username="${sfdc.username}" password="${sfdc.password}" securityToken="${sfdc.token}" url="${sfdc.url}">
 			<reconnection failsDeployment="true" >
 				<reconnect frequency="1000" count="3"/>
 			</reconnection>
 		</salesforce:basic-connection>
 	</salesforce:sfdc-config>
-	<global-property doc:name="Global Property" doc:id="4e10afb9-efa7-4d8c-b3e7-64e3fada682e" name="mule.env" value="local" />
-	<configuration-properties doc:name="Configuration properties" doc:id="7f669a2f-c4fc-4f3e-900a-dca89715c13d" file="frpp-load-${mule.env}.properties" />
-	<xml-module:config name="XML_Config" doc:name="XML Config" doc:id="85109181-b7f1-465b-9174-5a1723ffcf74" />
+	<global-property doc:name="Global Property" doc:id="8d7ae1c7-c891-4e3c-9077-3c85f780b205" name="mule.env" value="local" />
+	<configuration-properties doc:name="Configuration properties" doc:id="5829bb43-dcd2-4365-8834-ed93b1255915" file="frpp-load-${mule.env}.properties" />
+	<xml-module:config name="XML_Config" doc:name="XML Config" doc:id="a6e799dc-67e6-482f-a0ba-1ab6d8cc1c98" />
 </mule>
