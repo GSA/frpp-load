@@ -1,440 +1,1559 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	<xs:element name="FRPPData">
 		<xs:complexType>
 			<xs:choice maxOccurs="unbounded" minOccurs="0">
-				<xs:element name="Type20Land" type="Type20LandType"/><xs:element name="Type35Building" type="Type35BuildingDetailsType"/><xs:element name="Type40Structure" type="Type40StructureType"/></xs:choice><xs:attribute name="FY">
+				<xs:element name="Type20Land" type="Type20LandType"/>
+				<xs:element name="Type35Building" type="Type35BuildingDetailsType"/>
+				<xs:element name="Type40Structure" type="Type40StructureType"/>
+			</xs:choice>
+			<xs:attribute name="FY">
 				<xs:simpleType>
 					<xs:restriction base="xs:integer">
-						<xs:minInclusive value="2005"/><xs:maxInclusive value="2099"/></xs:restriction></xs:simpleType></xs:attribute><xs:attribute name="ACTION">
+						<xs:minInclusive value="2005"/>
+						<xs:maxInclusive value="2099"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="ACTION">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:minLength value="3"/><xs:maxLength value="6"/><xs:enumeration value="ADD"/><xs:enumeration value="MODIFY"/><xs:enumeration value="DELETE"/></xs:restriction></xs:simpleType></xs:attribute><xs:attribute name="AGENCYCODE">
+						<xs:minLength value="3"/>
+						<xs:maxLength value="6"/>
+						<xs:enumeration value="ADD"/>
+						<xs:enumeration value="MODIFY"/>
+						<xs:enumeration value="DELETE"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="AGENCYCODE">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:minLength value="2"/><xs:pattern value="\d{2}"/></xs:restriction></xs:simpleType></xs:attribute></xs:complexType></xs:element><xs:complexType name="Type20LandType">
+						<xs:minLength value="2"/>
+						<xs:pattern value="\d{2}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="Type20LandType">
 		<xs:choice maxOccurs="unbounded">
 			<xs:element name="RealPropertyType">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value="20"/></xs:restriction></xs:simpleType></xs:element><xs:element minOccurs="0" name="RealPropertyUse" nillable="true" type="RealPropertyUseLandType"/><xs:element minOccurs="0" name="LegalInterest" type="LegalInterestType"/><xs:element minOccurs="0" name="Status" type="StatusType"/><xs:element minOccurs="0" name="HistoricalStatus" type="HistoricalStatusType"/><xs:element minOccurs="0" ref="ReportingAgency"/><xs:element minOccurs="0" ref="UsingOrganization"/><xs:element minOccurs="0" ref="LeaseExpirationDate"/><xs:element ref="LeaseStartDate"/><xs:element ref="LeaseOccupancyDate"/><xs:element ref="IsAssetExcluded"/><xs:element ref="ReasonForExclusion"/><xs:element minOccurs="0" name="Size" type="SizeLand"/><xs:element minOccurs="0" ref="Utilization"/><xs:element minOccurs="0" name="AnnualOperatingCosts" type="AnnualOperatingCostsType"/><xs:element minOccurs="0" name="MainLocation" type="MainLocationType"/><xs:element ref="RealPropertyUniqueIdentifier"/><xs:element minOccurs="0" ref="City"/><xs:element minOccurs="0" ref="State"/><xs:element minOccurs="0" ref="Country"/><xs:element minOccurs="0" ref="County"/><xs:element minOccurs="0" ref="CongressionalDistricts"/><xs:element minOccurs="0" ref="Zipcode"/><xs:element minOccurs="0" name="InstallationAndSubInstallationIdentifier" type="InstallationAndSubInstallationIdentifierType"/><xs:element minOccurs="0" name="DispositionData" type="DispositionDataType"/><xs:element name="RealProperty" type="YesNoEnumType"/><xs:element name="FOIAExemption" type="FOIAExemptionType"/><xs:element name="StatutoryCitation" type="xs:string"/></xs:choice><xs:attribute default="add" name="action" type="xs:string"/></xs:complexType><xs:complexType name="Type35BuildingDetailsType">
+						<xs:whiteSpace value="collapse"/>
+						<xs:enumeration value="20"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element minOccurs="0" name="RealPropertyUse" nillable="true" type="RealPropertyUseLandType"/>
+			<xs:element minOccurs="0" name="LegalInterest" type="LegalInterestType"/>
+			<xs:element minOccurs="0" name="Status" type="StatusType"/>
+			<xs:element minOccurs="0" name="HistoricalStatus" type="HistoricalStatusType"/>
+			<xs:element minOccurs="0" ref="ReportingAgency"/>
+			<xs:element minOccurs="0" ref="UsingOrganization"/>
+			<xs:element minOccurs="0" ref="LeaseExpirationDate"/>
+			<xs:element ref="LeaseStartDate"/>
+			<xs:element ref="LeaseOccupancyDate"/>
+			<xs:element ref="IsAssetExcluded"/>
+			<xs:element ref="ReasonForExclusion"/>
+			<xs:element minOccurs="0" name="Size" type="SizeLand"/>
+			<xs:element minOccurs="0" ref="Utilization"/>
+			<xs:element minOccurs="0" name="AnnualOperatingCosts" type="AnnualOperatingCostsType"/>
+			<xs:element minOccurs="0" name="MainLocation" type="MainLocationType"/>
+			<xs:element ref="RealPropertyUniqueIdentifier"/>
+			<xs:element minOccurs="0" ref="City"/>
+			<xs:element minOccurs="0" ref="State"/>
+			<xs:element minOccurs="0" ref="Country"/>
+			<xs:element minOccurs="0" ref="County"/>
+			<xs:element minOccurs="0" ref="CongressionalDistricts"/>
+			<xs:element minOccurs="0" ref="Zipcode"/>
+			<xs:element minOccurs="0" name="InstallationAndSubInstallationIdentifier" type="InstallationAndSubInstallationIdentifierType"/>
+			<xs:element minOccurs="0" name="DispositionData" type="DispositionDataType"/>
+			<xs:element name="RealProperty" type="YesNoEnumType"/>
+			<xs:element name="FOIAExemption" type="FOIAExemptionType"/>
+			<xs:element name="StatutoryCitation" type="xs:string"/>
+		</xs:choice>
+		<xs:attribute default="add" name="action" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="Type35BuildingDetailsType">
 		<xs:choice maxOccurs="unbounded">
 			<xs:element name="RealPropertyType">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value="35"/></xs:restriction></xs:simpleType></xs:element><xs:element minOccurs="0" name="RealPropertyUse" nillable="true" type="RealPropertyUseBuildingType"/><xs:element name="FieldOffice" type="FieldOfficeType"/><xs:element name="FieldOfficeCollocation" type="YesNoEnumType"/><xs:element minOccurs="0" name="LegalInterest" type="LegalInterestType"/><xs:element minOccurs="0" name="Status" type="StatusType"/><xs:element minOccurs="0" name="HistoricalStatus" type="HistoricalStatusType"/><xs:element minOccurs="0" ref="ReportingAgency"/><xs:element minOccurs="0" ref="UsingOrganization"/><xs:element minOccurs="0" ref="LeaseExpirationDate"/><xs:element ref="LeaseStartDate"/><xs:element ref="LeaseOccupancyDate"/><xs:element minOccurs="0" name="Size" type="SizeBuilding"/><xs:element minOccurs="0" ref="Utilization"/><xs:element minOccurs="0" name="YearAssetReportedUnderutilized" type="YearAssetReportedUnderutilizedType"/><xs:element minOccurs="0" ref="ReplacementValue"/><xs:element minOccurs="0" ref="RepairNeeds"/><xs:element name="HistoricalCapitalExpenditures" type="NumericTwelveThreeGreaterThanZeroType"/><xs:element name="EstimatedFutureCapitalExpenditures" type="NumericTwelveThreeGreaterThanZeroType"/><xs:element minOccurs="0" name="AnnualOperatingCosts" type="AnnualOperatingCostsType"/><xs:element minOccurs="0" name="MainLocation" type="MainLocationType"/><xs:element ref="RealPropertyUniqueIdentifier"/><xs:element minOccurs="0" ref="City"/><xs:element minOccurs="0" ref="State"/><xs:element minOccurs="0" ref="Country"/><xs:element minOccurs="0" ref="County"/><xs:element minOccurs="0" ref="CongressionalDistricts"/><xs:element minOccurs="0" ref="Zipcode"/><xs:element minOccurs="0" name="InstallationAndSubInstallationIdentifier" type="InstallationAndSubInstallationIdentifierType"/><xs:element minOccurs="0" name="Personnel" type="PersonnelBuilding"/><xs:element ref="IsAssetExcluded"/><xs:element ref="ReasonForExclusion"/><xs:element ref="YearOfAssetConstruction"/><xs:element name="CanNumberOfFederalEmployeesBeDetermined" type="YesNoEnumType"/><xs:element name="CanNumberOfFederalContractorsBeDetermined" type="YesNoEnumType"/><xs:element minOccurs="0" name="IsSustainable" type="SustainableType"/><xs:element minOccurs="0" name="DispositionData" type="DispositionDataType"/><xs:element name="RealProperty" type="YesNoEnumType"/><xs:element name="FOIAExemption" type="FOIAExemptionType"/><xs:element name="StatutoryCitation" type="xs:string"/></xs:choice><xs:attribute default="add" name="action" type="xs:string"/></xs:complexType><xs:complexType name="Type40StructureType">
+						<xs:whiteSpace value="collapse"/>
+						<xs:enumeration value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element minOccurs="0" name="RealPropertyUse" nillable="true" type="RealPropertyUseBuildingType"/>
+			<xs:element name="FieldOffice" type="FieldOfficeType"/>
+			<xs:element name="FieldOfficeCollocation" type="YesNoEnumType"/>
+			<xs:element minOccurs="0" name="LegalInterest" type="LegalInterestType"/>
+			<xs:element minOccurs="0" name="Status" type="StatusType"/>
+			<xs:element minOccurs="0" name="HistoricalStatus" type="HistoricalStatusType"/>
+			<xs:element minOccurs="0" ref="ReportingAgency"/>
+			<xs:element minOccurs="0" ref="UsingOrganization"/>
+			<xs:element minOccurs="0" ref="LeaseExpirationDate"/>
+			<xs:element ref="LeaseStartDate"/>
+			<xs:element ref="LeaseOccupancyDate"/>
+			<xs:element minOccurs="0" name="Size" type="SizeBuilding"/>
+			<xs:element minOccurs="0" name="AssetHeight" type="AssetHeightType"/>
+			<xs:element minOccurs="0" name="AssetHeightRange" type="AssetHeightRangeType"/>
+			<xs:element minOccurs="0" ref="Utilization"/>
+			<xs:element minOccurs="0" name="YearAssetReportedUnderutilized" type="YearAssetReportedUnderutilizedType"/>
+			<xs:element minOccurs="0" ref="ReplacementValue"/>
+			<xs:element minOccurs="0" ref="RepairNeeds"/>
+			<xs:element name="HistoricalCapitalExpenditures" type="NumericTwelveThreeGreaterThanZeroType"/>
+			<xs:element name="EstimatedFutureCapitalExpenditures" type="NumericTwelveThreeGreaterThanZeroType"/>
+			<xs:element minOccurs="0" name="AnnualOperatingCosts" type="AnnualOperatingCostsType"/>
+			<xs:element minOccurs="0" name="MainLocation" type="MainLocationType"/>
+			<xs:element ref="RealPropertyUniqueIdentifier"/>
+			<xs:element minOccurs="0" ref="City"/>
+			<xs:element minOccurs="0" ref="State"/>
+			<xs:element minOccurs="0" ref="Country"/>
+			<xs:element minOccurs="0" ref="County"/>
+			<xs:element minOccurs="0" ref="CongressionalDistricts"/>
+			<xs:element minOccurs="0" ref="Zipcode"/>
+			<xs:element minOccurs="0" name="InstallationAndSubInstallationIdentifier" type="InstallationAndSubInstallationIdentifierType"/>
+			<xs:element minOccurs="0" name="Personnel" type="PersonnelBuilding"/>
+			<xs:element ref="IsAssetExcluded"/>
+			<xs:element ref="ReasonForExclusion"/>
+			<xs:element ref="YearOfAssetConstruction"/>
+			<xs:element name="CanNumberOfFederalEmployeesBeDetermined" type="YesNoEnumType"/>
+			<xs:element name="CanNumberOfFederalContractorsBeDetermined" type="YesNoEnumType"/>
+			<xs:element minOccurs="0" name="IsSustainable" type="SustainableType"/>
+			<xs:element minOccurs="0" name="DispositionData" type="DispositionDataType"/>
+			<xs:element name="RealProperty" type="YesNoEnumType"/>
+			<xs:element name="FOIAExemption" type="FOIAExemptionType"/>
+			<xs:element name="StatutoryCitation" type="xs:string"/>
+		</xs:choice>
+		<xs:attribute default="add" name="action" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="Type40StructureType">
 		<xs:choice maxOccurs="unbounded">
 			<xs:element name="RealPropertyType">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value="40"/></xs:restriction></xs:simpleType></xs:element><xs:element minOccurs="0" name="RealPropertyUse" nillable="true" type="RealPropertyUseStructureType"/><xs:element minOccurs="0" name="LegalInterest" type="LegalInterestType"/><xs:element minOccurs="0" name="Status" type="StatusType"/><xs:element minOccurs="0" name="HistoricalStatus" type="HistoricalStatusType"/><xs:element ref="ReportingAgency"/><xs:element minOccurs="0" ref="UsingOrganization"/><xs:element minOccurs="0" ref="LeaseExpirationDate"/><xs:element ref="LeaseStartDate"/><xs:element ref="LeaseOccupancyDate"/><xs:element ref="IsAssetExcluded"/><xs:element ref="ReasonForExclusion"/><xs:element ref="YearOfAssetConstruction"/><xs:element minOccurs="0" name="Size" type="SizeStructure"/><xs:element minOccurs="0" ref="Utilization"/><xs:element minOccurs="0" ref="ReplacementValue"/><xs:element minOccurs="0" ref="RepairNeeds"/><xs:element name="HistoricalCapitalExpenditures" type="NumericTwelveThreeGreaterThanZeroType"/><xs:element name="EstimatedFutureCapitalExpenditures" type="NumericTwelveThreeGreaterThanZeroType"/><xs:element minOccurs="0" name="AnnualOperatingCosts" type="AnnualOperatingCostsType"/><xs:element minOccurs="0" name="MainLocation" type="MainLocationType"/><xs:element ref="RealPropertyUniqueIdentifier"/><xs:element minOccurs="0" ref="City"/><xs:element minOccurs="0" ref="State"/><xs:element minOccurs="0" ref="Country"/><xs:element minOccurs="0" ref="County"/><xs:element minOccurs="0" ref="CongressionalDistricts"/><xs:element minOccurs="0" ref="Zipcode"/><xs:element minOccurs="0" name="InstallationAndSubInstallationIdentifier" type="InstallationAndSubInstallationIdentifierType"/><xs:element minOccurs="0" name="DispositionData" type="DispositionDataType"/><xs:element name="RealProperty" type="YesNoEnumType"/><xs:element name="FOIAExemption" type="FOIAExemptionType"/><xs:element name="StatutoryCitation" type="xs:string"/></xs:choice><xs:attribute default="add" name="action" type="xs:string"/></xs:complexType><xs:simpleType name="RealPropertyTypeType">
+						<xs:whiteSpace value="collapse"/>
+						<xs:enumeration value="40"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element minOccurs="0" name="RealPropertyUse" nillable="true" type="RealPropertyUseStructureType"/>
+			<xs:element minOccurs="0" name="LegalInterest" type="LegalInterestType"/>
+			<xs:element minOccurs="0" name="Status" type="StatusType"/>
+			<xs:element minOccurs="0" name="HistoricalStatus" type="HistoricalStatusType"/>
+			<xs:element ref="ReportingAgency"/>
+			<xs:element minOccurs="0" ref="UsingOrganization"/>
+			<xs:element minOccurs="0" ref="LeaseExpirationDate"/>
+			<xs:element ref="LeaseStartDate"/>
+			<xs:element ref="LeaseOccupancyDate"/>
+			<xs:element ref="IsAssetExcluded"/>
+			<xs:element ref="ReasonForExclusion"/>
+			<xs:element ref="YearOfAssetConstruction"/>
+			<xs:element minOccurs="0" name="Size" type="SizeStructure"/>
+			<xs:element minOccurs="0" name="AssetHeight" type="AssetHeightType"/>
+			<xs:element minOccurs="0" name="AssetHeightRange" type="AssetHeightRangeType"/>
+			<xs:element minOccurs="0" ref="Utilization"/>
+			<xs:element minOccurs="0" ref="ReplacementValue"/>
+			<xs:element minOccurs="0" ref="RepairNeeds"/>
+			<xs:element name="HistoricalCapitalExpenditures" type="NumericTwelveThreeGreaterThanZeroType"/>
+			<xs:element name="EstimatedFutureCapitalExpenditures" type="NumericTwelveThreeGreaterThanZeroType"/>
+			<xs:element minOccurs="0" name="AnnualOperatingCosts" type="AnnualOperatingCostsType"/>
+			<xs:element minOccurs="0" name="MainLocation" type="MainLocationType"/>
+			<xs:element ref="RealPropertyUniqueIdentifier"/>
+			<xs:element minOccurs="0" ref="City"/>
+			<xs:element minOccurs="0" ref="State"/>
+			<xs:element minOccurs="0" ref="Country"/>
+			<xs:element minOccurs="0" ref="County"/>
+			<xs:element minOccurs="0" ref="CongressionalDistricts"/>
+			<xs:element minOccurs="0" ref="Zipcode"/>
+			<xs:element minOccurs="0" name="InstallationAndSubInstallationIdentifier" type="InstallationAndSubInstallationIdentifierType"/>
+			<xs:element minOccurs="0" name="DispositionData" type="DispositionDataType"/>
+			<xs:element name="RealProperty" type="YesNoEnumType"/>
+			<xs:element name="FOIAExemption" type="FOIAExemptionType"/>
+			<xs:element name="StatutoryCitation" type="xs:string"/>
+		</xs:choice>
+		<xs:attribute default="add" name="action" type="xs:string"/>
+	</xs:complexType>
+	<xs:simpleType name="RealPropertyTypeType">
 		<xs:restriction base="xs:integer">
-			<xs:enumeration value="20"/><xs:enumeration value="35"/><xs:enumeration value="40"/></xs:restriction></xs:simpleType><xs:simpleType name="FOIAExemptionType">
+			<xs:enumeration value="20"/>
+			<xs:enumeration value="35"/>
+			<xs:enumeration value="40"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="FOIAExemptionType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="01"/>
+			<xs:enumeration value="02"/>
+			<xs:enumeration value="03"/>
+			<xs:enumeration value="04"/>
+			<xs:enumeration value="05"/>
+			<xs:enumeration value="06"/>
+			<xs:enumeration value="07"/>
+			<xs:enumeration value="08"/>
+			<xs:enumeration value="09"/>
+			<xs:enumeration value="10"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="AssetHeightType">
+        <xs:restriction base="xs:integer">
+            <xs:minInclusive value="1"/>
+            <xs:maxInclusive value="10000"/>
+        </xs:restriction>
+    </xs:simpleType>
+	<xs:simpleType name="RealPropertyUseLandType">
 		<xs:restriction base="xs:integer">
-			<xs:enumeration value="01"/><xs:enumeration value="02"/><xs:enumeration value="03"/><xs:enumeration value="04"/><xs:enumeration value="05"/><xs:enumeration value="06"/><xs:enumeration value="07"/><xs:enumeration value="08"/><xs:enumeration value="09"/><xs:enumeration value="10"/></xs:restriction></xs:simpleType><xs:simpleType name="RealPropertyUseLandType">
+			<xs:enumeration value="1"/>
+			<xs:enumeration value="4"/>
+			<xs:enumeration value="7"/>
+			<xs:enumeration value="8"/>
+			<xs:enumeration value="9"/>
+			<xs:enumeration value="10"/>
+			<xs:enumeration value="11"/>
+			<xs:enumeration value="12"/>
+			<xs:enumeration value="13"/>
+			<xs:enumeration value="14"/>
+			<xs:enumeration value="15"/>
+			<xs:enumeration value="16"/>
+			<xs:enumeration value="17"/>
+			<xs:enumeration value="18"/>
+			<xs:enumeration value="19"/>
+			<xs:enumeration value="20"/>
+			<xs:enumeration value="30"/>
+			<xs:enumeration value="40"/>
+			<xs:enumeration value="50"/>
+			<xs:enumeration value="65"/>
+			<xs:enumeration value="70"/>
+			<xs:enumeration value="72"/>
+			<xs:enumeration value="73"/>
+			<xs:enumeration value="80"/>
+			<xs:enumeration value="81"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="RealPropertyUseBuildingType">
 		<xs:restriction base="xs:integer">
-			<xs:enumeration value="1"/><xs:enumeration value="4"/><xs:enumeration value="7"/><xs:enumeration value="8"/><xs:enumeration value="9"/><xs:enumeration value="10"/><xs:enumeration value="11"/><xs:enumeration value="12"/><xs:enumeration value="13"/><xs:enumeration value="14"/><xs:enumeration value="15"/><xs:enumeration value="16"/><xs:enumeration value="17"/><xs:enumeration value="18"/><xs:enumeration value="19"/><xs:enumeration value="20"/><xs:enumeration value="30"/><xs:enumeration value="40"/><xs:enumeration value="50"/><xs:enumeration value="65"/><xs:enumeration value="70"/><xs:enumeration value="72"/><xs:enumeration value="73"/><xs:enumeration value="80"/><xs:enumeration value="81"/></xs:restriction></xs:simpleType><xs:simpleType name="RealPropertyUseBuildingType">
+			<xs:enumeration value="10"/>
+			<xs:enumeration value="14"/>
+			<xs:enumeration value="17"/>
+			<xs:enumeration value="21"/>
+			<xs:enumeration value="22"/>
+			<xs:enumeration value="23"/>
+			<xs:enumeration value="24"/>
+			<xs:enumeration value="25"/>
+			<xs:enumeration value="28"/>
+			<xs:enumeration value="29"/>
+			<xs:enumeration value="30"/>
+			<xs:enumeration value="31"/>
+			<xs:enumeration value="41"/>
+			<xs:enumeration value="50"/>
+			<xs:enumeration value="60"/>
+			<xs:enumeration value="72"/>
+			<xs:enumeration value="73"/>
+			<xs:enumeration value="74"/>
+			<xs:enumeration value="80"/>
+			<xs:enumeration value="84"/>
+			<xs:enumeration value="85"/>
+			<xs:enumeration value="86"/>
+			<xs:enumeration value="87"/>
+			<xs:enumeration value="88"/>
+			<xs:enumeration value="89"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="RealPropertyUseStructureType">
 		<xs:restriction base="xs:integer">
-			<xs:enumeration value="10"/><xs:enumeration value="14"/><xs:enumeration value="17"/><xs:enumeration value="21"/><xs:enumeration value="22"/><xs:enumeration value="23"/><xs:enumeration value="24"/><xs:enumeration value="25"/><xs:enumeration value="28"/><xs:enumeration value="29"/><xs:enumeration value="30"/><xs:enumeration value="31"/><xs:enumeration value="41"/><xs:enumeration value="50"/><xs:enumeration value="60"/><xs:enumeration value="72"/><xs:enumeration value="73"/><xs:enumeration value="74"/><xs:enumeration value="80"/><xs:enumeration value="84"/><xs:enumeration value="85"/><xs:enumeration value="86"/><xs:enumeration value="87"/><xs:enumeration value="88"/><xs:enumeration value="89"/></xs:restriction></xs:simpleType><xs:simpleType name="RealPropertyUseStructureType">
-		<xs:restriction base="xs:integer">
-			<xs:enumeration value="12"/><xs:enumeration value="13"/><xs:enumeration value="15"/><xs:enumeration value="16"/><xs:enumeration value="18"/><xs:enumeration value="28"/><xs:enumeration value="40"/><xs:enumeration value="50"/><xs:enumeration value="60"/><xs:enumeration value="65"/><xs:enumeration value="66"/><xs:enumeration value="70"/><xs:enumeration value="71"/><xs:enumeration value="72"/><xs:enumeration value="73"/><xs:enumeration value="75"/><xs:enumeration value="76"/><xs:enumeration value="77"/><xs:enumeration value="78"/><xs:enumeration value="79"/><xs:enumeration value="80"/><xs:enumeration value="82"/><xs:enumeration value="83"/></xs:restriction></xs:simpleType><xs:simpleType name="FieldOfficeType">
+			<xs:enumeration value="12"/>
+			<xs:enumeration value="13"/>
+			<xs:enumeration value="15"/>
+			<xs:enumeration value="16"/>
+			<xs:enumeration value="18"/>
+			<xs:enumeration value="28"/>
+			<xs:enumeration value="40"/>
+			<xs:enumeration value="50"/>
+			<xs:enumeration value="60"/>
+			<xs:enumeration value="65"/>
+			<xs:enumeration value="66"/>
+			<xs:enumeration value="70"/>
+			<xs:enumeration value="71"/>
+			<xs:enumeration value="72"/>
+			<xs:enumeration value="73"/>
+			<xs:enumeration value="75"/>
+			<xs:enumeration value="76"/>
+			<xs:enumeration value="77"/>
+			<xs:enumeration value="78"/>
+			<xs:enumeration value="79"/>
+			<xs:enumeration value="80"/>
+			<xs:enumeration value="82"/>
+			<xs:enumeration value="83"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="FieldOfficeType">
 		<xs:union>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+					<xs:whiteSpace value="collapse"/>
+					<xs:enumeration value=""/>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="HQ"/><xs:enumeration value="HF"/><xs:enumeration value="FO"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType><xs:simpleType name="LegalInterestIndicatorType">
+					<xs:enumeration value="HQ"/>
+					<xs:enumeration value="HF"/>
+					<xs:enumeration value="FO"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="LegalInterestIndicatorType">
 		<xs:restriction base="xs:string">
-			<xs:whiteSpace value="collapse"/><xs:enumeration value=""/><xs:enumeration value="G"/><xs:enumeration value="S"/><xs:enumeration value="F"/><xs:enumeration value="L"/><xs:enumeration value="M"/><xs:enumeration value="W"/><xs:enumeration value="g"/><xs:enumeration value="s"/><xs:enumeration value="f"/><xs:enumeration value="l"/><xs:enumeration value="m"/><xs:enumeration value="w"/></xs:restriction></xs:simpleType><xs:complexType name="LegalInterestType">
+			<xs:whiteSpace value="collapse"/>
+			<xs:enumeration value=""/>
+			<xs:enumeration value="G"/>
+			<xs:enumeration value="S"/>
+			<xs:enumeration value="F"/>
+			<xs:enumeration value="L"/>
+			<xs:enumeration value="M"/>
+			<xs:enumeration value="W"/>
+			<xs:enumeration value="g"/>
+			<xs:enumeration value="s"/>
+			<xs:enumeration value="f"/>
+			<xs:enumeration value="l"/>
+			<xs:enumeration value="m"/>
+			<xs:enumeration value="w"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="LegalInterestType">
 		<xs:choice maxOccurs="2">
-			<xs:element minOccurs="0" name="LegalInterestIndicator" type="LegalInterestIndicatorType"/><xs:element minOccurs="0" name="LeaseAuthorityIndicator" type="LeaseAuthorityIndicatorType"/></xs:choice></xs:complexType><xs:complexType name="StatusType">
+			<xs:element minOccurs="0" name="LegalInterestIndicator" type="LegalInterestIndicatorType"/>
+			<xs:element minOccurs="0" name="LeaseAuthorityIndicator" type="LeaseAuthorityIndicatorType"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="StatusType">
 		<xs:choice maxOccurs="9">
-			<xs:element name="StatusIndicator" type="StatusIndicatorType"/><xs:element minOccurs="0" name="SurplusDeclarationDate" type="SurplusDeclarationDateType"/><xs:element minOccurs="0" name="ReportOfExcessSubmittedDate" type="ReportOfExcessSubmittedDateType"/><xs:element minOccurs="0" name="ReportOfExcessAcceptedDate" type="ReportOfExcessAcceptedDateType"/><xs:element minOccurs="0" name="DeterminationToDisposeDate" type="DeterminationToDisposeDateType"/><xs:element minOccurs="0" name="CannotCurrentlyBeDisposedDate" type="CannotCurrentlyBeDisposedDateType"/><xs:element minOccurs="0" name="OutgrantIndicator" type="OutgrantIndicatorType"/><xs:element minOccurs="0" name="CannotCurrentlyBeDisposed" type="CannotCurrentlyBeDisposedType"/></xs:choice></xs:complexType><xs:simpleType name="CannotCurrentlyBeDisposedType">
+			<xs:element name="StatusIndicator" type="StatusIndicatorType"/>
+			<xs:element minOccurs="0" name="SurplusDeclarationDate" type="SurplusDeclarationDateType"/>
+			<xs:element minOccurs="0" name="ReportOfExcessSubmittedDate" type="ReportOfExcessSubmittedDateType"/>
+			<xs:element minOccurs="0" name="ReportOfExcessAcceptedDate" type="ReportOfExcessAcceptedDateType"/>
+			<xs:element minOccurs="0" name="DeterminationToDisposeDate" type="DeterminationToDisposeDateType"/>
+			<xs:element minOccurs="0" name="CannotCurrentlyBeDisposedDate" type="CannotCurrentlyBeDisposedDateType"/>
+			<xs:element minOccurs="0" name="OutgrantIndicator" type="OutgrantIndicatorType"/>
+			<xs:element minOccurs="0" name="CannotCurrentlyBeDisposed" type="CannotCurrentlyBeDisposedType"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:simpleType name="CannotCurrentlyBeDisposedType">
 		<xs:restriction base="xs:string">
-			<xs:whiteSpace value="collapse"/><xs:enumeration value=""/><xs:enumeration value="1"/><xs:enumeration value="2"/><xs:enumeration value="3"/><xs:enumeration value="4"/><xs:enumeration value="5"/><xs:enumeration value="6"/><xs:enumeration value="7"/><xs:enumeration value="8"/></xs:restriction></xs:simpleType><xs:simpleType name="StatusIndicatorType">
+			<xs:whiteSpace value="collapse"/>
+			<xs:enumeration value=""/>
+			<xs:enumeration value="1"/>
+			<xs:enumeration value="2"/>
+			<xs:enumeration value="3"/>
+			<xs:enumeration value="4"/>
+			<xs:enumeration value="5"/>
+			<xs:enumeration value="6"/>
+			<xs:enumeration value="7"/>
+			<xs:enumeration value="8"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="StatusIndicatorType">
 		<xs:restriction base="xs:string">
-			<xs:whiteSpace value="collapse"/><xs:enumeration value=""/><xs:enumeration value="A"/><xs:enumeration value="B"/><xs:enumeration value="C"/><xs:enumeration value="D"/><xs:enumeration value="F"/><xs:enumeration value="G"/><xs:enumeration value="I"/><xs:enumeration value="S"/><xs:enumeration value="a"/><xs:enumeration value="b"/><xs:enumeration value="c"/><xs:enumeration value="d"/><xs:enumeration value="f"/><xs:enumeration value="g"/><xs:enumeration value="i"/><xs:enumeration value="s"/></xs:restriction></xs:simpleType><xs:simpleType name="SurplusDeclarationDateType">
+			<xs:whiteSpace value="collapse"/>
+			<xs:enumeration value=""/>
+			<xs:enumeration value="A"/>
+			<xs:enumeration value="B"/>
+			<xs:enumeration value="C"/>
+			<xs:enumeration value="D"/>
+			<xs:enumeration value="F"/>
+			<xs:enumeration value="G"/>
+			<xs:enumeration value="I"/>
+			<xs:enumeration value="S"/>
+			<xs:enumeration value="a"/>
+			<xs:enumeration value="b"/>
+			<xs:enumeration value="c"/>
+			<xs:enumeration value="d"/>
+			<xs:enumeration value="f"/>
+			<xs:enumeration value="g"/>
+			<xs:enumeration value="i"/>
+			<xs:enumeration value="s"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SurplusDeclarationDateType">
 		<xs:union>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+					<xs:whiteSpace value="collapse"/>
+					<xs:enumeration value=""/>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:pattern value="(1[0-2]|0?[1-9]|1[012])[/](1[0-2]|0?[1-9]|[12][0-9]|3[01])[/](19|20|21)\d\d"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType><xs:simpleType name="ReportOfExcessSubmittedDateType">
+					<xs:pattern value="(1[0-2]|0?[1-9]|1[012])[/](1[0-2]|0?[1-9]|[12][0-9]|3[01])[/](19|20|21)\d\d"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="ReportOfExcessSubmittedDateType">
 		<xs:union>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+					<xs:whiteSpace value="collapse"/>
+					<xs:enumeration value=""/>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:pattern value="(1[0-2]|0?[1-9]|1[012])[/](1[0-2]|0?[1-9]|[12][0-9]|3[01])[/](19|20|21)\d\d"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType><xs:simpleType name="ReportOfExcessAcceptedDateType">
+					<xs:pattern value="(1[0-2]|0?[1-9]|1[012])[/](1[0-2]|0?[1-9]|[12][0-9]|3[01])[/](19|20|21)\d\d"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="ReportOfExcessAcceptedDateType">
 		<xs:union>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+					<xs:whiteSpace value="collapse"/>
+					<xs:enumeration value=""/>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:pattern value="(1[0-2]|0?[1-9]|1[012])[/](1[0-2]|0?[1-9]|[12][0-9]|3[01])[/](19|20|21)\d\d"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType><xs:simpleType name="DeterminationToDisposeDateType">
+					<xs:pattern value="(1[0-2]|0?[1-9]|1[012])[/](1[0-2]|0?[1-9]|[12][0-9]|3[01])[/](19|20|21)\d\d"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="DeterminationToDisposeDateType">
 		<xs:union>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+					<xs:whiteSpace value="collapse"/>
+					<xs:enumeration value=""/>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:pattern value="(1[0-2]|0?[1-9]|1[012])[/](1[0-2]|0?[1-9]|[12][0-9]|3[01])[/](19|20|21)\d\d"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType><xs:simpleType name="CannotCurrentlyBeDisposedDateType">
+					<xs:pattern value="(1[0-2]|0?[1-9]|1[012])[/](1[0-2]|0?[1-9]|[12][0-9]|3[01])[/](19|20|21)\d\d"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="CannotCurrentlyBeDisposedDateType">
 		<xs:union>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+					<xs:whiteSpace value="collapse"/>
+					<xs:enumeration value=""/>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:pattern value="(((1[0-2]|0?[1-9])[/](0?[1-9]|[12][0-9]|3[01])[/](19\d\d|20[0][0-9]|20[1][0-7]))|((0?[1-9])[/](0?[1-9]|[12][0-9]|3[01x])[/]2018))"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType><xs:simpleType name="OutgrantIndicatorType">
+					<xs:pattern value="(((1[0-2]|0?[1-9])[/](0?[1-9]|[12][0-9]|3[01])[/](19\d\d|20[0][0-9]|20[1][0-7]))|((0?[1-9])[/](0?[1-9]|[12][0-9]|3[01x])[/]2018))"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="OutgrantIndicatorType">
 		<xs:restriction base="xs:string">
-			<xs:whiteSpace value="collapse"/><xs:enumeration value="Y"/><xs:enumeration value="N"/><xs:enumeration value="y"/><xs:enumeration value="n"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType name="HistoricalStatusType">
+			<xs:whiteSpace value="collapse"/>
+			<xs:enumeration value="Y"/>
+			<xs:enumeration value="N"/>
+			<xs:enumeration value="y"/>
+			<xs:enumeration value="n"/>
+			<xs:enumeration value=""/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="HistoricalStatusType">
 		<xs:restriction base="xs:string">
-			<xs:whiteSpace value="collapse"/><xs:enumeration value=""/><xs:enumeration value="1"/><xs:enumeration value="2"/><xs:enumeration value="3"/><xs:enumeration value="4"/><xs:enumeration value="5"/><xs:enumeration value="6"/></xs:restriction></xs:simpleType><xs:simpleType name="LeaseAuthorityIndicatorType">
+			<xs:whiteSpace value="collapse"/>
+			<xs:enumeration value=""/>
+			<xs:enumeration value="1"/>
+			<xs:enumeration value="2"/>
+			<xs:enumeration value="3"/>
+			<xs:enumeration value="4"/>
+			<xs:enumeration value="5"/>
+			<xs:enumeration value="6"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="LeaseAuthorityIndicatorType">
 		<xs:restriction base="xs:string">
-			<xs:whiteSpace value="collapse"/><xs:enumeration value=""/><xs:enumeration value="IS"/><xs:enumeration value="CS"/><xs:enumeration value="SP"/><xs:enumeration value="PC"/><xs:enumeration value="is"/><xs:enumeration value="cs"/><xs:enumeration value="sp"/><xs:enumeration value="pc"/><xs:enumeration value="Is"/><xs:enumeration value="Cs"/><xs:enumeration value="Sp"/><xs:enumeration value="Pc"/><xs:enumeration value="iS"/><xs:enumeration value="cS"/><xs:enumeration value="sP"/><xs:enumeration value="pC"/></xs:restriction></xs:simpleType><xs:element name="LeaseExpirationDate">
+			<xs:whiteSpace value="collapse"/>
+			<xs:enumeration value=""/>
+			<xs:enumeration value="IS"/>
+			<xs:enumeration value="CS"/>
+			<xs:enumeration value="SP"/>
+			<xs:enumeration value="PC"/>
+			<xs:enumeration value="is"/>
+			<xs:enumeration value="cs"/>
+			<xs:enumeration value="sp"/>
+			<xs:enumeration value="pc"/>
+			<xs:enumeration value="Is"/>
+			<xs:enumeration value="Cs"/>
+			<xs:enumeration value="Sp"/>
+			<xs:enumeration value="Pc"/>
+			<xs:enumeration value="iS"/>
+			<xs:enumeration value="cS"/>
+			<xs:enumeration value="sP"/>
+			<xs:enumeration value="pC"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="LeaseExpirationDate">
 		<xs:simpleType>
 			<xs:union>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+						<xs:enumeration value=""/>
+					</xs:restriction>
+				</xs:simpleType>
+				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:pattern value="(1[0-2]|0?[1-9]|1[012])[/](1[0-2]|0?[1-9]|[12][0-9]|3[01])[/](19|20|21)\d\d"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="LeaseStartDate">
+						<xs:pattern value="(1[0-2]|0?[1-9]|1[012])[/](1[0-2]|0?[1-9]|[12][0-9]|3[01])[/](19|20|21)\d\d"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:union>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="LeaseStartDate">
 		<xs:simpleType>
 			<xs:union>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+						<xs:whiteSpace value="collapse"/>
+						<xs:enumeration value=""/>
+					</xs:restriction>
+				</xs:simpleType>
+				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:pattern value="(((1[0-2]|0?[1-9])[/](0?[1-9]|[12][0-9]|3[01])[/](1[4-9]\d\d|20[0][0-9]|20[1][0-7]))|((0?[1-9])[/](0?[1-9]|[12][0-9]|3[01])[/]2018))"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="LeaseOccupancyDate">
+						<xs:pattern value="(((1[0-2]|0?[1-9])[/](0?[1-9]|[12][0-9]|3[01])[/](1[4-9]\d\d|20[0][0-9]|20[1][0-7]))|((0?[1-9])[/](0?[1-9]|[12][0-9]|3[01])[/]2018))"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:union>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="LeaseOccupancyDate">
 		<xs:simpleType>
 			<xs:union>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:pattern value="(((1[0-2]|0?[1-9])[/](0?[1-9]|[12][0-9]|3[01])[/](19\d\d|20\d\d)))"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="IsAssetExcluded">
+						<xs:whiteSpace value="collapse"/>
+						<xs:enumeration value=""/>
+					</xs:restriction>
+				</xs:simpleType>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value="Y"/><xs:enumeration value="N"/></xs:restriction></xs:simpleType></xs:element><xs:element name="ReasonForExclusion">
-		<xs:simpleType>
-			<xs:union>
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:enumeration value="ABE"/><xs:enumeration value="AGR"/><xs:enumeration value="AAR"/><xs:enumeration value="CON"/><xs:enumeration value="FLC"/><xs:enumeration value="HAR"/><xs:enumeration value="INA"/><xs:enumeration value="NFO"/><xs:enumeration value="NPA"/><xs:enumeration value="MIL"/><xs:enumeration value="POW"/><xs:enumeration value="PDO"/><xs:enumeration value="RCL"/><xs:enumeration value="REC"/><xs:enumeration value="RIV"/><xs:enumeration value="WLA"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="YearOfAssetConstruction">
-		<xs:simpleType>
-			<xs:union>
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:pattern value="([1-9][0-9][0-9][0-9])|([2][0][0-1][0-8])|([9][9][9][9])"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:simpleType name="YesNoEnumType">
-		<xs:union>
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="Y"/><xs:enumeration value="N"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType><xs:element name="ReportingAgency">
+						<xs:pattern value="(((1[0-2]|0?[1-9])[/](0?[1-9]|[12][0-9]|3[01])[/](19\d\d|20\d\d)))"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:union>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="IsAssetExcluded">
 		<xs:simpleType>
 			<xs:restriction base="xs:string">
-				<xs:length value="4"/><xs:pattern value="\d{4}"/></xs:restriction></xs:simpleType></xs:element><xs:element name="UsingOrganization" nillable="true">
+				<xs:whiteSpace value="collapse"/>
+				<xs:enumeration value="Y"/>
+				<xs:enumeration value="N"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="ReasonForExclusion">
 		<xs:simpleType>
 			<xs:union>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+						<xs:whiteSpace value="collapse"/>
+						<xs:enumeration value=""/>
+					</xs:restriction>
+				</xs:simpleType>
+				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:length value="4"/><xs:pattern value="\d{4}"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="Utilization" nillable="true">
+						<xs:enumeration value="ABE"/>
+						<xs:enumeration value="AGR"/>
+						<xs:enumeration value="AAR"/>
+						<xs:enumeration value="CON"/>
+						<xs:enumeration value="FLC"/>
+						<xs:enumeration value="HAR"/>
+						<xs:enumeration value="INA"/>
+						<xs:enumeration value="NFO"/>
+						<xs:enumeration value="NPA"/>
+						<xs:enumeration value="MIL"/>
+						<xs:enumeration value="POW"/>
+						<xs:enumeration value="PDO"/>
+						<xs:enumeration value="RCL"/>
+						<xs:enumeration value="REC"/>
+						<xs:enumeration value="RIV"/>
+						<xs:enumeration value="WLA"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:union>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="YearOfAssetConstruction">
 		<xs:simpleType>
 			<xs:union>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+						<xs:whiteSpace value="collapse"/>
+						<xs:enumeration value=""/>
+					</xs:restriction>
+				</xs:simpleType>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:pattern value="([1-9][0-9][0-9][0-9])|([2][0][0-1][0-8])|([9][9][9][9])"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:union>
+		</xs:simpleType>
+	</xs:element>
+	<xs:simpleType name="YesNoEnumType">
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:whiteSpace value="collapse"/>
+					<xs:enumeration value=""/>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="Y"/>
+					<xs:enumeration value="N"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:element name="ReportingAgency">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:length value="4"/>
+				<xs:pattern value="\d{4}"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="UsingOrganization" nillable="true">
+		<xs:simpleType>
+			<xs:union>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:whiteSpace value="collapse"/>
+						<xs:enumeration value=""/>
+					</xs:restriction>
+				</xs:simpleType>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="4"/>
+						<xs:pattern value="\d{4}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:union>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="Utilization" nillable="true">
+		<xs:simpleType>
+			<xs:union>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:whiteSpace value="collapse"/>
+						<xs:enumeration value=""/>
+					</xs:restriction>
+				</xs:simpleType>
+				<xs:simpleType>
 					<xs:restriction base="xs:integer">
-						<xs:enumeration value="5"/><xs:enumeration value="6"/><xs:enumeration value="7"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:complexType name="SizeLand">
+						<xs:enumeration value="5"/>
+						<xs:enumeration value="6"/>
+						<xs:enumeration value="7"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:union>
+		</xs:simpleType>
+	</xs:element>
+	<xs:complexType name="SizeLand">
 		<xs:choice>
 			<xs:element name="Acres">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="15"/><xs:fractionDigits value="3"/><xs:minInclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element></xs:choice></xs:complexType><xs:complexType name="SizeBuilding">
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="3"/>
+								<xs:minInclusive value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="SizeBuilding">
 		<xs:choice maxOccurs="2">
 			<xs:element name="SquareFeet">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="15"/><xs:fractionDigits value="3"/><xs:minExclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="SquareFeetUnitOfMeasure">
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="3"/>
+								<xs:minExclusive value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SquareFeetUnitOfMeasure">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value=""/><xs:enumeration value="G"/><xs:enumeration value="R"/><xs:enumeration value="U"/><xs:enumeration value="g"/><xs:enumeration value="r"/><xs:enumeration value="u"/></xs:restriction></xs:simpleType></xs:element></xs:choice></xs:complexType><xs:complexType name="PersonnelBuilding">
+						<xs:whiteSpace value="collapse"/>
+						<xs:enumeration value=""/>
+						<xs:enumeration value="G"/>
+						<xs:enumeration value="R"/>
+						<xs:enumeration value="U"/>
+						<xs:enumeration value="g"/>
+						<xs:enumeration value="r"/>
+						<xs:enumeration value="u"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="PersonnelBuilding">
 		<xs:sequence>
 			<xs:element minOccurs="0" name="FederalEmployees">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="9"/><xs:fractionDigits value="3"/><xs:minInclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element minOccurs="0" name="FederalContractors">
+								<xs:totalDigits value="9"/>
+								<xs:fractionDigits value="3"/>
+								<xs:minInclusive value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element minOccurs="0" name="FederalContractors">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="9"/><xs:fractionDigits value="3"/><xs:minInclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element></xs:sequence></xs:complexType><xs:complexType name="SizeStructure">
+								<xs:totalDigits value="9"/>
+								<xs:fractionDigits value="3"/>
+								<xs:minInclusive value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SizeStructure">
 		<xs:choice maxOccurs="2">
 			<xs:element name="StructuralUnit">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="15"/><xs:fractionDigits value="3"/><xs:minExclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="UnitOfMeasure">
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="3"/>
+								<xs:minExclusive value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="UnitOfMeasure">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:integer">
-								<xs:enumeration value="1"/><xs:enumeration value="2"/><xs:enumeration value="3"/><xs:enumeration value="4"/><xs:enumeration value="5"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element></xs:choice></xs:complexType><xs:element name="ReplacementValue">
+								<xs:enumeration value="1"/>
+								<xs:enumeration value="2"/>
+								<xs:enumeration value="3"/>
+								<xs:enumeration value="4"/>
+								<xs:enumeration value="5"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:element name="ReplacementValue">
 		<xs:simpleType>
 			<xs:union>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+						<xs:whiteSpace value="collapse"/>
+						<xs:enumeration value=""/>
+					</xs:restriction>
+				</xs:simpleType>
+				<xs:simpleType>
 					<xs:restriction base="xs:decimal">
-						<xs:totalDigits value="15"/><xs:fractionDigits value="3"/><xs:minExclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="RepairNeeds">
+						<xs:totalDigits value="15"/>
+						<xs:fractionDigits value="3"/>
+						<xs:minExclusive value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:union>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="RepairNeeds">
 		<xs:simpleType>
 			<xs:union>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
-					<xs:restriction base="xs:decimal">
-						<xs:totalDigits value="15"/><xs:fractionDigits value="3"/><xs:minInclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:simpleType name="NumericTwelveThreeGreaterThanZeroType">
-			<xs:union>
+						<xs:whiteSpace value="collapse"/>
+						<xs:enumeration value=""/>
+					</xs:restriction>
+				</xs:simpleType>
 				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
-			<xs:restriction base="xs:decimal">
-				<xs:totalDigits value="12"/><xs:fractionDigits value="3"/><xs:minInclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType><xs:simpleType name="YearAssetReportedUnderutilizedType">
+					<xs:restriction base="xs:decimal">
+						<xs:totalDigits value="15"/>
+						<xs:fractionDigits value="3"/>
+						<xs:minInclusive value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:union>
+		</xs:simpleType>
+	</xs:element>
+	<xs:simpleType name="NumericTwelveThreeGreaterThanZeroType">
 		<xs:union>
-		<xs:simpleType>
+			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
-		<xs:restriction base="xs:string">
-			<xs:whiteSpace value="collapse"/><xs:length value="4"/><xs:pattern value="(19[0-9][0-9])|(20[0][0-9])|(20[1][0-8])"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType><xs:complexType name="AnnualOperatingCostsType">
+					<xs:whiteSpace value="collapse"/>
+					<xs:enumeration value=""/>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="12"/>
+					<xs:fractionDigits value="3"/>
+					<xs:minInclusive value="0"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="YearAssetReportedUnderutilizedType">
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:whiteSpace value="collapse"/>
+					<xs:enumeration value=""/>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:whiteSpace value="collapse"/>
+					<xs:length value="4"/>
+					<xs:pattern value="(19[0-9][0-9])|(20[0][0-9])|(20[1][0-8])"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:complexType name="AnnualOperatingCostsType">
 		<xs:choice maxOccurs="4">
-			<xs:element name="OwnedandOtherwiseManagedAnnualOperatingCosts" type="NumericTwelveThreeGreaterThanZeroType"/><xs:element name="OwnedandOtherwiseManagedAnnualMaintenanceCosts" type="NumericTwelveThreeGreaterThanZeroType"/><xs:element name="LeasedAnnualOperatingCosts" type="NumericTwelveThreeGreaterThanZeroType"/><xs:element name="LeasedAnnualMaintenanceCosts" type="NumericTwelveThreeGreaterThanZeroType"/><xs:element name="LeaseAnnualRent">
+			<xs:element name="OwnedandOtherwiseManagedAnnualOperatingCosts" type="NumericTwelveThreeGreaterThanZeroType"/>
+			<xs:element name="OwnedandOtherwiseManagedAnnualMaintenanceCosts" type="NumericTwelveThreeGreaterThanZeroType"/>
+			<xs:element name="LeasedAnnualOperatingCosts" type="NumericTwelveThreeGreaterThanZeroType"/>
+			<xs:element name="LeasedAnnualMaintenanceCosts" type="NumericTwelveThreeGreaterThanZeroType"/>
+			<xs:element name="LeaseAnnualRent">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="15"/><xs:fractionDigits value="3"/><xs:minInclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element minOccurs="0" name="ComponentCosts" type="ComponentCostsType"/></xs:choice></xs:complexType><xs:complexType name="ComponentCostsType">
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="3"/>
+								<xs:minInclusive value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element minOccurs="0" name="ComponentCosts" type="ComponentCostsType"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="ComponentCostsType">
 		<xs:choice maxOccurs="11">
 			<xs:element name="TotalRecurringMaintRepairCost">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="15"/><xs:fractionDigits value="3"/><xs:minInclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="ElevatorCost">
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="3"/>
+								<xs:minInclusive value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ElevatorCost">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="15"/><xs:fractionDigits value="3"/><xs:minInclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="HVACCost">
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="3"/>
+								<xs:minInclusive value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="HVACCost">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="15"/><xs:fractionDigits value="3"/><xs:minInclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="PlumbingCost">
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="3"/>
+								<xs:minInclusive value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="PlumbingCost">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="15"/><xs:fractionDigits value="3"/><xs:minInclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="TotalUtilitiesCost">
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="3"/>
+								<xs:minInclusive value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TotalUtilitiesCost">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="15"/><xs:fractionDigits value="3"/><xs:minInclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="WaterSewageCost">
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="3"/>
+								<xs:minInclusive value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="WaterSewageCost">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="15"/><xs:fractionDigits value="3"/><xs:minInclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="ElectricityCost">
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="3"/>
+								<xs:minInclusive value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ElectricityCost">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="15"/><xs:fractionDigits value="3"/><xs:minInclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="GasCost">
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="3"/>
+								<xs:minInclusive value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="GasCost">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="15"/><xs:fractionDigits value="3"/><xs:minInclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="SteamCost">
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="3"/>
+								<xs:minInclusive value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SteamCost">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="15"/><xs:fractionDigits value="3"/><xs:minInclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="CleaningJanitorialCost">
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="3"/>
+								<xs:minInclusive value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CleaningJanitorialCost">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="15"/><xs:fractionDigits value="3"/><xs:minInclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="RoadsGroundsKeepingCost">
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="3"/>
+								<xs:minInclusive value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="RoadsGroundsKeepingCost">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="15"/><xs:fractionDigits value="3"/><xs:minInclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element></xs:choice></xs:complexType><xs:complexType name="MainLocationType">
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="3"/>
+								<xs:minInclusive value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="MainLocationType">
 		<xs:choice maxOccurs="3">
 			<xs:element name="StreetAddress">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:maxLength value="100"/><xs:minLength value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element minOccurs="0" name="Latitude">
+								<xs:maxLength value="100"/>
+								<xs:minLength value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element minOccurs="0" name="Latitude">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="12"/><xs:fractionDigits value="7"/><xs:minInclusive value="-90.00000001"/><xs:maxInclusive value="90.00000001"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element minOccurs="0" name="Longitude">
+								<xs:totalDigits value="12"/>
+								<xs:fractionDigits value="7"/>
+								<xs:minInclusive value="-90.00000001"/>
+								<xs:maxInclusive value="90.00000001"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element minOccurs="0" name="Longitude">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="12"/><xs:fractionDigits value="7"/><xs:minInclusive value="-180.00000001"/><xs:maxInclusive value="180.00000001"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element></xs:choice></xs:complexType><xs:element name="RealPropertyUniqueIdentifier">
+								<xs:totalDigits value="12"/>
+								<xs:fractionDigits value="7"/>
+								<xs:minInclusive value="-180.00000001"/>
+								<xs:maxInclusive value="180.00000001"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:element name="RealPropertyUniqueIdentifier">
 		<xs:simpleType>
 			<xs:restriction base="xs:string">
-				<xs:minLength value="1"/><xs:maxLength value="24"/></xs:restriction></xs:simpleType></xs:element><xs:element name="City" nillable="true">
+				<xs:minLength value="1"/>
+				<xs:maxLength value="24"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="City" nillable="true">
 		<xs:simpleType>
 			<xs:union>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+						<xs:whiteSpace value="collapse"/>
+						<xs:enumeration value=""/>
+					</xs:restriction>
+				</xs:simpleType>
+				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:length value="4"/><xs:pattern value="\d{4}"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="State">
+						<xs:length value="4"/>
+						<xs:pattern value="\d{4}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:union>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="State">
 		<xs:simpleType>
 			<xs:union>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+						<xs:whiteSpace value="collapse"/>
+						<xs:enumeration value=""/>
+					</xs:restriction>
+				</xs:simpleType>
+				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:length value="2"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="Country">
+						<xs:length value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:union>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="Country">
 		<xs:simpleType>
 			<xs:union>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+						<xs:whiteSpace value="collapse"/>
+						<xs:enumeration value=""/>
+					</xs:restriction>
+				</xs:simpleType>
+				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:length value="3"/><xs:pattern value="\d{3}"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="County" nillable="true">
+						<xs:length value="3"/>
+						<xs:pattern value="\d{3}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:union>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="County" nillable="true">
 		<xs:simpleType>
 			<xs:union>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+						<xs:whiteSpace value="collapse"/>
+						<xs:enumeration value=""/>
+					</xs:restriction>
+				</xs:simpleType>
+				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:length value="3"/><xs:pattern value="\d{3}"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="CongressionalDistricts">
+						<xs:length value="3"/>
+						<xs:pattern value="\d{3}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:union>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="CongressionalDistricts">
 		<xs:simpleType>
 			<xs:union>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+						<xs:whiteSpace value="collapse"/>
+						<xs:enumeration value=""/>
+					</xs:restriction>
+				</xs:simpleType>
+				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:minLength value="0"/><xs:maxLength value="20"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="Zipcode">
+						<xs:minLength value="0"/>
+						<xs:maxLength value="20"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:union>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="Zipcode">
 		<xs:simpleType>
 			<xs:union>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+						<xs:whiteSpace value="collapse"/>
+						<xs:enumeration value=""/>
+					</xs:restriction>
+				</xs:simpleType>
+				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:minLength value="1"/><xs:maxLength value="10"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:complexType name="InstallationAndSubInstallationIdentifierType">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:union>
+		</xs:simpleType>
+	</xs:element>
+	<xs:complexType name="InstallationAndSubInstallationIdentifierType">
 		<xs:choice maxOccurs="3">
 			<xs:element minOccurs="0" name="InstallationName">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:maxLength value="100"/><xs:minLength value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="InstallationIdentifier">
+								<xs:maxLength value="100"/>
+								<xs:minLength value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="InstallationIdentifier">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:minLength value="1"/><xs:maxLength value="24"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="SubInstallationIdentifier">
+								<xs:minLength value="1"/>
+								<xs:maxLength value="24"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SubInstallationIdentifier">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:minLength value="1"/><xs:maxLength value="24"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element></xs:choice></xs:complexType><xs:simpleType name="SustainableType">
+								<xs:minLength value="1"/>
+								<xs:maxLength value="24"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:simpleType name="SustainableType">
 		<xs:restriction base="xs:string">
-			<xs:whiteSpace value="collapse"/><xs:enumeration value=""/><xs:enumeration value="1"/><xs:enumeration value="2"/><xs:enumeration value="3"/><xs:enumeration value="4"/></xs:restriction></xs:simpleType><xs:complexType name="DispositionDataType">
+			<xs:whiteSpace value="collapse"/>
+			<xs:enumeration value=""/>
+			<xs:enumeration value="1"/>
+			<xs:enumeration value="2"/>
+			<xs:enumeration value="3"/>
+			<xs:enumeration value="4"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="AssetHeightRangeType">
+	    <xs:restriction base="xs:string">
+		    <xs:whiteSpace value="collapse"/>
+		    <xs:enumeration value=""/>
+		    <xs:enumeration value="A"/>
+		    <xs:enumeration value="B"/>
+		    <xs:enumeration value="C"/>
+		    <xs:enumeration value="D"/>
+		    <xs:enumeration value="E"/>
+	    </xs:restriction>
+    </xs:simpleType>
+	<xs:complexType name="DispositionDataType">
 		<xs:choice maxOccurs="4" minOccurs="0">
 			<xs:element name="DispositionMethod">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/><xs:enumeration value=""/><xs:enumeration value="PB"/><xs:enumeration value="HA"/><xs:enumeration value="HE"/><xs:enumeration value="PR"/><xs:enumeration value="HM"/><xs:enumeration value="CF"/><xs:enumeration value="PF"/><xs:enumeration value="PA"/><xs:enumeration value="WC"/><xs:enumeration value="NS"/><xs:enumeration value="SH"/><xs:enumeration value="LE"/><xs:enumeration value="FT"/><xs:enumeration value="SL"/><xs:enumeration value="SN"/><xs:enumeration value="SP"/><xs:enumeration value="LX"/><xs:enumeration value="DM"/><xs:enumeration value="OT"/><xs:enumeration value="LD"/><xs:enumeration value="AB"/><xs:enumeration value="DE"/><xs:enumeration value="RH"/><xs:enumeration value="LT"/><xs:enumeration value="RO"/><xs:enumeration value="EX"/><xs:enumeration value="LW"/><xs:enumeration value="pb"/><xs:enumeration value="ha"/><xs:enumeration value="he"/><xs:enumeration value="pr"/><xs:enumeration value="hm"/><xs:enumeration value="cf"/><xs:enumeration value="pf"/><xs:enumeration value="pa"/><xs:enumeration value="wc"/><xs:enumeration value="ns"/><xs:enumeration value="sh"/><xs:enumeration value="le"/><xs:enumeration value="ft"/><xs:enumeration value="sl"/><xs:enumeration value="sn"/><xs:enumeration value="sp"/><xs:enumeration value="lx"/><xs:enumeration value="dm"/><xs:enumeration value="ot"/><xs:enumeration value="ld"/><xs:enumeration value="ab"/><xs:enumeration value="de"/><xs:enumeration value="rh"/><xs:enumeration value="lt"/><xs:enumeration value="ro"/><xs:enumeration value="ex"/><xs:enumeration value="lw"/><xs:enumeration value="Pb"/><xs:enumeration value="Ha"/><xs:enumeration value="He"/><xs:enumeration value="Pr"/><xs:enumeration value="Hm"/><xs:enumeration value="Cf"/><xs:enumeration value="Pf"/><xs:enumeration value="Pa"/><xs:enumeration value="Wc"/><xs:enumeration value="Ns"/><xs:enumeration value="Sh"/><xs:enumeration value="Le"/><xs:enumeration value="Ft"/><xs:enumeration value="Sl"/><xs:enumeration value="Sn"/><xs:enumeration value="Sp"/><xs:enumeration value="Lx"/><xs:enumeration value="Dm"/><xs:enumeration value="Ot"/><xs:enumeration value="Ld"/><xs:enumeration value="Ab"/><xs:enumeration value="De"/><xs:enumeration value="Rh"/><xs:enumeration value="Lt"/><xs:enumeration value="Ro"/><xs:enumeration value="Ex"/><xs:enumeration value="Lw"/><xs:enumeration value="pB"/><xs:enumeration value="hA"/><xs:enumeration value="hE"/><xs:enumeration value="pR"/><xs:enumeration value="hM"/><xs:enumeration value="cF"/><xs:enumeration value="pF"/><xs:enumeration value="pA"/><xs:enumeration value="wC"/><xs:enumeration value="nS"/><xs:enumeration value="sH"/><xs:enumeration value="lE"/><xs:enumeration value="fT"/><xs:enumeration value="sL"/><xs:enumeration value="sN"/><xs:enumeration value="sP"/><xs:enumeration value="lX"/><xs:enumeration value="dM"/><xs:enumeration value="oT"/><xs:enumeration value="lD"/><xs:enumeration value="aB"/><xs:enumeration value="dE"/><xs:enumeration value="rH"/><xs:enumeration value="lT"/><xs:enumeration value="rO"/><xs:enumeration value="eX"/><xs:enumeration value="lW"/></xs:restriction></xs:simpleType></xs:element><xs:element name="DispositionDate">
+						<xs:whiteSpace value="collapse"/>
+						<xs:enumeration value=""/>
+						<xs:enumeration value="PB"/>
+						<xs:enumeration value="HA"/>
+						<xs:enumeration value="HE"/>
+						<xs:enumeration value="PR"/>
+						<xs:enumeration value="HM"/>
+						<xs:enumeration value="CF"/>
+						<xs:enumeration value="PF"/>
+						<xs:enumeration value="PA"/>
+						<xs:enumeration value="WC"/>
+						<xs:enumeration value="NS"/>
+						<xs:enumeration value="SH"/>
+						<xs:enumeration value="LE"/>
+						<xs:enumeration value="FT"/>
+						<xs:enumeration value="SL"/>
+						<xs:enumeration value="SN"/>
+						<xs:enumeration value="SP"/>
+						<xs:enumeration value="LX"/>
+						<xs:enumeration value="DM"/>
+						<xs:enumeration value="OT"/>
+						<xs:enumeration value="LD"/>
+						<xs:enumeration value="AB"/>
+						<xs:enumeration value="DE"/>
+						<xs:enumeration value="RH"/>
+						<xs:enumeration value="LT"/>
+						<xs:enumeration value="RO"/>
+						<xs:enumeration value="EX"/>
+						<xs:enumeration value="LW"/>
+						<xs:enumeration value="pb"/>
+						<xs:enumeration value="ha"/>
+						<xs:enumeration value="he"/>
+						<xs:enumeration value="pr"/>
+						<xs:enumeration value="hm"/>
+						<xs:enumeration value="cf"/>
+						<xs:enumeration value="pf"/>
+						<xs:enumeration value="pa"/>
+						<xs:enumeration value="wc"/>
+						<xs:enumeration value="ns"/>
+						<xs:enumeration value="sh"/>
+						<xs:enumeration value="le"/>
+						<xs:enumeration value="ft"/>
+						<xs:enumeration value="sl"/>
+						<xs:enumeration value="sn"/>
+						<xs:enumeration value="sp"/>
+						<xs:enumeration value="lx"/>
+						<xs:enumeration value="dm"/>
+						<xs:enumeration value="ot"/>
+						<xs:enumeration value="ld"/>
+						<xs:enumeration value="ab"/>
+						<xs:enumeration value="de"/>
+						<xs:enumeration value="rh"/>
+						<xs:enumeration value="lt"/>
+						<xs:enumeration value="ro"/>
+						<xs:enumeration value="ex"/>
+						<xs:enumeration value="lw"/>
+						<xs:enumeration value="Pb"/>
+						<xs:enumeration value="Ha"/>
+						<xs:enumeration value="He"/>
+						<xs:enumeration value="Pr"/>
+						<xs:enumeration value="Hm"/>
+						<xs:enumeration value="Cf"/>
+						<xs:enumeration value="Pf"/>
+						<xs:enumeration value="Pa"/>
+						<xs:enumeration value="Wc"/>
+						<xs:enumeration value="Ns"/>
+						<xs:enumeration value="Sh"/>
+						<xs:enumeration value="Le"/>
+						<xs:enumeration value="Ft"/>
+						<xs:enumeration value="Sl"/>
+						<xs:enumeration value="Sn"/>
+						<xs:enumeration value="Sp"/>
+						<xs:enumeration value="Lx"/>
+						<xs:enumeration value="Dm"/>
+						<xs:enumeration value="Ot"/>
+						<xs:enumeration value="Ld"/>
+						<xs:enumeration value="Ab"/>
+						<xs:enumeration value="De"/>
+						<xs:enumeration value="Rh"/>
+						<xs:enumeration value="Lt"/>
+						<xs:enumeration value="Ro"/>
+						<xs:enumeration value="Ex"/>
+						<xs:enumeration value="Lw"/>
+						<xs:enumeration value="pB"/>
+						<xs:enumeration value="hA"/>
+						<xs:enumeration value="hE"/>
+						<xs:enumeration value="pR"/>
+						<xs:enumeration value="hM"/>
+						<xs:enumeration value="cF"/>
+						<xs:enumeration value="pF"/>
+						<xs:enumeration value="pA"/>
+						<xs:enumeration value="wC"/>
+						<xs:enumeration value="nS"/>
+						<xs:enumeration value="sH"/>
+						<xs:enumeration value="lE"/>
+						<xs:enumeration value="fT"/>
+						<xs:enumeration value="sL"/>
+						<xs:enumeration value="sN"/>
+						<xs:enumeration value="sP"/>
+						<xs:enumeration value="lX"/>
+						<xs:enumeration value="dM"/>
+						<xs:enumeration value="oT"/>
+						<xs:enumeration value="lD"/>
+						<xs:enumeration value="aB"/>
+						<xs:enumeration value="dE"/>
+						<xs:enumeration value="rH"/>
+						<xs:enumeration value="lT"/>
+						<xs:enumeration value="rO"/>
+						<xs:enumeration value="eX"/>
+						<xs:enumeration value="lW"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="DispositionDate">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:pattern value="(1[0-2]|0?[1-9]|1[012])[/](1[0-2]|0?[1-9]|[12][0-9]|3[01])[/](19|20|21)\d\d"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="DispositionValue">
+								<xs:pattern value="(1[0-2]|0?[1-9]|1[012])[/](1[0-2]|0?[1-9]|[12][0-9]|3[01])[/](19|20|21)\d\d"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="DispositionValue">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="15"/><xs:fractionDigits value="3"/><xs:minInclusive value="0"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element><xs:element name="NetProceeds">
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="3"/>
+								<xs:minInclusive value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="NetProceeds">
 				<xs:simpleType>
 					<xs:union>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/><xs:enumeration value=""/></xs:restriction></xs:simpleType><xs:simpleType>
+								<xs:whiteSpace value="collapse"/>
+								<xs:enumeration value=""/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
 							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="15"/><xs:fractionDigits value="3"/></xs:restriction></xs:simpleType></xs:union></xs:simpleType></xs:element></xs:choice></xs:complexType>
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="3"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
 </xs:schema>
