@@ -178,8 +178,10 @@ output application/json
 			(DispositionDate : asset.Field58) if (asset.Field58 != null),
 			(DispositionValue : asset.Field59) if (asset.Field59 != null),
 			(NetProceeds : asset.Field60) if (asset.Field60 != null),
-			}) if (asset.Field57 != null or asset.Field58 != null or asset.Field59 != null or asset.Field60 != null)
-	 	}
+			}) if (asset.Field57 != null or asset.Field58 != null or asset.Field59 != null or asset.Field60 != null),
+		(AssetHeight: asset.Field61) if (asset.Field61 != null),
+	 	(AssetHeightRange: asset.Field62) if (asset.Field62 != null)
+	   }
  	]
  }
  	
@@ -362,8 +364,10 @@ output application/json
 			(DispositionDate : asset.Field50) if (asset.Field50 != null),
 			(DispositionValue : asset.Field51) if (asset.Field51 != null),
 			(NetProceeds : asset.Field52) if (asset.Field52 != null),
-			}) if (asset.Field49 != null or asset.Field50 != null or asset.Field51 != null or asset.Field52 != null)
-	 	}
+			}) if (asset.Field49 != null or asset.Field50 != null or asset.Field51 != null or asset.Field52 != null),
+		(AssetHeight: asset.Field53) if (asset.Field53 != null),
+	 	(AssetHeightRange: asset.Field54) if (asset.Field54 != null)
+	   }
  	]
  }
  	
@@ -856,6 +860,8 @@ payload.*Type35Building filter ($ != null) map {
 	InstallationName__c : $.InstallationAndSubInstallationIdentifier.InstallationName,
 	InstallationId__c : $.InstallationAndSubInstallationIdentifier.InstallationIdentifier,
 	SubInstallationId__c : $.InstallationAndSubInstallationIdentifier.SubInstallationIdentifier,
+	Asset_Height__c : $.AssetHeight,
+	Asset_Height_Range__c : $.AssetHeightRange,
 	UtilizationCode__c : $.Utilization,
 	FederalEmployees__c : $.Personnel.FederalEmployees,
 	FederalContractors__c : $.Personnel.FederalContractors,
@@ -986,6 +992,8 @@ payload.*Type40Structure filter ($ != null) map {
 	Year_of_Construction__c : $.YearOfAssetConstruction,
 	StructuralUnits__c : $.Size.StructuralUnit,
 	UnitOfMeasure__c : $.Size.UnitOfMeasure,
+	Asset_Height__c : $.AssetHeight,
+	Asset_Height_Range__c : $.AssetHeightRange,
 	ReplacementValue__c : $.ReplacementValue,
 	RepairNeeds__c : $.RepairNeeds,
 	Historical_Capital_Expenditures__c : $.HistoricalCapitalExpenditures,
