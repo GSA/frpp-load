@@ -940,7 +940,7 @@ payload.*Type20Land filter ($ != null) map {
 	Real_Property_Code__c : $.RealProperty,
 	FOIA_Exemption_Code__c : $.FOIAExemption,
 	Statutory_Citation__c : $.StatutoryCitation,
-	ActionType__c: vars.buildingPayload.FRPPData.@ACTION,
+	ActionType__c: vars.landPayload.FRPPData.@ACTION,
 	FILE_ID__c: vars.file.Id,
 	FiscalYear__c: '${current.fiscalYear}'
 }
@@ -1014,7 +1014,7 @@ payload.*Type40Structure filter ($ != null) map {
 	Real_Property_Code__c : $.RealProperty,
 	FOIA_Exemption_Code__c : $.FOIAExemption,
 	Statutory_Citation__c : $.StatutoryCitation,
-	ActionType__c: vars.buildingPayload.FRPPData.@ACTION,
+	ActionType__c: vars.structurePayload.FRPPData.@ACTION,
 	FILE_ID__c: vars.file.Id,
 	FiscalYear__c: '${current.fiscalYear}'
 }
