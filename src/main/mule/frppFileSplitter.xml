@@ -389,7 +389,7 @@ output application/json
 			</ee:message>
 					<ee:variables>
 						<ee:set-variable variableName="fullPayload"><![CDATA[%dw 2.0
-output application/xml
+output application/xml skipNullOn="everywhere"
 ---
 payload]]></ee:set-variable>
 				<ee:set-variable variableName="countFullPayload" ><![CDATA[%dw 2.0
