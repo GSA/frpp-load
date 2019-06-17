@@ -6,20 +6,21 @@
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-	<flow name="filePoller_httpInvoke" doc:id="d6fe0fee-6e9a-4855-9f9b-0ab28f06ccb8">
-		<http:listener doc:name="Listener" doc:id="ab1bb57b-099b-401c-8866-dcb7cddc4229" config-ref="HTTP_Listener_config_Global" path="/frppload" />
-		<choice doc:name="Choice - fileName Provided?" doc:id="7c06fe60-ceb0-41f5-94d7-b8270e03934b">
+	<flow name="filePoller_httpInvoke" doc:id="82d3ced1-4285-4dba-8548-f02a7a61e643">
+		<http:listener doc:name="Listener" doc:id="0e300c27-9c58-49de-9181-25d22225954c" config-ref="HTTP_Listener_config_Global" path="/frppload" />
+		<logger level="INFO" doc:name="MuleX" doc:id="b4ff2c98-4a61-498a-924a-20122ce9882e" message="MuleX: FrppFilePoller Service Started."/>
+		<choice doc:name="Choice - fileName Provided?" doc:id="90342834-a02e-447c-a716-227622c0ab21">
 			
 			<when expression="#[attributes.queryParams.fileName == 'ALL' or attributes.queryParams.fileName == 'all'  or  attributes.queryParams.fileName == 'All']">
-				<flow-ref doc:name="call filePoller_main" doc:id="2135465c-59dd-4cc7-87b7-1e0dc66177e4" name="filePoller_main" />
+				<flow-ref doc:name="call filePoller_main" doc:id="fa587315-2118-4489-ac55-79bc54c234bf" name="filePoller_main" />
 			</when>
 			
 			
 			<when expression='#[attributes.queryParams.fileName != null and attributes.queryParams.fileName != ""]'>
-				<flow-ref doc:name="filePoller_throttlingCount" doc:id="60d620a2-a040-4f71-833e-7c4c2f92ba4a" name="filePoller_throttlingCount"/>
-				<choice doc:name="Choice - Throttling Limit?" doc:id="ebb263c0-f930-4dc2-aa70-21578a0eb292">
+				<flow-ref doc:name="filePoller_throttlingCount" doc:id="926fbb9d-9406-4c86-814a-4013c3a50ab1" name="filePoller_throttlingCount"/>
+				<choice doc:name="Choice - Throttling Limit?" doc:id="e957c87c-7509-40b9-82c6-7df39a47962c">
 					<when expression="#[(vars.remainingCount &gt; 0) or (p('throttling.flag') != &quot;true&quot;)]">
-						<salesforce:query doc:name="Get the List of Files" doc:id="64e168fa-7436-47b6-ba9b-10e5c754876d" config-ref="SalesforceGeoFL3_Global" target="filePayloads">
+						<salesforce:query doc:name="Get the List of Files" doc:id="309d124e-d858-40b9-b82f-630aac534c9b" config-ref="SalesforceGeoFL3_Global" target="filePayloads">
 			<salesforce:salesforce-query>Select ID, File_Name__c, File_Type__c, File_Extension__c, Status__c, AGENCY_CODE__c, Attachment_ID__c, createdby.email from FRPP_FILE__c where Active__c=True and File_Type__c='CR' and Status__c='Staging In Progress2'  and FILE_NAME__c = ':fileName'</salesforce:salesforce-query>
 			<salesforce:parameters><![CDATA[#[output application/java
 ---
@@ -28,60 +29,61 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 }]]]></salesforce:parameters>
 
 		</salesforce:query>
-						<choice doc:name="Choice - Payload Size &gt; 0?" doc:id="afe76f2b-9a8e-44ca-a9c6-7dd0f44bcec9">
+						<choice doc:name="Choice - Payload Size &gt; 0?" doc:id="684d06b5-a261-4143-9f76-a2d549bedc69">
 					<when expression="#[sizeOf (vars.filePayloads) &gt; 0]">
-						<flow-ref doc:name="Call to forEachFile" doc:id="f096e204-8862-4259-905b-7ab5515f1468" name="forEachFile" />
-						<set-payload value="FRPPFilePoller Flow Completed." doc:name="set Http Response" doc:id="19c91a53-4752-4235-93c0-66a4d487e754" />
+						<flow-ref doc:name="Call to forEachFile" doc:id="224cf289-b5bd-4f22-9a2e-b565d02ac102" name="forEachFile" />
+						<set-payload value="FRPPFilePoller Flow Completed." doc:name="set Http Response" doc:id="e32322d9-26a3-46c3-88ec-845692eddee5" />
 					</when>
 					<otherwise>
-						<set-variable value='#["FRPPFilePoller services was called with a File Name: " ++ attributes.queryParams.fileName ++ ".\n\nNo matching file payload found in SalesForce with that name."]' doc:name="email Body - No Matching File." doc:id="6f942898-a07e-4ed4-a8e6-dd6bc937f43b" variableName="emailBody" />
-						<flow-ref doc:name="supportEmailNotificationFlow" doc:id="a651711d-cca3-4f93-9941-a1e24558c37a" name="supportEmailNotificationFlow" />
-						<set-payload value="FRPPFilePoller Flow Completed with Error: No matching File found" doc:name="No Matching File." doc:id="432b5efd-bd77-41ef-8465-3ad8e91ce48f" />
+						<set-variable value='#["FRPPFilePoller services was called with a File Name: " ++ attributes.queryParams.fileName ++ ".\n\nNo matching file payload found in SalesForce with that name."]' doc:name="email Body - No Matching File." doc:id="843025e9-6e75-43d2-991b-de8d016368b9" variableName="emailBody" />
+						<flow-ref doc:name="supportEmailNotificationFlow" doc:id="8603900c-6d51-4630-8aee-544490d3497a" name="supportEmailNotificationFlow" />
+						<set-payload value="FRPPFilePoller Flow Completed with Error: No matching File found" doc:name="No Matching File." doc:id="30ce723a-e90f-4b0f-b206-bee7e2fef9a3" />
 					</otherwise>
 				</choice>
 					</when>
 					
 					<otherwise >
-						<set-payload value="Reached Max Throttling Limit. No files were processed." doc:name="Throttling Limit Reached." doc:id="e4b92b2b-49db-45d1-9149-00e1d2010153" />
+						<set-payload value="Reached Max Throttling Limit. No files were processed." doc:name="Throttling Limit Reached." doc:id="86e2b5ba-8731-4079-a73b-b3369b2e2c7f" />
 					</otherwise>
 				</choice>
 			</when>
 			<otherwise>
-				<set-payload value="Incorrect query parameters provided. No files were processed." doc:name="Incorrect QueryParams" doc:id="895a7e30-165c-4b67-a3d6-058926c70d13" />
+				<set-payload value="Incorrect query parameters provided. No files were processed." doc:name="Incorrect QueryParams" doc:id="7ca51955-d52d-46b4-a32b-580110b8744a" />
 			</otherwise>
 		</choice>
+		<logger level="INFO" doc:name="MuleX" doc:id="b581d6d5-9ef3-40da-b73e-5951dfcb5c27" message="MuleX: FrppFilePoller Service Completed."/>
 		<error-handler >
-			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="1ccb1ee7-328b-4505-8ba8-4cee410b3cec" >
-				<flow-ref doc:name="filePoller_ErrorHandler" doc:id="0192c90a-26e6-4083-888b-9b975ca4e7e6" name="filePoller_ErrorHandler"/>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="0ba5556f-01eb-4456-a26e-d6cc36b9b9f0" >
+				<flow-ref doc:name="filePoller_ErrorHandler" doc:id="ee30d4f2-19f6-4b86-85da-1036f9a56f89" name="filePoller_ErrorHandler"/>
 			</on-error-continue>
 		</error-handler>
 	</flow>
 	
-	<flow name="filePoller_schedule" doc:id="b72e0599-bf11-46d8-b16d-a56a6e36102b" >
-		<scheduler doc:name="Scheduler" doc:id="b40276a8-94a6-4c41-bca0-ea0ed003b2e9" >
+	<flow name="filePoller_schedule" doc:id="ff461d90-7c4a-4338-bed3-115d1e007fe0" >
+		<scheduler doc:name="Scheduler" doc:id="ebd7083b-d865-4675-8068-0468c13241c1" >
 			<scheduling-strategy >
 				<fixed-frequency timeUnit="SECONDS" frequency="${schedule.time.sec}"/>
 			</scheduling-strategy>
 		</scheduler>
-		<choice doc:name="Choice - scheduler On?" doc:id="94d7ef38-24ba-44d3-b831-2732fc80f8ce" >
+		<choice doc:name="Choice - scheduler On?" doc:id="aebc2f44-0d36-4cc5-9af4-e7a735f2486a" >
 			<when expression="p('schedule.enabled') == &quot;true&quot;">
-				<flow-ref doc:name="call filePoller_main" doc:id="cca8fb21-a520-42b5-ac16-4fbda31b8979" name="filePoller_main"/>
+				<flow-ref doc:name="call filePoller_main" doc:id="3fe2fdb9-632c-4972-8cc6-5ad0d0deb9b0" name="filePoller_main"/>
 			</when>
 		</choice>
 		<error-handler>
-			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="c3573218-55e8-4e67-9284-57d08a7a5616" >
-				<flow-ref doc:name="filePoller_ErrorHandler" doc:id="96a7debf-33da-4915-a5e2-34c715cdb4b2" name="filePoller_ErrorHandler"/>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="08f90050-eebc-4b96-a968-f9586be38920" >
+				<flow-ref doc:name="filePoller_ErrorHandler" doc:id="eda49c30-5f45-42a3-9061-1ca412c23a14" name="filePoller_ErrorHandler"/>
 			</on-error-continue>
 		</error-handler>
 	</flow>
 	
-	<sub-flow name="filePoller_main" doc:id="cbb7c540-f282-4ce7-8463-9e249e605c36" >
-		<choice doc:name="Choice - throttlingFlag?" doc:id="192b65f6-103c-4b7f-ae0e-f3dd088c7427">
+	<sub-flow name="filePoller_main" doc:id="e5c0343d-0cdb-4333-a75f-51d919c96247" >
+		<choice doc:name="Choice - throttlingFlag?" doc:id="bae1a3d9-8649-4cc6-8d00-4184c0634f6a">
 			<when expression="p('throttling.flag') == &quot;true&quot;">
-				<flow-ref doc:name="filePoller_throttlingCount" doc:id="e7f28d98-245c-4cca-80a7-7765e7fb84bd" name="filePoller_throttlingCount"/>
-				<choice doc:name="Choice - remainingCount?" doc:id="b3552664-5238-4732-83d3-c5e6e1bc53ee">
+				<flow-ref doc:name="filePoller_throttlingCount" doc:id="0d3e4fc3-a84f-42c3-b3ed-8c37637adbb1" name="filePoller_throttlingCount"/>
+				<choice doc:name="Choice - remainingCount?" doc:id="1527afe3-8c5a-4c0e-aebb-efcb01f50048">
 					<when expression="#[vars.remainingCount &gt; 0]">
-						<salesforce:query doc:name="Query FRPPFile" doc:id="a7c8c7a9-a1cf-4dba-873d-1ed18c52f82c" config-ref="SalesforceGeoFL3_Global" target="filePayloads">
+						<salesforce:query doc:name="Query FRPPFile" doc:id="87be9aa1-580f-4fff-a435-7ccfc00f82c4" config-ref="SalesforceGeoFL3_Global" target="filePayloads">
 					<salesforce:salesforce-query>Select ID, File_Name__c, File_Type__c, File_Extension__c, Status__c, AGENCY_CODE__c,  Attachment_ID__c, createdby.email from FRPP_FILE__c where Active__c=True and File_Type__c='CR' and Status__c='Staging In Progress2' Order By CreatedDate LIMIT :limitCount</salesforce:salesforce-query>
 					<salesforce:parameters><![CDATA[#[output application/java
 ---
@@ -89,38 +91,38 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	"limitCount" : vars.remainingCount
 }]]]></salesforce:parameters>
 				</salesforce:query>
-						<remove-variable doc:name="Remove processingCount" doc:id="bd2e2daf-035f-41f8-ac86-2380343491bd" variableName="processingCount" />
-						<remove-variable doc:name="Remove remainingCount" doc:id="e2651779-72d0-463c-ab89-e6ff94b8d653" variableName="remainingCount" />
+						<remove-variable doc:name="Remove processingCount" doc:id="e796ceca-7c8c-4024-a2e3-0ca95b5b5227" variableName="processingCount" />
+						<remove-variable doc:name="Remove remainingCount" doc:id="36b895f1-4f6a-4df7-9172-314297eae69c" variableName="remainingCount" />
 					</when>
 					<otherwise >
-						<remove-variable doc:name="Remove Variable" doc:id="2a0e1c01-76a7-43ae-b3a2-b4cda3805b1a" variableName="filePayloads"/>
+						<remove-variable doc:name="Remove Variable" doc:id="0e17552b-306a-4106-9d66-edf0ed673fa8" variableName="filePayloads"/>
 					</otherwise>
 				</choice>
 			</when>
 			<otherwise>
-				<salesforce:query doc:name="Query FRPPFile" doc:id="1c76902b-3a29-4146-b092-68cf84203406" config-ref="SalesforceGeoFL3_Global" target="filePayloads">
+				<salesforce:query doc:name="Query FRPPFile" doc:id="ff6ed773-bc9e-4027-a81c-54efb52ccf71" config-ref="SalesforceGeoFL3_Global" target="filePayloads">
 					<salesforce:salesforce-query>Select ID, File_Name__c, File_Type__c, File_Extension__c, Status__c, AGENCY_CODE__c,  Attachment_ID__c, createdby.email from FRPP_FILE__c where Active__c=True and File_Type__c='CR' and Status__c='Staging In Progress2' Order By CreatedDate </salesforce:salesforce-query>
 				</salesforce:query>
 			</otherwise>
 		</choice>
-		<choice doc:name="Choice" doc:id="cd6aa288-6cab-47f3-8216-a65f4565a6dd">
+		<choice doc:name="Choice" doc:id="12815c18-9d6a-45ce-992d-afc4586c8ede">
 			<when expression="#[(vars.filePayloads == null)]">
-				<set-payload value="FRPPFilePoller Flow Completed with Error: Reached Throttling Limit. No Files were processed this time." doc:name="set Http Response" doc:id="dd13d5b6-fe86-45bb-a444-082fde5442ed" />
+				<set-payload value="FRPPFilePoller Flow Completed with Error: Reached Throttling Limit. No Files were processed this time." doc:name="set Http Response" doc:id="8991c10a-fd72-4d6f-8ef7-1f88484fa6b2" />
 			</when>
 			<when expression="#[(sizeOf (vars.filePayloads) &gt; 0)]">
-				<flow-ref doc:name="forEachFile Call" doc:id="9a8de588-a621-4c9b-b879-d92a2a59216c" name="forEachFile" />
-				<set-payload value="FRPPFilePoller Flow Completed." doc:name="set Http Response" doc:id="2c27c139-f9d4-4f44-ab5e-864978ff51e3" />
+				<flow-ref doc:name="forEachFile Call" doc:id="599b631a-3164-4ffb-967a-74eb35ec9c54" name="forEachFile" />
+				<set-payload value="FRPPFilePoller Flow Completed." doc:name="set Http Response" doc:id="954060b8-7ba7-42d6-b97f-c58af10e78d3" />
 			</when>
 			<otherwise >
-				<set-payload value="FRPPFilePoller Flow completed. Did not have any files to process." doc:name="No Files Found." doc:id="9a5c1a06-7a16-4bec-ad45-8f9f7594f55a" />
+				<set-payload value="FRPPFilePoller Flow completed. Did not have any files to process." doc:name="No Files Found." doc:id="4cf65d58-d5c7-4857-b978-d662a25cf77e" />
 			</otherwise>
 		</choice>
 	</sub-flow>
 	
-	<sub-flow name="filePoller_throttlingCount" doc:id="83ed2b6d-c14f-4745-ad04-0473d329bdd8" >
+	<sub-flow name="filePoller_throttlingCount" doc:id="152b0827-b305-4bed-945f-97f6b7d0d250" >
 		
-		<salesforce:get-server-timestamp doc:name="Get server timestamp" doc:id="12dcb2da-bcef-42be-8acf-5f48044fa22a" config-ref="SalesforceGeoFL3_Global" target="sfCurrentTimeStamp" />
-		<ee:transform doc:name="Transform Message" doc:id="b793713d-e29e-4ffc-8c25-d4b0a7cac10d">
+		<salesforce:get-server-timestamp doc:name="Get server timestamp" doc:id="f3a64e5d-6fa2-4e50-bc91-f5022094e70b" config-ref="SalesforceGeoFL3_Global" target="sfCurrentTimeStamp" />
+		<ee:transform doc:name="Transform Message" doc:id="1bd316d8-06e0-4521-94ad-e7192d86609f">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
@@ -130,7 +132,7 @@ output application/java
 vars.sfCurrentTimeStamp as DateTime {format: "yyyy-MM-DD'T'hh:mm:ss'Z'"} - |PT${inProcess.Hrs}H|]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<salesforce:query doc:name="Processing Count" doc:id="8c811911-30e6-4705-b458-d439887d8b69" config-ref="SalesforceGeoFL3_Global" target="processingCount" targetValue="#[payload[0].expr0]">
+		<salesforce:query doc:name="Processing Count" doc:id="9c16771b-471f-4562-970e-ae2d30f16e12" config-ref="SalesforceGeoFL3_Global" target="processingCount" targetValue="#[payload[0].expr0]">
 			<salesforce:salesforce-query >Select Count(Id) from FRPP_FILE__c where Active__c=True and File_Type__c='CR' and (Status__c ='Processing' OR Status__c='Validation in progress') and LastModifiedDate  &gt; :sfCurrentTimeStamp</salesforce:salesforce-query>
 			<salesforce:parameters ><![CDATA[#[output application/java
 ---
@@ -138,13 +140,13 @@ vars.sfCurrentTimeStamp as DateTime {format: "yyyy-MM-DD'T'hh:mm:ss'Z'"} - |PT${
 	"sfCurrentTimeStamp" : vars.sfCurrentTimeStamp
 }]]]></salesforce:parameters>
 		</salesforce:query>
-		<set-variable value="#[p('throttling.count') - vars.processingCount default 0]" doc:name="remainingCount" doc:id="24a98a8d-e2a8-475f-be4c-99ddb4bc6daf" variableName="remainingCount" />
+		<set-variable value="#[p('throttling.count') - vars.processingCount default 0]" doc:name="remainingCount" doc:id="32d0aa21-4c8e-4f71-ba0d-c171e991d4bd" variableName="remainingCount" />
 	</sub-flow>
-	<sub-flow name="forEachFile" doc:id="4cb17d40-955c-4874-a171-e5329ccdafd7" >
-		<foreach doc:name="For Each" doc:id="81cdc2f1-41cd-49a2-a075-75f473823b23" collection="vars.filePayloads">
-			<set-variable value="#[payload]" doc:name="Save File Info" doc:id="2e6ba88a-56ff-4b4d-92cf-0e583fb6beab" variableName="file"/>
-			<set-variable value="#[vars.file.FILE_NAME__c]" doc:name="Set FileName" doc:id="d2535910-05ec-4836-b988-c605fae3d02f" variableName="fileName" />
-			<ee:transform doc:name="set Request Payload" doc:id="4d1a81cd-8a4b-4267-a299-3c4f9206e8de" >
+	<sub-flow name="forEachFile" doc:id="2acacace-64fe-46a4-bfff-05ebca8c54b3" >
+		<foreach doc:name="For Each" doc:id="6faa1189-8e15-4372-a394-72757f9f074b" collection="vars.filePayloads">
+			<set-variable value="#[payload]" doc:name="Save File Info" doc:id="2d8ac22e-fd47-4d6b-9488-adf62f8d76fb" variableName="file"/>
+			<set-variable value="#[vars.file.FILE_NAME__c]" doc:name="Set FileName" doc:id="796f5905-8aee-412d-b36a-64fe2739c083" variableName="fileName" />
+			<ee:transform doc:name="set Request Payload" doc:id="be9e4a07-8dd1-46c2-8319-12a1dd6f5683" >
 				<ee:message >
 				</ee:message>
 				<ee:variables >
@@ -154,35 +156,35 @@ output application/java
 { body: {filename:vars.fileName} }]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
-			<salesforce:invoke-apex-rest-method doc:name="Retrieve Available Queue" doc:id="82943730-9982-4a28-b02a-0377455dee64" config-ref="SalesforceGeoFL3_Global" className="FRPP_retrieveAvailableMuleQueue" methodName="getAvailableQueue^/OGPretriveAvailableMuleQueue/^HttpPost^String^" target="queueName" targetValue="#[payload.getAvailableQueueOutput]">
+			<salesforce:invoke-apex-rest-method doc:name="Retrieve Available Queue" doc:id="8b14b2bd-0161-47ad-b974-36caff9b27c6" config-ref="SalesforceGeoFL3_Global" className="FRPP_retrieveAvailableMuleQueue" methodName="getAvailableQueue^/OGPretriveAvailableMuleQueue/^HttpPost^String^" target="queueName" targetValue="#[payload.getAvailableQueueOutput]">
 				<salesforce:request ><![CDATA[#[vars.getQueueReq]]]></salesforce:request>
 			</salesforce:invoke-apex-rest-method>
 		
-			<remove-variable doc:name="Remove getQueueReq" doc:id="18181939-472d-4a64-8caa-91d7bdfcb8de" variableName="getQueueReq"/>
-			<choice doc:name="Choice" doc:id="dddd50ca-c6ff-4729-ab18-d74c8ae384c0" >
+			<remove-variable doc:name="Remove getQueueReq" doc:id="1c8ce4ff-edcd-46d6-96db-bdf9d689c53b" variableName="getQueueReq"/>
+			<choice doc:name="Choice" doc:id="62904472-0517-492e-942a-ca2860a998af" >
 				
 				<when expression='#[startsWith(vars.queueName,"response")]' >
-					<async doc:name="Async" doc:id="1858f636-7f81-44ac-9b5c-22cfc6ff08e9" >
-						<flow-ref doc:name="Call to fileSplitter_main" doc:id="813ee863-336f-4c2b-bfcc-e4973056a8fe" name="fileSplitter_main" target="fileResults" targetValue="#[payload]" />
+					<async doc:name="Async" doc:id="a6dc5613-0ce9-48c9-bcaf-7825d4a0e7b8" >
+						<flow-ref doc:name="Call to fileSplitter_main" doc:id="06199437-caab-4889-aceb-8c5bcd088086" name="fileSplitter_main" target="fileResults" targetValue="#[payload]" />
 					</async>
-					<logger level="INFO" doc:name="log Results" doc:id="38cb9a5a-3f92-4df1-a882-ed2ba619223f" message="File: #[vars.fileName]  launched processing." />
+					<logger level="INFO" doc:name="log Results" doc:id="002c6c23-65d2-49d6-b69a-c5d3f6f72954" message="File: #[vars.fileName]  launched processing." />
 				</when>
 				<when expression='#[startsWith(vars.queueName,"none")]' >
-					<logger level="INFO" doc:name="No Queue Log" doc:id="251d1175-88db-4761-8b49-0db57ddd739f" message="File: #[vars.fileName]. No Queues Available from SF." />
+					<logger level="INFO" doc:name="No Queue Log" doc:id="a053a38e-a74f-479b-982a-cae888a3a2a4" message="File: #[vars.fileName]. No Queues Available from SF." />
 				</when>
 				<otherwise>
-				<set-variable value='#["Error occured during processing the File:  " ++ vars.fileName ++". \n\n Error: " ++ vars.queueName ++ ". Cannot get QueueName from SF."]' doc:name="email Body" doc:id="2023d5e3-84f2-40ea-8b48-d0b37ed7b1cf" variableName="emailBody" />
-				<flow-ref doc:name="supportEmailNotificationFlow" doc:id="e2592e77-38b8-4140-ace3-e563ad5dea69" name="supportEmailNotificationFlow" />
+				<set-variable value='#["Error occured during processing the File:  " ++ vars.fileName ++". \n\n Error: " ++ vars.queueName ++ ". Cannot get QueueName from SF."]' doc:name="email Body" doc:id="c6551c11-0cee-4601-b8ad-f555b0f5e1d9" variableName="emailBody" />
+				<flow-ref doc:name="supportEmailNotificationFlow" doc:id="9efc4d20-ade7-47d1-b881-02a70f0939c7" name="supportEmailNotificationFlow" />
 				
 			</otherwise>
 			</choice>
-			<remove-variable doc:name="Remove file Variable" doc:id="642351ca-bf31-4430-8b32-d0fa6a90a260" variableName="file" />
+			<remove-variable doc:name="Remove file Variable" doc:id="1db5e828-a283-4170-917b-71d726f31fa3" variableName="file" />
 		</foreach>
 	</sub-flow>
-	<sub-flow name="filePoller_ErrorHandler" doc:id="ba6aaf5d-e9fd-4eec-8b75-15eb6cb090ee" >
-		<flow-ref doc:name="releaseQueue" doc:id="4526d0fc-3034-4aef-b6c8-e73942c0a834" name="releaseQueue" />
-		<logger level="INFO" doc:name="Error Log" doc:id="15b50e76-eed5-491e-a590-d2ba7b43fcf7" message="ERROR: Error in filePoller Service: Error Type: #[error.errorType],  ErrorDescription: #[error.detailedDescription]." />
-		<ee:transform doc:name="set error Msg" doc:id="372b4a19-781f-4f66-aae6-da586b95d544">
+	<sub-flow name="filePoller_ErrorHandler" doc:id="aef87be2-3025-4612-8a59-1f952afa5cf0" >
+		<flow-ref doc:name="releaseQueue" doc:id="bb7db7c4-8cab-4bfe-b1f9-d6d9bd126c71" name="releaseQueue" />
+		<logger level="INFO" doc:name="Error Log" doc:id="8d6220e7-f349-4779-a49a-fbc5b17a0711" message="ERROR: Error in filePoller Service: Error Type: #[error.errorType],  ErrorDescription: #[error.detailedDescription]." />
+		<ee:transform doc:name="set error Msg" doc:id="7bcadf48-abef-4e26-a83e-3a92f1dc5211">
 					<ee:message>
 					</ee:message>
 					<ee:variables>
@@ -197,8 +199,8 @@ output application/java
 ]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-		<set-variable value='#["Error occured during processing filePoller Service. \n\nPlease find attached error details."]' doc:name="email Body" doc:id="49850d5f-04af-4c45-9fa4-1da4a88e0c1d" variableName="emailBody" />
-		<flow-ref doc:name="supportEmailNotificationFlow" doc:id="90e4b10e-3cc6-4d22-bd08-dd927390c10c" name="supportEmailNotificationFlow" />
-		<set-payload value='#["ErrorType: " ++ error.errorType.namespace ++ ":" ++ error.errorType.identifier ++ ", ErrorDescription: " ++ error.detailedDescription ++ " For FileName: " ++ vars.filename]' doc:name="Set Error Payload" doc:id="5f0f6597-1d2c-43ae-8be1-867e6d76ed79" />
+		<set-variable value='#["Error occured during processing filePoller Service. \n\nPlease find attached error details."]' doc:name="email Body" doc:id="339a21d2-f132-40eb-98bc-9e5808265c98" variableName="emailBody" />
+		<flow-ref doc:name="supportEmailNotificationFlow" doc:id="05d0c66b-4b14-4047-86f8-587efd23be11" name="supportEmailNotificationFlow" />
+		<set-payload value='#["ErrorType: " ++ error.errorType.namespace ++ ":" ++ error.errorType.identifier ++ ", ErrorDescription: " ++ error.detailedDescription ++ " For FileName: " ++ vars.filename]' doc:name="Set Error Payload" doc:id="0e987150-57c4-412e-bead-0aaa00996610" />
 	</sub-flow>
 </mule>
