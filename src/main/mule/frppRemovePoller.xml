@@ -62,9 +62,6 @@ http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mu
 	
 	<sub-flow name="removePoller_main" doc:id="4d40e83d-37df-4f8d-9b4c-db5aebd7d2c8" >
 		<choice doc:name="Choice - Payload Size &gt; 0?" doc:id="4e7b336a-9014-4e22-b733-7aeb4ebbf000">
-			<when expression="#[(vars.removeFileIDs == null)]">
-				<set-payload value="FRPPRemovePoller Flow Completed. No Files were processed this time." doc:name="set Http Response" doc:id="e45d3f85-1f23-4342-a22a-e3fd279de614" />
-			</when>
 			<when expression="#[(sizeOf (vars.removeFileIDs) &gt; 0)]">
 				<foreach doc:name="For Each" doc:id="f5c551b6-ccf9-45b6-99cc-ed4894eb30ac" collection="vars.removeFileIDs">
 					<set-variable value="#[payload.Id]" doc:name="Save File Info" doc:id="6f44449f-6aa8-45b4-8e63-1ecafabf1104" variableName="fileID" />
@@ -91,9 +88,7 @@ output application/json
 				<set-payload value='FRPPRemovePoller Flow Completed.' doc:name="set Http Response" doc:id="f0a7ecf0-d39c-43f0-8b16-abf7ea1631e2" />
 			</when>
 			<otherwise >
-				<set-variable value='#["FRPPRemovePoller services was called with a File Name: " ++ attributes.queryParams.fileName ++ ".\n\nNo matching file found in SalesForce with that name in REMOVE Status."]' doc:name="email Body - No Matching File." doc:id="d8ec250f-b032-4a06-95a5-e11164a46272" variableName="emailBody" />
-						<flow-ref doc:name="supportEmailNotificationFlow" doc:id="7c8c96db-4f76-4806-afc8-ea2088b66030" name="supportEmailNotificationFlow" />
-						<set-payload value="FRPPRemovePoller Flow completed. Did not have any files in REMOVE Status to process." doc:name="No Files Found." doc:id="cb56af53-0106-4917-ba74-b22ea0c5d9ee" />			
+						<set-payload value="FRPPRemovePoller Flow completed. Did not have (any files or FileName provided) in REMOVE Status to process." doc:name="No Files Found." doc:id="cb56af53-0106-4917-ba74-b22ea0c5d9ee" />			
 			</otherwise>
 		</choice>
 	</sub-flow>
