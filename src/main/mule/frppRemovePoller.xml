@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	
+	<flow name="removePoller_schedule" doc:id="9da61b0b-bab0-4311-91a8-070619f80b07">
+		<scheduler doc:name="Scheduler" doc:id="32da5e91-a3bf-4ce0-a87d-709f3600f94f">
+			<scheduling-strategy>
+				<fixed-frequency timeUnit="SECONDS" frequency="${schedule.remove.time.sec}" />
+			</scheduling-strategy>
+		</scheduler>
+		<choice doc:name="Choice - scheduler On?" doc:id="98c25b0d-3eca-415b-a0ca-078c16e8ae80">
+			<when expression="p('schedule.remove.enabled') == &quot;true&quot;">
+				<salesforce:query doc:name="Query All Files" doc:id="3af1389a-0116-4d8f-b6b5-3d8decbd8738" config-ref="SalesforceGeoFL3_Global" target="removeFileIDs">
+					<salesforce:salesforce-query >Select ID, Status__c, CI_STATUS__c from FRPP_FILE__c where File_Type__c='CR' and Status__c='Removal In Progress' and CI_STATUS__c ='REMOVE'</salesforce:salesforce-query>
+				</salesforce:query>
+				<flow-ref doc:name="call removePoller_main" doc:id="89d62320-fc21-4811-8932-88b6ec948179" name="removePoller_main" />
+			</when>
+		</choice>
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="144b73ae-9974-4802-bc64-82464c18c8b3">
+				<flow-ref doc:name="removePoller_ErrorHandler" doc:id="836aa353-db80-41e0-bcce-09531972984e" name="removePoller_ErrorHandler" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	
+	<flow name="removePoller_http" doc:id="7f1659b3-7221-465f-9e99-7058e1daef22" >
+		<http:listener doc:name="Listener" doc:id="71e8067b-2a49-44bc-900d-f559c5abb4ca" config-ref="HTTP_Listener_config_Global" path="/remove"/>
+		<choice doc:name="Choice - fileName Provided?" doc:id="ab0308de-f5b8-4671-85a0-d9c8fbb35cf5" >
+			<when expression="#[attributes.queryParams.fileName == 'ALL' or attributes.queryParams.fileName == 'all'  or  attributes.queryParams.fileName == 'All']">
+				<salesforce:query doc:name="Query All Files" doc:id="9e4956fc-8697-421b-83dc-5aa68f654927" config-ref="SalesforceGeoFL3_Global" target="removeFileIDs">
+					<salesforce:salesforce-query >Select ID, Status__c, CI_STATUS__c from FRPP_FILE__c where File_Type__c='CR' and Status__c='Removal In Progress' and CI_STATUS__c ='REMOVE'</salesforce:salesforce-query>
+				</salesforce:query>
+				<flow-ref doc:name="removePoller_main" doc:id="450eb649-5c62-42a6-bafa-e19bdf6e3985" name="removePoller_main"/>
+			</when>
+			<when expression='#[attributes.queryParams.fileName != null and attributes.queryParams.fileName != ""]'>
+				<salesforce:query doc:name="Query- SF" doc:id="eba55014-4c4b-4895-8502-b2c619f668f5" config-ref="SalesforceGeoFL3_Global" target="removeFileIDs">
+					<salesforce:salesforce-query >Select ID, Status__c,CI_STATUS__c from FRPP_FILE__c where File_Type__c='CR' and Status__c='Removal In Progress' and CI_STATUS__c ='REMOVE'  and FILE_NAME__c = ':fileName'</salesforce:salesforce-query>
+					<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	fileName : attributes.queryParams.fileName
+}]]]></salesforce:parameters>
+				</salesforce:query>
+				<flow-ref doc:name="removePoller_main" doc:id="eac1c52a-8494-4fc6-8860-8f27911193e4" name="removePoller_main"/>
+			</when>
+			<otherwise >
+				<set-payload value="Incorrect query parameters provided. No Remove files were processed." doc:name="Incorrect QueryParams" doc:id="da1c5528-c59b-4712-ac67-39a02edfc623" />
+			</otherwise>
+		</choice>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="284ae51c-12e6-4648-8f93-ea8068d4b024" >
+				<flow-ref doc:name="removePoller_ErrorHandler" doc:id="f0e58a3e-da76-4779-b91d-0d64560c3039" name="removePoller_ErrorHandler"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	
+	<sub-flow name="removePoller_main" doc:id="4d40e83d-37df-4f8d-9b4c-db5aebd7d2c8" >
+		<choice doc:name="Choice - Payload Size &gt; 0?" doc:id="4e7b336a-9014-4e22-b733-7aeb4ebbf000">
+			<when expression="#[(vars.removeFileIDs == null)]">
+				<set-payload value="FRPPRemovePoller Flow Completed. No Files were processed this time." doc:name="set Http Response" doc:id="e45d3f85-1f23-4342-a22a-e3fd279de614" />
+			</when>
+			<when expression="#[(sizeOf (vars.removeFileIDs) &gt; 0)]">
+				<foreach doc:name="For Each" doc:id="f5c551b6-ccf9-45b6-99cc-ed4894eb30ac" collection="vars.removeFileIDs">
+					<set-variable value="#[payload.Id]" doc:name="Save File Info" doc:id="6f44449f-6aa8-45b4-8e63-1ecafabf1104" variableName="fileID" />
+					<ee:transform doc:name="Set CIStatus to STARTED" doc:id="f6d45ac8-ec26-4fbf-9554-031821eb02fc">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="updateStatusReq"><![CDATA[%dw 2.0
+output application/json
+---
+[{
+	Id: vars.fileID,
+	// CI_STATUS__c : p('CI.remove.status1'), //Removal In Progress
+	CI_STATUS__c : 'REMOVE'
+}]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="SetFileStatus" doc:id="c5cf124c-a161-47f4-9e6a-930d8a2078c2" name="SetStatuses" />
+					<async doc:name="Async" doc:id="20aa36d7-423e-4cc8-b12e-24958dd0bc73" >
+						<flow-ref doc:name="removeData Call" doc:id="d0620a21-1b75-4754-befe-9574ffbe7cd2" name="removeData" />
+					</async>
+		</foreach>
+				<logger level="INFO" doc:name="Logger" doc:id="5db5aa61-75de-482a-afdb-a6478a350d0f" message="MULE Removed #[sizeOf (vars.removeFileIDs)] File(s)."/>
+				<set-payload value='FRPPRemovePoller Flow Completed.' doc:name="set Http Response" doc:id="f0a7ecf0-d39c-43f0-8b16-abf7ea1631e2" />
+			</when>
+			<otherwise >
+				<set-variable value='#["FRPPRemovePoller services was called with a File Name: " ++ attributes.queryParams.fileName ++ ".\n\nNo matching file found in SalesForce with that name in REMOVE Status."]' doc:name="email Body - No Matching File." doc:id="d8ec250f-b032-4a06-95a5-e11164a46272" variableName="emailBody" />
+						<flow-ref doc:name="supportEmailNotificationFlow" doc:id="7c8c96db-4f76-4806-afc8-ea2088b66030" name="supportEmailNotificationFlow" />
+						<set-payload value="FRPPRemovePoller Flow completed. Did not have any files in REMOVE Status to process." doc:name="No Files Found." doc:id="cb56af53-0106-4917-ba74-b22ea0c5d9ee" />			
+			</otherwise>
+		</choice>
+	</sub-flow>
+	
+	<sub-flow name="removeData" doc:id="29b14823-9603-43ee-a7cb-12a4099760c6" >
+		<salesforce:query doc:name="Query FRPP_ASSET_ERROR__c" doc:id="e02c7bba-ed34-438a-b596-0ccfe93004db" config-ref="SalesforceGeoFL3_Global" target="assetIDs">
+			<salesforce:salesforce-query >Select Id from FRPP_ASSET_ERROR__c where FILE_ID__c = ':fileID' </salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	fileID : vars.fileID
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<flow-ref doc:name="deleteOperation - errorAssets" doc:id="4542c2c3-aa2b-4637-908a-70c6054ca32d" name="deleteOperation"/>
+		<salesforce:query doc:name="Query FRPP_ASSET__c" doc:id="7e41941b-2745-4cd4-a78f-e2274673f785" config-ref="SalesforceGeoFL3_Global" target="assetIDs">
+			<salesforce:salesforce-query>Select Id from FRPP_ASSET__c where ASSET_RECORD_TYPE__c = 'STAGING' AND File_ID__c =  ':fileID' </salesforce:salesforce-query>
+			<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	fileID : vars.fileID
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<flow-ref doc:name="deleteOperation - Assets" doc:id="7f0c8be0-f18c-48ec-9beb-43f3e6e53c57" name="deleteOperation"/>
+		<remove-variable doc:name="Remove assetIDs" doc:id="6e10410f-b6c8-4aad-87b7-5d504f997676" variableName="assetIDs" />
+		<ee:transform doc:name="TEMPxxxxxxx" doc:id="454e4e98-f4c5-4af1-b1dc-66e7c6f2d129">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="updateStatusReq"><![CDATA[%dw 2.0
+output application/json
+---
+[{
+	Id: vars.fileID,
+	Active__c : true,
+	Status__c : "Removal In Progress",
+	CI_STATUS__c : 'REMOVE'
+}]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Set CIStatus to STARTED" doc:id="9a51933e-dec0-41aa-a20a-fef4f8091b45">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="updateStatusReq"><![CDATA[%dw 2.0
+output application/json
+---
+[{
+	Id: vars.fileID,
+	Active__c : false,
+	Status__c : "Removed", 
+	CI_STATUS__c : 'REMOVE COMPLETE'
+	// CI_STATUS__c : p('CI.remove.status1'), //Removal In Progress
+	//CI_STATUS__c : 'REMOVE'
+}]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="SetFileStatus" doc:id="497c5b8c-8a2f-4bd9-a964-087a828c2c50" name="SetStatuses" />
+	</sub-flow>
+	<sub-flow name="deleteOperation" doc:id="72d53c18-83e4-440b-80d2-00afd4b13e07" >
+		<choice doc:name="Choice" doc:id="5437631c-3834-4ee0-abd0-47dd446eff34">
+			<when expression="#[sizeOf (vars.assetIDs default []) &gt; 0]">
+				<foreach doc:name="For Each" doc:id="8ed39452-85e6-40db-a589-7633514c3d26" collection="vars.assetIDs" batchSize="200">
+					<set-payload value="#[payload.Id]" doc:name="Set Payload Ids" doc:id="73d90ce0-69cc-4aa0-813a-659bebe547a8" />
+					<salesforce:delete doc:name="Delete Assets" doc:id="6c448403-0d80-43d4-a24f-b18f975d5df3" config-ref="SalesforceGeoFL3_Global" target="errorAssetResp" />
+					<remove-variable doc:name="Remove errorAssetResp" doc:id="d98f5343-86c1-45d9-9e5e-2cc74a02a3da" variableName="errorAssetResp" />
+				</foreach>
+			</when>
+		</choice>
+	</sub-flow>
+	<sub-flow name="removePoller_ErrorHandler" doc:id="a01d5682-bbe6-496c-bb5e-01c34c4b32b6" >
+		<logger level="INFO" doc:name="Error Log" doc:id="6c73b10e-c2bf-4e57-b565-97c6ff11b194" message="ERROR: Error in removePoller Service: Error Type: #[error.errorType],  ErrorDescription: #[error.detailedDescription]." />
+		<ee:transform doc:name="set error Msg" doc:id="f6ad5443-b359-4b8b-a4cb-5b820f0d30fd">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="errorMsg"><![CDATA[%dw 2.0
+output application/java
+---
+[
+  ("ErrorType:   " ++ error.errorType.namespace ++ ":" ++ error.errorType.identifier), 	
+  ("Description: " ++ error.detailedDescription)
+]
+
+]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+		<set-variable value='#["Error occured during processing removePoller Service. \n\nPlease find attached error details."]' doc:name="email Body" doc:id="a0d8360c-3106-43af-b74c-ea9d5eacb08f" variableName="emailBody" />
+		<flow-ref doc:name="supportEmailNotificationFlow" doc:id="bf6362f5-1cfa-4b9e-a351-78d90fd75265" name="supportEmailNotificationFlow" />
+		<set-payload value='#["ErrorType: " ++ error.errorType.namespace ++ ":" ++ error.errorType.identifier ++ ", ErrorDescription: " ++ error.detailedDescription ++ " For FileName: " ++ vars.filename]' doc:name="Set Error Payload" doc:id="8391ed11-4814-4ab6-b820-4580d4c68f5d" />
+	</sub-flow>
+	
+</mule>
