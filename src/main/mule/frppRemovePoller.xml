@@ -87,7 +87,7 @@ output application/json
 						<flow-ref doc:name="removeData Call" doc:id="d0620a21-1b75-4754-befe-9574ffbe7cd2" name="removeData" />
 					</async>
 		</foreach>
-				<logger level="INFO" doc:name="Logger" doc:id="5db5aa61-75de-482a-afdb-a6478a350d0f" message="MULE Removed #[sizeOf (vars.removeFileIDs)] File(s)."/>
+				<logger level="INFO" doc:name="Logger" doc:id="5db5aa61-75de-482a-afdb-a6478a350d0f" message="MULE Started Removing #[sizeOf (vars.removeFileIDs)] File(s)."/>
 				<set-payload value='FRPPRemovePoller Flow Completed.' doc:name="set Http Response" doc:id="f0a7ecf0-d39c-43f0-8b16-abf7ea1631e2" />
 			</when>
 			<otherwise >
@@ -97,9 +97,8 @@ output application/json
 			</otherwise>
 		</choice>
 	</sub-flow>
-	
-	<sub-flow name="removeData" doc:id="29b14823-9603-43ee-a7cb-12a4099760c6" >
-		<salesforce:query doc:name="Query FRPP_ASSET_ERROR__c" doc:id="e02c7bba-ed34-438a-b596-0ccfe93004db" config-ref="SalesforceGeoFL3_Global" target="assetIDs">
+	<flow name="removeData" doc:id="0010e414-e793-4289-9bc7-e09f4c2293a8" >
+		<salesforce:query doc:name="Query FRPP_ASSET_ERROR__c" doc:id="1bf0b93b-f38c-4e42-bb1a-f69bff2f4fbe" config-ref="SalesforceGeoFL3_Global" target="assetIDs">
 			<salesforce:salesforce-query >Select Id from FRPP_ASSET_ERROR__c where FILE_ID__c = ':fileID' </salesforce:salesforce-query>
 			<salesforce:parameters ><![CDATA[#[output application/java
 ---
@@ -107,8 +106,8 @@ output application/json
 	fileID : vars.fileID
 }]]]></salesforce:parameters>
 		</salesforce:query>
-		<flow-ref doc:name="deleteOperation - errorAssets" doc:id="4542c2c3-aa2b-4637-908a-70c6054ca32d" name="deleteOperation"/>
-		<salesforce:query doc:name="Query FRPP_ASSET__c" doc:id="7e41941b-2745-4cd4-a78f-e2274673f785" config-ref="SalesforceGeoFL3_Global" target="assetIDs">
+		<flow-ref doc:name="deleteOperation - errorAssets" doc:id="4b789895-72f6-4128-82ff-6218c56db1bb" name="deleteOperation"/>
+		<salesforce:query doc:name="Query FRPP_ASSET__c" doc:id="f288d819-f78f-4d67-95da-ba1ed94f9a87" config-ref="SalesforceGeoFL3_Global" target="assetIDs">
 			<salesforce:salesforce-query>Select Id from FRPP_ASSET__c where ASSET_RECORD_TYPE__c = 'STAGING' AND File_ID__c =  ':fileID' </salesforce:salesforce-query>
 			<salesforce:parameters><![CDATA[#[output application/java
 ---
@@ -116,9 +115,9 @@ output application/json
 	fileID : vars.fileID
 }]]]></salesforce:parameters>
 		</salesforce:query>
-		<flow-ref doc:name="deleteOperation - Assets" doc:id="7f0c8be0-f18c-48ec-9beb-43f3e6e53c57" name="deleteOperation"/>
-		<remove-variable doc:name="Remove assetIDs" doc:id="6e10410f-b6c8-4aad-87b7-5d504f997676" variableName="assetIDs" />
-		<ee:transform doc:name="TEMPxxxxxxx" doc:id="454e4e98-f4c5-4af1-b1dc-66e7c6f2d129">
+		<flow-ref doc:name="deleteOperation - Assets" doc:id="e59c4f02-2b17-4030-9e4c-f435a3b6ff3f" name="deleteOperation"/>
+		<remove-variable doc:name="Remove assetIDs" doc:id="c34d8aa7-5b40-47b2-9f6b-b6512ac089e7" variableName="assetIDs" />
+		<ee:transform doc:name="TEMPxxxxxxx" doc:id="b692681f-639b-4ce9-b1c3-d37f6c58d2f7">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
@@ -133,7 +132,7 @@ output application/json
 }]]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<ee:transform doc:name="Set CIStatus to STARTED" doc:id="9a51933e-dec0-41aa-a20a-fef4f8091b45">
+		<ee:transform doc:name="Set CIStatus to STARTED" doc:id="2a89c8cd-3826-4c4e-8621-f712abab40a6">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
@@ -150,8 +149,13 @@ output application/json
 }]]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<flow-ref doc:name="SetFileStatus" doc:id="497c5b8c-8a2f-4bd9-a964-087a828c2c50" name="SetStatuses" />
-	</sub-flow>
+		<flow-ref doc:name="SetFileStatus" doc:id="526193a0-ed99-44d0-bed2-60053b3710b3" name="SetStatuses" />
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="3db756b2-33f8-467d-a698-0b62e3a3267a">
+				<flow-ref doc:name="removePoller_ErrorHandler" doc:id="e54f9e98-7a8a-453f-aa99-edce277fae9d" name="removePoller_ErrorHandler" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
 	<sub-flow name="deleteOperation" doc:id="72d53c18-83e4-440b-80d2-00afd4b13e07" >
 		<choice doc:name="Choice" doc:id="5437631c-3834-4ee0-abd0-47dd446eff34">
 			<when expression="#[sizeOf (vars.assetIDs default []) &gt; 0]">
@@ -182,7 +186,7 @@ output application/java
 				</ee:transform>
 		<set-variable value='#["Error occured during processing removePoller Service. \n\nPlease find attached error details."]' doc:name="email Body" doc:id="a0d8360c-3106-43af-b74c-ea9d5eacb08f" variableName="emailBody" />
 		<flow-ref doc:name="supportEmailNotificationFlow" doc:id="bf6362f5-1cfa-4b9e-a351-78d90fd75265" name="supportEmailNotificationFlow" />
-		<set-payload value='#["ErrorType: " ++ error.errorType.namespace ++ ":" ++ error.errorType.identifier ++ ", ErrorDescription: " ++ error.detailedDescription ++ " For FileName: " ++ vars.filename]' doc:name="Set Error Payload" doc:id="8391ed11-4814-4ab6-b820-4580d4c68f5d" />
+		<set-payload value='#["ErrorType: " ++ error.errorType.namespace ++ ":" ++ error.errorType.identifier ++ ", ErrorDescription: " ++ error.detailedDescription ++ " For FileID: " ++ vars.fileID]' doc:name="Set Error Payload" doc:id="8391ed11-4814-4ab6-b820-4580d4c68f5d" />
 	</sub-flow>
 	
 </mule>
