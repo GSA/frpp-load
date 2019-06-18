@@ -167,7 +167,7 @@ output application/java
 					<async doc:name="Async" doc:id="a6dc5613-0ce9-48c9-bcaf-7825d4a0e7b8" >
 						<flow-ref doc:name="Call to fileSplitter_main" doc:id="06199437-caab-4889-aceb-8c5bcd088086" name="fileSplitter_main" target="fileResults" targetValue="#[payload]" />
 					</async>
-					<logger level="INFO" doc:name="log Results" doc:id="002c6c23-65d2-49d6-b69a-c5d3f6f72954" message="File: #[vars.fileName]  launched processing." />
+					<logger level="INFO" doc:name="log Results" doc:id="002c6c23-65d2-49d6-b69a-c5d3f6f72954" message="File: #[vars.fileName], Queue: #[vars.queueName]  launched processing." />
 				</when>
 				<when expression='#[startsWith(vars.queueName,"none")]' >
 					<logger level="INFO" doc:name="No Queue Log" doc:id="a053a38e-a74f-479b-982a-cae888a3a2a4" message="File: #[vars.fileName]. No Queues Available from SF." />
