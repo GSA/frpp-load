@@ -803,7 +803,7 @@ output application/json
 				<flow-ref doc:name="SetFileStatus" doc:id="5d960ad8-42f6-4978-8b1b-cec9ded2ab30" name="SetStatuses" />
 				<choice doc:name="assetType" doc:id="21fa30c7-baec-4193-9643-e21951970703">
 					<when expression='#[vars.assetType == "Building"]'>
-						<logger level="INFO" doc:name="MuleX" doc:id="61c72ba0-29b0-4964-9087-d79cfdf53394" message="MuleX: FrppFileSplitter2: BuildingTransfromToSF Start."/>
+						<logger level="INFO" doc:name="MuleX" doc:id="61c72ba0-29b0-4964-9087-d79cfdf53394" message="MuleX: FrppFileSplitter2: BuildingTransfromToSF Start Thread:  #[p('thread.maxThreads') - vars.threadPoolSize + 1]"/>
 						<ee:transform doc:name="BuildingSFPayload" doc:id="5f4b1249-8832-402f-af56-8672737b40db">
 				<ee:message>
 				</ee:message>
@@ -885,7 +885,7 @@ payload.*Type35Building filter ($ != null) map {
 ]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
-					<logger level="INFO" doc:name="MuleX" doc:id="a3d2b971-90c1-4fee-ab6b-b687fcec8939" message="MuleX: FrppFileSplitter2: BuildingTransfromToSF End."/>
+					<logger level="INFO" doc:name="MuleX" doc:id="a3d2b971-90c1-4fee-ab6b-b687fcec8939" message="MuleX: FrppFileSplitter2: BuildingTransfromToSF End Thread:  #[p('thread.maxThreads') - vars.threadPoolSize + 1]"/>
 					</when>
 					<when expression='#[vars.assetType == "Land"]'>
 						<logger level="INFO" doc:name="MuleX" doc:id="954e3129-99fc-4b5a-bc3d-cb585d4b0266" message="MuleX: FrppFileSplitter2: LandTransfromToSF Start."/>
