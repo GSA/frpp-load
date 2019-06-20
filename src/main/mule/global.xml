@@ -32,7 +32,7 @@ http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mu
 			</reconnection>
 		</salesforce:basic-connection>
 	</salesforce:sfdc-config>
-	<global-property doc:name="Global Property" doc:id="8d7ae1c7-c891-4e3c-9077-3c85f780b205" name="mule.env" value="local" />
+	<global-property doc:name="Global Property" doc:id="8d7ae1c7-c891-4e3c-9077-3c85f780b205" name="mule.env" value="dev" />
 	<configuration-properties doc:name="Configuration properties" doc:id="5829bb43-dcd2-4365-8834-ed93b1255915" file="frpp-load-${mule.env}.properties" />
 	<xml-module:config name="XML_Config" doc:name="XML Config" doc:id="a6e799dc-67e6-482f-a0ba-1ab6d8cc1c98" />
 </mule>
