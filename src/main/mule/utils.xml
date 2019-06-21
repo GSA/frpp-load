@@ -7,7 +7,7 @@ http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mu
 http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mule/xml-module/current/mule-xml-module.xsd">
 	<sub-flow name="authorizeToDelete" doc:id="be2899fa-90bd-47a2-a769-98b562df3dd5" >
 		<choice doc:name="Choice" doc:id="a9d01703-24d3-4fa4-a0fc-9168addaf28e" >
-			<when expression='(vars.fullPayload.FRPPData.@ACTION == "DELETE")'>
+			<when expression='(payload.FRPPData.@ACTION == "DELETE")'>
 				<salesforce:query doc:name="Query - PermissionSetId" doc:id="da5e1f00-1b4e-41fa-b554-cec9e03b3acc" config-ref="SalesforceGeoFL3_Global" target="permissionSetId">
 					<salesforce:salesforce-query >select PermissionSetId FROM PermissionSetAssignment where AssigneeId in 
 	(select CreatedByID from FRPP_FILE__c where ID= ':fileID') 
@@ -33,7 +33,6 @@ http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mu
 	<sub-flow name="schemaValidationFlow" doc:id="8737a356-f53d-428e-b649-09911601ee16" >
 		<try doc:name="Try" doc:id="583e0341-4feb-4625-8f94-e870c2722694">
 			<xml-module:validate-schema schemas="schemas/FRPPXMLvalidation.xsd"  doc:id="8be22d73-1fa6-41bf-b4e7-fc2d4aa1f4c2" config-ref="XML_Config">
-				<xml-module:content ><![CDATA[#[vars.fullPayload]]]></xml-module:content>
 			</xml-module:validate-schema>
 			<set-variable value="true" doc:name="set true" doc:id="b5fba77d-0fb4-4941-b6ff-9a2c7eba3ac5" variableName="validXML"/>
 			<error-handler>
