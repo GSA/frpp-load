@@ -385,14 +385,10 @@ output application/json
 		</choice>
  
  
-		<ee:transform doc:name="Transform Input To XML(2)" doc:id="9d1e1ad7-d2f1-448a-a297-f0739e0e675d">
+		<ee:transform doc:name="Transform Input To XML" doc:id="9d1e1ad7-d2f1-448a-a297-f0739e0e675d">
 			<ee:message>
 			</ee:message>
 					<ee:variables>
-						<ee:set-variable variableName="fullPayload"><![CDATA[%dw 2.0
-output application/xml skipNullOn="everywhere"
----
-payload]]></ee:set-variable>
 				<ee:set-variable variableName="countFullPayload" ><![CDATA[%dw 2.0
 output application/java
 ---
@@ -408,19 +404,19 @@ sizeOf (payload.FRPPData filterObject ($ != null))]]></ee:set-variable>
 				<set-variable value="${InvalidXMLTemplateName}" doc:name="set useTemplateName" doc:id="9b10b087-ad3b-4c4b-adc2-19ba5055dab2" variableName="useTemplateName" />
 				<flow-ref doc:name="userEmailNotificationFlow" doc:id="3d3fed08-8922-48f1-8e46-0c8fd22f79ba" name="userEmailNotificationFlow" />
 			</when>
-			<when expression="#['${current.fiscalYear}'  != vars.fullPayload.FRPPData.@FY]">
+			<when expression="#['${current.fiscalYear}'  != payload.FRPPData.@FY]">
 				<logger level="INFO" doc:name="FY Invalid" doc:id="d9865dea-2293-40b5-9d98-c9b006e70287" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR: Fiscal Year Invalid." />
 				<set-variable value="false" doc:name="Set final Status Flag" doc:id="6568056e-06cf-4894-84be-b6ce9eb41332" variableName="setFinalStatus" />
 				<set-variable value="${InvalidXMLFYTemplateName}" doc:name="set useTemplateName" doc:id="43cab46f-1204-4a64-a3bc-e79d157f70dd" variableName="useTemplateName" />
 				<flow-ref doc:name="userEmailNotificationFlow" doc:id="259b6f1b-2343-4a8d-9443-8b9ab8c21112" name="userEmailNotificationFlow" />
 			</when>
-			<when expression='#[vars.file.AGENCY_CODE__c  != vars.fullPayload.FRPPData.@AGENCYCODE]'>
+			<when expression='#[vars.file.AGENCY_CODE__c  != payload.FRPPData.@AGENCYCODE]'>
 				<logger level="INFO" doc:name="AgencyCode Invalid" doc:id="d0417fbb-fe35-4392-b736-dc6375e76b0a" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR: Agency Code Invalid." />
 				<set-variable value="false" doc:name="Set final Status Flag" doc:id="6749056d-1129-4ec7-bf18-dd97467188ba" variableName="setFinalStatus" />
 				<set-variable value="${InvalidXMLAgencyTemplateName}" doc:name="set useTemplateName" doc:id="a0f9443f-0806-45ea-bb74-19dff413bcb3" variableName="useTemplateName" />
 				<flow-ref doc:name="userEmailNotificationFlow" doc:id="57150247-365d-4509-a68b-8c406166993e" name="userEmailNotificationFlow" />
 			</when>
-			<when expression='#[(vars.fullPayload.FRPPData.@ACTION != "DELETE") and (vars.fullPayload.FRPPData.@ACTION !=  "ADD") and  (vars.fullPayload.FRPPData.@ACTION !=  "MODIFY")]' doc:id="73b36d9b-aa22-4652-8529-41f20b2e49d9">
+			<when expression='#[(payload.FRPPData.@ACTION != "DELETE") and (payload.FRPPData.@ACTION !=  "ADD") and  (payload.FRPPData.@ACTION !=  "MODIFY")]' doc:id="73b36d9b-aa22-4652-8529-41f20b2e49d9">
 				<logger level="INFO" doc:name="Action Invalid" doc:id="24d1e0ae-46a0-4bc8-8042-b6069648ceba" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR: Action Invalid." />
 				<set-variable value="false" doc:name="Set final Status Flag" doc:id="0ed9b023-d051-4972-a066-1bcd52ec2686" variableName="setFinalStatus" />
 				<set-variable value="${InvalidXMLActionTemplateName}" doc:name="set useTemplateName" doc:id="545964f0-cc68-4b98-a176-c1ea59d73d50" variableName="useTemplateName" />
@@ -450,7 +446,7 @@ output application/json
 			</when>
 			<otherwise >
 				<remove-variable doc:name="Remove Variable validXML" doc:id="7dfda688-9f59-43d4-b133-f5d582204ddc" variableName="validXML" />
-				<remove-variable doc:name="Remove Variable  fullPayload" doc:id="323b1291-ef20-4b89-83b7-4d67b757003d" variableName="fullPayload" />
+			<!-- 	<remove-variable doc:name="Remove Variable  fullPayload" doc:id="323b1291-ef20-4b89-83b7-4d67b757003d" variableName="fullPayload" />  -->
 				<logger level="INFO" doc:name="Valid XML" doc:id="755abe84-c631-4e72-ab33-f506ef109469" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 2.VALID XML Payload." />
 				<ee:transform doc:name="Set CIStatus to STARTED" doc:id="4350bc10-23a8-4bf0-8fc0-06b32a87844c">
 			<ee:message>
@@ -812,76 +808,77 @@ output application/json
 output application/java
 type sfDate = Date {format: "M/d/yyyy"}
 ---
-payload.*Type35Building filter ($ != null) map {
-	Asset_Type_Code__c : $.RealPropertyType,
-	RealPropertyUseCode__c : $.RealPropertyUse,
-	Field_Office_Code__c : $.FieldOffice,
-	Field_Office_Collocation_Code__c : $.FieldOfficeCollocation,
-	LegalInterestCode__c : $.LegalInterest.LegalInterestIndicator,
-	LeaseAuthorityCode__c : $.LegalInterest.LeaseAuthorityIndicator,
-	AssetStatusCode__c : $.Status.StatusIndicator,
-	SurplusDeclarationDate__c : if ($.Status.SurplusDeclarationDate != null) ($.Status.SurplusDeclarationDate as sfDate) else null,
-	ReportofExcessSubmittedDate__c : if ($.Status.ReportOfExcessSubmittedDate != null) ($.Status.ReportOfExcessSubmittedDate as sfDate) else null,
-	ReportofExcessAcceptedDate__c : if ($.Status.ReportOfExcessAcceptedDate != null) ($.Status.ReportOfExcessAcceptedDate as sfDate) else null,
-	DeterminationtoDisposeDate__c : if ($.Status.DeterminationToDisposeDate != null) ($.Status.DeterminationToDisposeDate as sfDate) else null,
-	Cannot_Currently_Be_Disposed_of_Date__c : if ($.Status.CannotCurrentlyBeDisposedDate != null) ($.Status.CannotCurrentlyBeDisposedDate as sfDate) else null,
-	OutGrantIndicator__c : $.Status.OutgrantIndicator,
-	CannotCurrentlyBeDisposed_Code__c : $.Status.CannotCurrentlyBeDisposed,
-	HistoricalStatusCode__c : $.HistoricalStatus,
-	ReportingAgencyCode__c : if ($.ReportingAgency != null) ($.ReportingAgency) [0 to 1] else null,
-	ReportingBureauCode__c : if ($.ReportingAgency != null) ($.ReportingAgency) [2 to 3] else null,
-	UsingAgencyCode__c : if ($.UsingOrganization != null) ($.UsingOrganization) [0 to 1] else null,
-	UsingBureauCode__c : if ($.UsingOrganization != null) ($.UsingOrganization) [2 to 3] else null,
-	LeaseExpirationDate__c : if ($.LeaseExpirationDate != null) ($.LeaseExpirationDate as sfDate) else null,
-	Lease_Start_Date__c : if ($.LeaseStartDate != null) ($.LeaseStartDate as sfDate) else null,
-	Lease_Occupancy_Date__c : if ($.LeaseOccupancyDate != null) $.LeaseOccupancyDate as sfDate else null,
-	SquareFeet__c :  $.Size.SquareFeet,
-	SquareFeetUnitOfMeasure_Code__c : $.Size.SquareFeetUnitOfMeasure,
-	Year_Asset_Reported_Underutilized__c : $.YearAssetReportedUnderutilized,
-	ReplacementValue__c : $.ReplacementValue,
-	RepairNeeds__c : $.RepairNeeds,
-	Historical_Capital_Expenditures__c : $.HistoricalCapitalExpenditures,
-	Estimated_Future_Capital_Expenditures__c : $.EstimatedFutureCapitalExpenditures,
-	Owned_and_Managed_Annual_Operations_Cost__c : $.AnnualOperatingCosts.OwnedandOtherwiseManagedAnnualOperatingCosts,
-	Owned_and_Managed_Maintenance_Cost__c : $.AnnualOperatingCosts.OwnedandOtherwiseManagedAnnualMaintenanceCosts,
-	Leased_Annual_Operations_Costs__c : $.AnnualOperatingCosts.LeasedAnnualOperatingCosts,
-	Leased_Annual_Maintenance_Costs__c : $.AnnualOperatingCosts.LeasedAnnualMaintenanceCosts,
-	AnnualRent__c : $.AnnualOperatingCosts.LeaseAnnualRent,
-	StreetAddress__c : $.MainLocation.StreetAddress,
-	Latitude__c : $.MainLocation.Latitude,
-	Longitude__c : $.MainLocation.Longitude,
-	RealPropertyUniqueId__c : $.RealPropertyUniqueIdentifier,
-	CityCode__c : $.City,
-	StateCode__c : $.State,
-	CountryCode__c : $.Country,
-	CountyCode__c : $.County,
-	CongressionalDistrict__c : $.CongressionalDistricts,
-	ZipCode__c : $.Zipcode,
-	InstallationName__c : $.InstallationAndSubInstallationIdentifier.InstallationName,
-	InstallationId__c : $.InstallationAndSubInstallationIdentifier.InstallationIdentifier,
-	SubInstallationId__c : $.InstallationAndSubInstallationIdentifier.SubInstallationIdentifier,
-	Asset_Height__c : $.AssetHeight,
-	Asset_Height_Range_Code__c : $.AssetHeightRange,
-	UtilizationCode__c : $.Utilization,
-	FederalEmployees__c : $.Personnel.FederalEmployees,
-	FederalContractors__c : $.Personnel.FederalContractors,
-	IsAsset_Excluded_Code__c : $.IsAssetExcluded,
-	Exclusion_Reason_Code__c : $.ReasonForExclusion,
-	Year_of_Construction__c : $.YearOfAssetConstruction,
-	Determine_Number_of_Fed_Employees_Code__c : $.CanNumberOfFederalEmployeesBeDetermined,
-	Determine_Number_of_Fed_Contractors_Code__c : $.CanNumberOfFederalContractorsBeDetermined,
-	SustainabilityCode__c : $.IsSustainable,
-	DispositionMethodCode__c : $.DispositionData.DispositionMethod,
-	DispositionDate__c : if ($.DispositionData.DispositionDate != null) $.DispositionData.DispositionDate as sfDate else null,
-	DispositionValue__c : $.DispositionData.DispositionValue,
-	NetProceeds__c : $.DispositionData.NetProceeds,
-	Real_Property_Code__c : $.RealProperty,
-	FOIA_Exemption_Code__c : $.FOIAExemption,
-	Statutory_Citation__c : $.StatutoryCitation,
+payload filter ($ != null) map ((item, index) -> {
+	Asset_Type_Code__c : item.Type35Building.RealPropertyType,
+	RealPropertyUseCode__c : item.Type35Building.RealPropertyUse,
+	Field_Office_Code__c : item.Type35Building.FieldOffice,
+	Field_Office_Collocation_Code__c : item.Type35Building.FieldOfficeCollocation,
+	LegalInterestCode__c : item.Type35Building.LegalInterest.LegalInterestIndicator,
+	LeaseAuthorityCode__c : item.Type35Building.LegalInterest.LeaseAuthorityIndicator,
+	AssetStatusCode__c : item.Type35Building.Status.StatusIndicator,
+	SurplusDeclarationDate__c : if (item.Type35Building.Status.SurplusDeclarationDate != null) (item.Type35Building.Status.SurplusDeclarationDate as sfDate) else null,
+	ReportofExcessSubmittedDate__c : if (item.Type35Building.Status.ReportOfExcessSubmittedDate != null) (item.Type35Building.Status.ReportOfExcessSubmittedDate as sfDate) else null,
+	ReportofExcessAcceptedDate__c : if (item.Type35Building.Status.ReportOfExcessAcceptedDate != null) (item.Type35Building.Status.ReportOfExcessAcceptedDate as sfDate) else null,
+	DeterminationtoDisposeDate__c : if (item.Type35Building.Status.DeterminationToDisposeDate != null) (item.Type35Building.Status.DeterminationToDisposeDate as sfDate) else null,
+	Cannot_Currently_Be_Disposed_of_Date__c : if (item.Type35Building.Status.CannotCurrentlyBeDisposedDate != null) (item.Type35Building.Status.CannotCurrentlyBeDisposedDate as sfDate) else null,
+	OutGrantIndicator__c : item.Type35Building.Status.OutgrantIndicator,
+	CannotCurrentlyBeDisposed_Code__c : item.Type35Building.Status.CannotCurrentlyBeDisposed,
+	HistoricalStatusCode__c : item.Type35Building.HistoricalStatus,
+	ReportingAgencyCode__c : if (item.Type35Building.ReportingAgency != null) (item.Type35Building.ReportingAgency) [0 to 1] else null,
+	ReportingBureauCode__c : if (item.Type35Building.ReportingAgency != null) (item.Type35Building.ReportingAgency) [2 to 3] else null,
+	UsingAgencyCode__c : if (item.Type35Building.UsingOrganization != null) (item.Type35Building.UsingOrganization) [0 to 1] else null,
+	UsingBureauCode__c : if (item.Type35Building.UsingOrganization != null) (item.Type35Building.UsingOrganization) [2 to 3] else null,
+	LeaseExpirationDate__c : if (item.Type35Building.LeaseExpirationDate != null) (item.Type35Building.LeaseExpirationDate as sfDate) else null,
+	Lease_Start_Date__c : if (item.Type35Building.LeaseStartDate != null) (item.Type35Building.LeaseStartDate as sfDate) else null,
+	Lease_Occupancy_Date__c : if (item.Type35Building.LeaseOccupancyDate != null) item.Type35Building.LeaseOccupancyDate as sfDate else null,
+	SquareFeet__c :  item.Type35Building.Size.SquareFeet,
+	SquareFeetUnitOfMeasure_Code__c : item.Type35Building.Size.SquareFeetUnitOfMeasure,
+	Year_Asset_Reported_Underutilized__c : item.Type35Building.YearAssetReportedUnderutilized,
+	ReplacementValue__c : item.Type35Building.ReplacementValue,
+	RepairNeeds__c : item.Type35Building.RepairNeeds,
+	Historical_Capital_Expenditures__c : item.Type35Building.HistoricalCapitalExpenditures,
+	Estimated_Future_Capital_Expenditures__c : item.Type35Building.EstimatedFutureCapitalExpenditures,
+	Owned_and_Managed_Annual_Operations_Cost__c : item.Type35Building.AnnualOperatingCosts.OwnedandOtherwiseManagedAnnualOperatingCosts,
+	Owned_and_Managed_Maintenance_Cost__c : item.Type35Building.AnnualOperatingCosts.OwnedandOtherwiseManagedAnnualMaintenanceCosts,
+	Leased_Annual_Operations_Costs__c : item.Type35Building.AnnualOperatingCosts.LeasedAnnualOperatingCosts,
+	Leased_Annual_Maintenance_Costs__c : item.Type35Building.AnnualOperatingCosts.LeasedAnnualMaintenanceCosts,
+	AnnualRent__c : item.Type35Building.AnnualOperatingCosts.LeaseAnnualRent,
+	StreetAddress__c : item.Type35Building.MainLocation.StreetAddress,
+	Latitude__c : item.Type35Building.MainLocation.Latitude,
+	Longitude__c : item.Type35Building.MainLocation.Longitude,
+	RealPropertyUniqueId__c : item.Type35Building.RealPropertyUniqueIdentifier,
+	CityCode__c : item.Type35Building.City,
+	StateCode__c : item.Type35Building.State,
+	CountryCode__c : item.Type35Building.Country,
+	CountyCode__c : item.Type35Building.County,
+	CongressionalDistrict__c : item.Type35Building.CongressionalDistricts,
+	ZipCode__c : item.Type35Building.Zipcode,
+	InstallationName__c : item.Type35Building.InstallationAndSubInstallationIdentifier.InstallationName,
+	InstallationId__c : item.Type35Building.InstallationAndSubInstallationIdentifier.InstallationIdentifier,
+	SubInstallationId__c : item.Type35Building.InstallationAndSubInstallationIdentifier.SubInstallationIdentifier,
+	Asset_Height__c : item.Type35Building.AssetHeight,
+	Asset_Height_Range_Code__c : item.Type35Building.AssetHeightRange,
+	UtilizationCode__c : item.Type35Building.Utilization,
+	FederalEmployees__c : item.Type35Building.Personnel.FederalEmployees,
+	FederalContractors__c : item.Type35Building.Personnel.FederalContractors,
+	IsAsset_Excluded_Code__c : item.Type35Building.IsAssetExcluded,
+	Exclusion_Reason_Code__c : item.Type35Building.ReasonForExclusion,
+	Year_of_Construction__c : item.Type35Building.YearOfAssetConstruction,
+	Determine_Number_of_Fed_Employees_Code__c : item.Type35Building.CanNumberOfFederalEmployeesBeDetermined,
+	Determine_Number_of_Fed_Contractors_Code__c : item.Type35Building.CanNumberOfFederalContractorsBeDetermined,
+	SustainabilityCode__c : item.Type35Building.IsSustainable,
+	DispositionMethodCode__c : item.Type35Building.DispositionData.DispositionMethod,
+	DispositionDate__c : if (item.Type35Building.DispositionData.DispositionDate != null) item.Type35Building.DispositionData.DispositionDate as sfDate else null,
+	DispositionValue__c : item.Type35Building.DispositionData.DispositionValue,
+	NetProceeds__c : item.Type35Building.DispositionData.NetProceeds,
+	Real_Property_Code__c : item.Type35Building.RealProperty,
+	FOIA_Exemption_Code__c : item.Type35Building.FOIAExemption,
+	Statutory_Citation__c : item.Type35Building.StatutoryCitation,
 	ActionType__c: vars.buildingPayload.FRPPData.@ACTION,
 	FILE_ID__c: vars.file.Id,
 	FiscalYear__c: '${current.fiscalYear}'
 }
+)
 ]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
@@ -1077,7 +1074,8 @@ vars.sfAssetsPayload filter (vars.sfResponse.id[$$] == null) map (
 					<salesforce:records><![CDATA[#[vars.sfErrorAssestsPayload]]]></salesforce:records>
 				</salesforce:create>
 				
-				<logger level="INFO" doc:name="MuleX" doc:id="4ac7947b-443f-4ae8-87c4-4e912d962c47" message="MuleX: FrppFileSplitter4: CreateSFErrorPayload Start."/>
+				<remove-variable doc:name="Remove sfErrorAssestsPayload" doc:id="87382179-68af-41ed-b2ec-b2feaf0a5309" variableName="sfErrorAssestsPayload"/>
+						<logger level="INFO" doc:name="MuleX" doc:id="4ac7947b-443f-4ae8-87c4-4e912d962c47" message="MuleX: FrppFileSplitter4: CreateSFErrorPayload Start."/>
 				
 				
 				
@@ -1115,7 +1113,7 @@ output application/json
 flatten (vars.sfErrorsPayload.errors)]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-			   	<logger level="INFO" doc:name="MuleX" doc:id="78018a90-fdd2-4688-9f1c-6006f8f366e8" message="MuleX: FrppFileSplitter4: CreateSFErrorPayload End."/>
+						<logger level="INFO" doc:name="MuleX" doc:id="78018a90-fdd2-4688-9f1c-6006f8f366e8" message="MuleX: FrppFileSplitter4: CreateSFErrorPayload End."/>
 			   	
 						<foreach doc:name="For Each 200 Batch" doc:id="04a78bce-edc4-4760-afea-c1e747029839" collection="#[vars.sfErrorsPayload]" batchSize="200">
 							<ee:transform doc:name="Transform To JSON" doc:id="ce038da1-fba0-4548-923b-f1a2cf2c999e" >
@@ -1132,6 +1130,7 @@ payload]]></ee:set-payload>
 						<logger level="INFO" doc:name="Error Logger" doc:id="016d058a-fc71-4577-b012-74990d74b350" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 3b. #[vars.assetType] Batch No.: #[vars.counter] ALL Err records processed Succesfully."/>
 					</when>
 					<otherwise >
+						<remove-variable doc:name="Remove sfErrorAssestsPayload" doc:id="72ebdfcb-384c-4f5c-8396-ebc9885c413e" variableName="sfErrorAssestsPayload"/>
 						<logger level="INFO" doc:name="Success Logger" doc:id="a83cc715-af76-49b0-9e64-b46d67a68f83" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 3a. #[vars.assetType] Batch No.: #[vars.counter] ALL records processed Succesfully."/>
 					</otherwise>
 				</choice>
@@ -1153,13 +1152,14 @@ output application/json
 					<flow-ref doc:name="SetFileStatus" doc:id="260f3f33-ed8c-4d08-a32f-a2a2913e5028" name="SetStatuses" />
 				</when>
 				<otherwise >
+					<remove-variable doc:name="Remove sfAssetsPayload" doc:id="d4ad7ab2-ec8d-4d7a-a863-a8589f5aa007" variableName="sfAssetsPayload"/>
 					<logger level="INFO" doc:name="Validation Errors" doc:id="b63cbd38-4209-45e2-a695-f89190eac006" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR:  Received SF error other then Validation Error.  Need to Exit."/>
-				<set-variable value="false" doc:name="Set proceed? to false" doc:id="08f0eed1-d2b9-4172-915f-653034cb263d" variableName="proceed?" />
-				<set-variable value="${InvalidXMLFYTemplateName}" doc:name="set useTemplateName" doc:id="9725ed71-6895-4c85-92f9-133074a07cc3" variableName="useTemplateName" />
-				<ee:transform doc:name="set error Msg" doc:id="7ec46111-d005-4b82-a93b-9d776e7eb184">
-					<ee:message>
-					</ee:message>
-					<ee:variables >
+					<set-variable value="false" doc:name="Set proceed? to false" doc:id="08f0eed1-d2b9-4172-915f-653034cb263d" variableName="proceed?" />
+					<set-variable value="${InvalidXMLFYTemplateName}" doc:name="set useTemplateName" doc:id="9725ed71-6895-4c85-92f9-133074a07cc3" variableName="useTemplateName" />
+					<ee:transform doc:name="set error Msg" doc:id="7ec46111-d005-4b82-a93b-9d776e7eb184">
+						<ee:message>
+						</ee:message>
+						<ee:variables >
 						<ee:set-variable variableName="errorMsg" ><![CDATA[%dw 2.0
 output application/java
 ---
