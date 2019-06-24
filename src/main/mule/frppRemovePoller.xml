@@ -74,8 +74,8 @@ output application/json
 ---
 [{
 	Id: vars.fileID,
-	// CI_STATUS__c : p('CI.remove.status1'), //Removal In Progress
-	CI_STATUS__c : 'REMOVE'
+	CI_STATUS__c : p('CI.remove.status1') //Removal In Progress
+	
 }]]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
@@ -139,8 +139,7 @@ output application/json
 	Active__c : false,
 	Status__c : "Removed", 
 	CI_STATUS__c : 'REMOVE COMPLETE'
-	// CI_STATUS__c : p('CI.remove.status1'), //Removal In Progress
-	//CI_STATUS__c : 'REMOVE'
+	
 }]]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
