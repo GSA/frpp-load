@@ -387,6 +387,10 @@ output application/json
  
 		<ee:transform doc:name="Transform Input To XML" doc:id="e05553bd-9921-4795-b609-4b19c2e3fb39">
 			<ee:message>
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml skipNullOn="everywhere", inlineCloseOn="empty"
+---
+payload]]></ee:set-payload>
 			</ee:message>
 					<ee:variables>
 				<ee:set-variable variableName="countFullPayload" ><![CDATA[%dw 2.0
