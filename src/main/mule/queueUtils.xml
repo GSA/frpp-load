@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="publishQUtilHttp" doc:id="1b3c187f-e1c2-48f2-a11e-fef3d7bfefdc" >
+		<http:listener doc:name="Listener" doc:id="9dea9469-6669-4f49-9132-6d7614ab0283" config-ref="HTTP_Listener_config_Global" path="/publishQueue"/>
+		<set-variable value="#[attributes.queryParams.QName]" doc:name="Set queueName" doc:id="5cadc920-248f-4c08-8ffe-9e6ef0492ace" variableName="queueName"/>
+		<set-variable value="#[attributes.queryParams.count]" doc:name="Set msgCount" doc:id="94e06603-84b5-4107-af02-b006dde3ebdc" variableName="msgCount"/>
+		<flow-ref doc:name="Call publishQUtilLoop" doc:id="7a4b0af3-c37a-4e64-8ffd-4877328473d7" name="publishQUtilLoop"/>
+		<set-payload value='#["Published " ++ attributes.queryParams.count ++ " messages to Queue:" ++ vars.queueName]' doc:name="Set Payload" doc:id="89a29f6e-569a-436b-a660-1d8901215102" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="2d8e4cbe-20cc-4042-a8c4-7578ad8cf18e" >
+				<logger level="INFO" doc:name="Logger" doc:id="f5fc3b78-f77e-40c8-96b1-ba6e5356851b" message='#["Error Publishing to Queue:" ++ vars.queueName]'/>
+			</on-error-propagate>
+		</error-handler>
+		
+	</flow>
+	<sub-flow name="publishQUtilLoop" doc:id="000e7cd6-3152-4f41-80b4-27d17befc4df" >
+		<vm:publish doc:name="Publish to Queue" doc:id="39a156af-6f8d-4808-8233-e411b019757a" config-ref="VM_Batch_Config" sendCorrelationId="AUTO" queueName="#[vars.queueName]" timeout="1">
+			<vm:content><![CDATA[#[vars.msgCount]]]></vm:content>
+				</vm:publish>
+		<ee:transform doc:name="Transform Message" doc:id="f3d38c44-2a71-4941-adc4-3cd5b73d6f91" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="msgCount" ><![CDATA[%dw 2.0
+output application/java
+---
+vars.msgCount - 1]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="63441bf1-f8f0-46c7-af8e-017ee2dbd22d" >
+			<when expression="#[(vars.msgCount &gt; 0)]">
+				<flow-ref doc:name="Call publishQUtilLoop" doc:id="eb26d349-0254-4608-a45b-2aa314bc80f4" name="publishQUtilLoop" />
+			</when>
+		</choice>
+	</sub-flow>
+	<flow name="clearQueueUtilHttp" doc:id="e8344a7c-d552-460e-8830-85a2e22cc709" >
+		<http:listener doc:name="Listener" doc:id="984d32e0-e3ef-4f0e-ace9-07dd64d94296" config-ref="HTTP_Listener_config_Global" path="/clearQueue"/>
+		<set-variable value="#[attributes.queryParams.QName]" doc:name="Set queueName" doc:id="4e5359e5-4f2a-47a9-94a0-1801e6e28faa" variableName="queueName"/>
+		<set-variable value="0" doc:name="Set clearQCount" doc:id="7fa27a1b-0102-400c-944a-43c1313b8dbe" variableName="clearQCount"/>
+		<flow-ref doc:name="Call clearQueueLoop" doc:id="3144756f-076e-4f91-8e0e-356d5fb71d37" name="clearQueueFlow"/>
+		<set-payload value='#["Cleared " ++ vars.clearQCount ++ " messages from Queue:" ++ vars.queueName]' doc:name="Set Payload" doc:id="3a8e056a-251f-40ad-8f13-1e17d7b17a09" />
+	</flow>
+	<flow name="clearQueueFlow" doc:id="3bb836c0-12f5-48d8-b763-5d1564f91c78" >
+		<choice doc:name="Choice" doc:id="7278a115-d627-45d2-9a68-956e52c7a6ea" >
+			<when expression="#[vars.clearQCount == null or vars.clearQCount == '']">
+				<set-variable value="0" doc:name="Set clearQCount" doc:id="07c72627-9c18-45fd-bebc-8202f19809d0" variableName="clearQCount"/>
+			</when>
+		</choice>
+		<vm:consume queueName="#[vars.queueName]" doc:name="Consume" target="vmClearMsg" doc:id="30ec8332-74e1-4c27-993a-e44e8e3b1890" config-ref="VM_Batch_Config" timeout="1" />
+		<ee:transform doc:name="Transform Message" doc:id="6d6cc630-8c0f-477f-ae48-4bf7ca4e5cb1">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="clearQCount"><![CDATA[%dw 2.0
+output application/java
+---
+vars.clearQCount + 1]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="45b4dc55-af4d-4045-b2a8-6b3077c7a38b" message="Cleared Msg#[vars.clearQCount] from #[vars.queueName]" />
+		<remove-variable doc:name="Remove Variable" doc:id="03aeb7ed-0251-47c8-9e0a-a9fa1988565e" variableName="vmClearMsg" />
+		<flow-ref doc:name="Call clearQueueFlow" doc:id="b3f88972-ba81-4648-b954-2b2690470195" name="clearQueueFlow"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="21e61c7d-f6cd-41de-8202-6516a848ff74" >
+				<logger level="INFO" doc:name="Logger" doc:id="50e19f6a-0180-4832-aa7c-fc593c193b7e" message="No Message left on the queue: #[vars.queueName]"/>
+			</on-error-continue>
+		</error-handler>
+				
+	</flow>
+</mule>
