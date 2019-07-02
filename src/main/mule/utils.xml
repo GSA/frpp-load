@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:xml-module="http://www.mulesoft.org/schema/mule/xml-module" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:xml-module="http://www.mulesoft.org/schema/mule/xml-module" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
 http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mule/xml-module/current/mule-xml-module.xsd">
 	<sub-flow name="authorizeToDelete" doc:id="be2899fa-90bd-47a2-a769-98b562df3dd5" >
@@ -56,7 +58,6 @@ http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mu
 
 
 	<sub-flow name="SetStatuses" doc:id="c2f2a64c-fb45-4d93-9b3f-160e0c91d15f" >
-		
 		<salesforce:update type="FRPP_FILE__c" doc:name="Update_FRPP_FILE" doc:id="84a08981-f265-4157-9c69-ac4c27924f53" config-ref="SalesforceGeoFL3_Global" target="updateStatusResp">
 			<salesforce:records ><![CDATA[#[vars.updateStatusReq]]]></salesforce:records>
 		</salesforce:update>
@@ -83,6 +84,104 @@ http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mu
 				<logger level="INFO" doc:name="Logger" doc:id="bb344766-6765-4784-b3eb-9a7fe2573045" message="Warning: No queueName available in pipeline to Release."/>
 			</otherwise>
 		</choice>
+	</sub-flow>
+	<sub-flow name="logPayloads" doc:id="a771bd7b-c0fb-42b8-a34a-74d22d0545f8" >
+		<choice doc:name="1.sfAssetsPayload" doc:id="043cb4d9-e51e-4fcb-872f-c84a1c734fce" >
+					<when expression='#[vars.sfAssetsPayload != null and vars.sfAssetsPayload != ""]'>
+						<ee:transform doc:name="Transform SFReq To Json" doc:id="00e77bfa-7001-4499-b4f1-4f7ce17f9d5c">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="sfAssetsPayload" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.sfAssetsPayload]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<logger level="ERROR" doc:name="Log SFReq" doc:id="85c318fe-93dc-41e3-8120-a1bc19c87620" message='File ID: #[vars.file.Id], File Name: #[vars.fileName], Thread: #[vars.currentThread] --&gt; Salesforce Request: #[vars.sfAssetsPayload]'/>
+					</when>
+				</choice>
+				
+				<choice doc:name="2.sfResponse" doc:id="1078dd2d-da50-4568-bc26-a7fcc8f246f1" >
+					<when expression='#[vars.sfResponse != null and vars.sfResponse != ""]'>
+						<ee:transform doc:name="Transform SFResp To Json" doc:id="d9e03bdb-703c-42c4-8b2d-ae8472a60381">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="sfResponse" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.sfResponse]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<logger level="ERROR" doc:name="Log SFResp" doc:id="38787752-a26a-484e-b083-a7c7d1133b89" message='File ID: #[vars.file.Id], File Name: #[vars.fileName], Thread: #[vars.currentThread] --&gt;  Salesforce Response: #[vars.sfResponse]'/>
+					</when>
+				</choice>
+				
+				
+				<choice doc:name="3.sfErrorAssestsPayload" doc:id="4b11d766-c7c6-45e7-b6a0-286384d8b792" >
+					<when expression='#[vars.sfErrorAssestsPayload != null and vars.sfErrorAssestsPayload != ""]'>
+						<ee:transform doc:name="Transform SFErrAst To Json" doc:id="a1708a1e-d019-48b9-9dbb-622f756b8233">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="sfErrorAssestsPayload" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.sfErrorAssestsPayload]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<logger level="ERROR" doc:name="Log SFErrAst" doc:id="ecfe6972-dbab-4c39-b95a-8bf6d3d70489" message='File ID: #[vars.file.Id], File Name: #[vars.fileName], Thread: #[vars.currentThread] --&gt;  SF ErrorAssets Req: #[vars.sfErrorAssestsPayload]'/>
+					</when>
+				</choice>
+				
+				<choice doc:name="4.sfErrorAssestsResponse" doc:id="3178d1ac-603a-40ba-a0f8-fb436d4cb3d9" >
+					<when expression='#[vars.sfErrorAssestsResponse != null and vars.sfErrorAssestsResponse != ""]'>
+						<ee:transform doc:name="Transform SFErrAstRsp To Json" doc:id="f087db5e-5de2-4580-99b6-848b7a0c4c81">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="sfErrorAssestsResponse" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.sfErrorAssestsResponse]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<logger level="ERROR" doc:name="Log SFErrAstRep" doc:id="bd5e6f23-6a45-41bb-9367-9117d8fb4378" message='File ID: #[vars.file.Id], File Name: #[vars.fileName], Thread: #[vars.currentThread] --&gt;  SF ErrorAssets Response: #[vars.sfErrorAssestsResponse]'/>
+					</when>
+				</choice>
+				
+				<choice doc:name="5.sfErrorsPayloadBatch" doc:id="316556f2-3d27-4ab3-93aa-8b466525d55a" >
+					<when expression='#[vars.sfErrorsPayloadBatch != null and vars.sfErrorsPayloadBatch != ""]'>
+						<ee:transform doc:name="Transform sfErrorsPayloadBatch To Json" doc:id="987f9b6a-849a-4a29-879d-ce2e118c95b4">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="sfErrorsPayloadBatch" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.sfErrorsPayloadBatch]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<logger level="ERROR" doc:name="Log sfErrorsPayloadBatch" doc:id="9c0ce9bc-8349-402d-ba52-b91340d9a3bd" message='File ID: #[vars.file.Id], File Name: #[vars.fileName], Thread: #[vars.currentThread] --&gt;  Sent: sfErrorsPayloadBatch: #[vars.sfErrorsPayloadBatch]'/>
+					</when>
+				</choice>
+				
+				<choice doc:name="6.sfErrorsResponse" doc:id="b442dd48-c68b-458d-ad1b-a515648a614e" >
+					<when expression='#[vars.sfErrorsResponse != null and vars.sfErrorsResponse != ""]'>
+						<ee:transform doc:name="Transform sfErrorsResponse To Json" doc:id="1917a62a-34d5-4050-829c-af177adb4f06">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="sfErrorsResponse" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.sfErrorsResponse]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<logger level="ERROR" doc:name="Log sfErrorsResponse" doc:id="8d467095-a774-432b-b89b-5f807b045f85" message='File ID: #[vars.file.Id], File Name: #[vars.fileName], Thread: #[vars.currentThread] --&gt; Got sfErrorsResponse: #[vars.sfErrorsResponse]'/>
+					</when>
+				</choice>
 	</sub-flow>
 		
 	
