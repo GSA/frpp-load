@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	
+	<flow name="frppICPoller_schedule" doc:id="116cdb67-460e-4b36-8958-049076132dca">
+		<scheduler doc:name="Scheduler" doc:id="87768dd4-f277-4fb3-b611-61bb6b91abf2">
+			<scheduling-strategy>
+				<fixed-frequency timeUnit="SECONDS" frequency="${schedule.IC.time.sec}" />
+			</scheduling-strategy>
+		</scheduler>
+		<choice doc:name="Choice - scheduler On?" doc:id="63d9860e-b88f-4b7b-85dd-99136dd0b2ea">
+			<when expression="p('schedule.IC.enabled') == &quot;true&quot;">
+				<salesforce:query doc:name="Query All Files" doc:id="bc52e3a1-4e66-44d5-8818-ac2c0d5b671b" config-ref="SalesforceGeoFL3_Global" target="ICFileIDs">
+					<salesforce:salesforce-query >Select ID, AGENCY_CODE__c, BUREAU_CODE__c, Status__c, CI_STATUS__c from FRPP_FILE__c where File_Type__c='IC' and Active__c=true and Status__c='Queued'</salesforce:salesforce-query>
+				</salesforce:query>
+				<flow-ref doc:name="call frppICPoller_main" doc:id="fa8802bd-4177-4a2b-9743-bdf43767adb0" name="frppICPoller_main" />
+			</when>
+		</choice>
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b7f8ce39-28bb-4d48-acc0-6c2bb3737d25">
+				<flow-ref doc:name="frppICPoller_ErrorHandlerMain" doc:id="8663013b-9bf0-4688-944b-82e2e3b1db7b" name="frppICPoller_ErrorHandlerMain" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	
+	<flow name="frppICPoller_http" doc:id="eb7acd76-2865-41b5-ae7f-d672a615edc8" >
+		<http:listener doc:name="Listener" doc:id="cb35160d-acd0-4af5-9f32-796873d1024e" config-ref="HTTP_Listener_config_Global" path="/frppIC"/>
+		<choice doc:name="Choice - fileName Provided?" doc:id="165bed4a-e412-4d33-aeaa-c27ea81e8bf4" >
+			<when expression="#[attributes.queryParams.fileName == 'ALL' or attributes.queryParams.fileName == 'all'  or  attributes.queryParams.fileName == 'All']">
+				<salesforce:query doc:name="Query All Files" doc:id="7bdc742c-236b-420e-87ff-c2843b0b91d4" config-ref="SalesforceGeoFL3_Global" target="ICFileIDs">
+					<salesforce:salesforce-query >Select ID, AGENCY_CODE__c, BUREAU_CODE__c, Status__c, CI_STATUS__c from FRPP_FILE__c where File_Type__c='IC' and Active__c=true and Status__c='Queued'</salesforce:salesforce-query>
+				</salesforce:query>
+				<flow-ref doc:name="frppICPoller_main" doc:id="1433f1e7-efa9-4c21-89de-9a2e020cb02a" name="frppICPoller_main"/>
+			</when>
+			<when expression='#[attributes.queryParams.fileName != null and attributes.queryParams.fileName != ""]'>
+				<salesforce:query doc:name="Query- SF" doc:id="07f34a19-4b72-4eb3-9907-74725bb05d7b" config-ref="SalesforceGeoFL3_Global" target="ICFileIDs">
+					<salesforce:salesforce-query >Select ID, AGENCY_CODE__c, BUREAU_CODE__c, Status__c, CI_STATUS__c from FRPP_FILE__c where File_Type__c='IC' and Active__c=true and Status__c='Queued' and FILE_NAME__c = ':fileName'</salesforce:salesforce-query>
+					<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	fileName : attributes.queryParams.fileName
+}]]]></salesforce:parameters>
+				</salesforce:query>
+				<flow-ref doc:name="frppICPoller_main" doc:id="e34175a5-962a-4d21-8e82-72f7b750fda6" name="frppICPoller_main"/>
+			</when>
+			<otherwise >
+				<set-payload value="Incorrect query parameters provided. No frppIC files were processed." doc:name="Incorrect QueryParams" doc:id="2483d3db-d7de-43c6-b19a-a38e7b9c2871" />
+			</otherwise>
+		</choice>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="a6816738-be30-457d-910d-4af82aa06348" >
+				<flow-ref doc:name="frppICPoller_ErrorHandlerMain" doc:id="74ec28fe-1e8e-4955-940e-d06c229c61a8" name="frppICPoller_ErrorHandlerMain"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	
+	<sub-flow name="frppICPoller_main" doc:id="e43eb602-9459-4cd9-a0ed-3595176ecd77" >
+		<choice doc:name="Choice - Payload Size &gt; 0?" doc:id="c238ae3d-a27c-4c14-8394-d48a28133938">
+			<when expression="#[(sizeOf (vars.ICFileIDs) &gt; 0)]">
+				<foreach doc:name="For Each" doc:id="86525715-c981-4703-a157-092a29928ae8" collection="vars.ICFileIDs">
+					<async doc:name="Async" doc:id="8a4a4a7c-f81c-42bf-8970-5d9654884be8" >
+						<set-variable value="#[payload.Id]" doc:name="IC_FileId" doc:id="6bc42997-85ff-4ee0-af91-af6c3ecba0df" variableName="IC_FileId" />
+						<flow-ref doc:name="frppICData Call" doc:id="b217283a-a153-4f9f-abfa-671092f30f48" name="frppICData" />
+					</async>
+		</foreach>
+				<logger level="INFO" doc:name="Logger" doc:id="a19d83fd-0a0a-4995-9039-debad1d4e9b4" message="FRPPICPoller: MULE Started Processing #[sizeOf (vars.ICFileIDs)] Inventory clearance File(s)."/>
+				<set-payload value='#["FRPPICPoller Flow Completed. Started processing " ++ sizeOf(vars.ICFileIDs) ++ " Inventory clearance File(s)."]' doc:name="set Http Response" doc:id="efc9f6cf-6ad5-479c-8644-4126b5ee1493" />
+			</when>
+			<otherwise >
+						<set-payload value="frppICPoller Flow completed. Did not have (any files or FileName provided) in Queued Status to process." doc:name="No Files Found." doc:id="0730c582-5dcb-4f7e-a792-01a360f76f74" />			
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<flow name="frppICData" doc:id="de9a9fec-6676-4fc4-85d3-0c146d8cd504" >
+		<ee:transform doc:name="Set CIStatus to STARTED" doc:id="bb89b5b1-1dd8-46d1-a877-0726183efb7f">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="updateStatusReq"><![CDATA[%dw 2.0
+output application/json
+---
+[{
+	Id: vars.IC_FileId,
+	STATUS__c : p('status1') //Processing
+}]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="SetFileStatus" doc:id="c4bdec36-2bec-4000-ad59-18da8cd8124e" name="SetStatuses" />
+		<choice doc:name="Choice" doc:id="1a72448e-2ef3-4494-8d91-d8ea1e93b17b" >
+			<when expression='#[payload.BUREAU_CODE__c == null or payload.BUREAU_CODE__c == ""]'>
+				<salesforce:query doc:name="Query FRPP_ASSET__c" doc:id="8ed08b3d-243f-45fe-bcab-2114b18544eb" config-ref="SalesforceGeoFL3_Global" target="assetIDs">
+			<salesforce:salesforce-query>Select Id from FRPP_ASSET__c where ReportingAgencyCode__c = ':agencyCode' and FiscalYear__c = ':fiscalYr' and ASSET_RECORD_TYPE__c='UPLOADED' and Active__c = true</salesforce:salesforce-query>
+			<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	agencyCode : payload.AGENCY_CODE__c,
+	fiscalYr : p('current.fiscalYear')
+}]]]></salesforce:parameters>
+		</salesforce:query>
+			</when>
+			<otherwise >
+				<salesforce:query doc:name="Query FRPP_ASSET__c" doc:id="7142e0a6-054a-4f51-9c57-2bbfa0346eb7" config-ref="SalesforceGeoFL3_Global" target="assetIDs">
+			<salesforce:salesforce-query>Select Id from FRPP_ASSET__c where ReportingAgencyCode__c = ':agencyCode' and FiscalYear__c = ':fiscalYr' and ReportingBureauCode__c= ':bureauCode'  and ASSET_RECORD_TYPE__c='UPLOADED' and Active__c = true</salesforce:salesforce-query>
+			<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	agencyCode : payload.AGENCY_CODE__c,
+	fiscalYr : p('current.fiscalYear'),
+	bureauCode : payload.BUREAU_CODE__c
+}]]]></salesforce:parameters>
+		</salesforce:query>
+			</otherwise>
+		</choice>
+		<choice doc:name="Choice" doc:id="f869843d-6078-491a-a734-36339a526b17" >
+			<when expression='#[sizeOf(vars.assetIDs) &gt; 0]'>
+				<logger level="INFO" doc:name="Process Started." doc:id="cca7e016-0146-4be1-8f76-5c693c8081a4" message="FRPPICPoller: Started processing Inventory Clearance for FileID: #[vars.IC_FileId]"/>
+				<ee:transform doc:name="set assetIDs" doc:id="d5cfcbf6-9517-405c-8cef-72c521d053e4">
+					<ee:message>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="assetIDs" ><![CDATA[%dw 2.0
+output application/java
+---
+
+vars.assetIDs map ($ - 'type')
+]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				
+				
+				
+				<salesforce:create-job operation="delete" type="FRPP_ASSET__c" doc:name="Create job" doc:id="37bed2a3-16af-4a42-a9f6-923765ba3f50" config-ref="SalesforceGeoFL3_Global" target="createJob"/>
+				<foreach doc:name="For Each" doc:id="5f5ff785-b107-431a-ae7f-f8ac6b818fde" collection="vars.assetIds" batchSize="10000">
+					<ee:transform doc:name="Transform To Json" doc:id="3a293713-4a94-464b-ab54-f2528ca7a9a7" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+						</ee:message>
+						<ee:variables >
+						</ee:variables>
+					</ee:transform>
+					<salesforce:create-batch doc:name="Create batch" doc:id="eb27463d-89d2-4d39-8297-32c9c9b7d3ac" config-ref="SalesforceGeoFL3_Global" jobInfoBatch="#[vars.createJob]" target="createBatch" >
+						<salesforce:objects ><![CDATA[#[payload]]]></salesforce:objects>
+					</salesforce:create-batch>
+				</foreach>
+				<salesforce:close-job doc:name="Close job" doc:id="5c3b9626-7d92-4cfa-b98d-61f765cc41ee" config-ref="SalesforceGeoFL3_Global" jobId="#[vars.createJob.id]" target="closeJob"/>
+				<set-variable value="true" doc:name="Set KeepLooping" doc:id="70b33fd6-cea9-4d44-a7d8-a11b80d31752" variableName="KeepLooping" />
+				<flow-ref doc:name="Call to frppICPooler_whileLoop  " doc:id="37794230-ed7b-4615-b6d6-6fbd21cd633a" name="frppICPoller_whileLoop"/>
+				<choice doc:name="Choice" doc:id="f7242b47-fd3d-4924-a830-4af6a32aaad1">
+					<when expression="#[vars.assetDeleted != 'false']">
+		<salesforce:job-info doc:name="Job info" doc:id="cb0f0386-6211-40ea-bdd0-c8fa93b3a28b" config-ref="SalesforceGeoFL3_Global" jobId="#[vars.createJob.id]" target="jobInfo"/>
+						<choice doc:name="Choice" doc:id="86f2f692-0fab-42f6-ab70-a0b1209a1da7">
+							<when expression="#[vars.jobInfo.numberBatchesFailed == 0 and vars.jobInfo.numberRecordsFailed == 0 and (sizeOf(vars.assetIDs) == vars.jobInfo.numberRecordsProcessed)]">
+								<logger level="INFO" doc:name="Log Assets Cleared" doc:id="09af9d09-71df-4757-a544-b1ff5d880037" message="FRPPICPoller completed clearing #[vars.jobInfo.numberRecordsProcessed] assets."/>
+							</when>
+							<otherwise >
+								<set-variable value="false" doc:name="assetDeleted" doc:id="9c67a487-6650-4f4a-8356-d2075eedeacb" variableName="assetDeleted" />
+								<ee:transform doc:name="Transform Message" doc:id="ef739143-e9bb-4e11-9344-1893a8b28c7f">
+									<ee:message>
+									</ee:message>
+									<ee:variables>
+										<ee:set-variable variableName="errorTxt"><![CDATA[%dw 2.0
+output application/json
+---
+{
+	JOBId: vars.createJob.id,
+	numberBatchesFailed: vars.jobInfo.numberBatchesFailed,
+	numberRecordsFailed: vars.jobInfo.numberRecordsFailed,
+	numberOfRecordsInJob: sizeOf(vars.assetIDs),
+	numberRecordsProcessed: vars.jobInfo.numberRecordsProcessed
+}
+	  ]]></ee:set-variable>
+									</ee:variables>
+								</ee:transform>
+								<logger level="ERROR" doc:name="Error Log" doc:id="ad90463c-5311-4de9-9dd4-37ca9504f784" message="FRPPICPoller:  ERROR: The job completion variables did not match. #[vars.errorTxt]" />
+							</otherwise>
+							
+						</choice>
+					</when>
+				</choice>
+				<choice doc:name="Choice" doc:id="dcc431a4-f874-43b6-8b08-c725df9a8cbd" >
+					<when expression="#[vars.assetDeleted != 'false']">
+					    <ee:transform doc:name="Set CIStatus to STARTED" doc:id="ca8dd9e4-55aa-4774-ba7c-e1f167605d9d">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="updateStatusReq"><![CDATA[%dw 2.0
+output application/json
+---
+[{
+	Id: vars.IC_FileId,
+	STATUS__c : p('CI.status2') //COMPLETED
+}]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="SetFileStatus" doc:id="5f6914bb-8ea5-48da-aa00-08fd696bd462" name="SetStatuses" />
+					</when>
+					<otherwise >
+						<ee:transform doc:name="Set CIStatus to STARTED" doc:id="adda321a-4920-4fa1-a0d2-f0c343e68f0b">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="updateStatusReq"><![CDATA[%dw 2.0
+output application/json
+---
+[{
+	Id: vars.IC_FileId,
+	Status__c: p('status5') // // Error during processing
+}]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="SetFileStatus" doc:id="aa9f43f2-5696-4966-86e2-8866bd9d133b" name="SetStatuses" />
+						<logger level="ERROR" doc:name="Error Log" doc:id="d8ec91ed-10a3-42cc-b4f6-e19490a69a58" message="FRPPICPoller: ERROR: Some of the Assets were not deleted in Batch with JOBID: #[vars.createJob.id]" />
+		<ee:transform doc:name="set error Msg" doc:id="40f69961-03bf-4be3-9236-99ebf57eba8b">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="errorMsg"><![CDATA[%dw 2.0
+output application/java
+---
+[
+  ("Some of the Assets were not deleted in Batch submitted to SF with JOBID: " ++ vars.createJob.id), 	
+  ("Please check Salesforce Bulk Data Load Jobs for details")
+]
+
+]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+		<set-variable value='#["Some of the Assets were not deleted in the Batch submitted to SF. \n\nPlease find attached details."]' doc:name="email Body" doc:id="87f57c10-9866-4cc9-b1df-efc2ad115230" variableName="emailBody" />
+		<flow-ref doc:name="supportEmailNotificationFlow" doc:id="690e3740-6565-4ca1-a371-5ee6a927e43d" name="supportEmailNotificationFlow" />
+					</otherwise>
+				</choice>
+				
+				
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Set CIStatus to STARTED" doc:id="6233dc68-33f4-48bb-8778-e60a336d2dbf">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="updateStatusReq"><![CDATA[%dw 2.0
+output application/json
+---
+[{
+	Id: vars.IC_FileId,
+	STATUS__c : 'No data to clear'
+}]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+				<flow-ref doc:name="SetFileStatus" doc:id="851a50f7-981d-4b72-8b94-50f88c471341" name="SetStatuses" />
+			</otherwise>
+		</choice>
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="58afa587-0fc7-4b0c-80cc-b4458f507884">
+				<flow-ref doc:name="frppICPoller_ErrorHandler" doc:id="83ea60b9-6a39-4061-842f-3884ce998478" name="frppICPoller_ErrorHandler" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<sub-flow name="frppICPoller_whileLoop" doc:id="fdb2803b-8030-47df-a5c3-58e31cebc614" >
+		<choice doc:name="Choice" doc:id="86a31dc4-9e02-4d0c-8e38-8d86abf64cc1" >
+			<when expression="#[vars.KeepLooping == 'true']">
+				<set-variable value="false" doc:name="Set KeepLooping" doc:id="cc734286-5a51-4cea-be53-eea35ba8c01e" variableName="KeepLooping" />
+				<remove-variable doc:name="Remove assetDeleted" doc:id="3a1c9d8e-f5bb-4cd5-885a-62f92555feac" variableName="assetDeleted"/>
+				<salesforce:batch-info-list doc:name="Batch info list" doc:id="ae109e0d-2903-4f09-8f68-038e87e10545" config-ref="SalesforceGeoFL3_Global" target="batchInfoList">
+					<salesforce:job-id ><![CDATA[#[vars.createJob.id]]]></salesforce:job-id>
+				</salesforce:batch-info-list>
+				<foreach doc:name="For Each" doc:id="8c4c6341-ea5d-49ed-8a57-bf90de4f5174" collection="vars.batchInfoList">
+					<choice doc:name="Choice" doc:id="47d34d8c-5301-425c-8947-c821cbc3343c">
+				<when expression="#[( payload.state == 'Queued' or payload.state == 'InProgress'  or payload.state == 'In Progress') and vars.KeepLooping == 'false']">
+							<ee:transform doc:name="sleep" doc:id="4475d46e-fd2b-4756-93d1-1e47ab22bbbd">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="waitTemp"><![CDATA[%dw 2.0
+import * from dw::Runtime
+output application/json
+---
+ { "user" : 2 } wait p('IC.sleep_ms')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+							<set-variable value="true" doc:name="Set KeepLooping" doc:id="ecdf250a-8fc4-4e1f-b977-e2a40470f14f" variableName="KeepLooping" />
+							<remove-variable doc:name="Remove batchInfoList" doc:id="cb15118c-75f9-4f54-b176-e5bbc5898bc0" variableName="batchInfoList"/>
+				</when>
+				<when expression="#[payload.state != 'Completed' and vars.KeepLooping == 'false']">
+							<set-variable value="false" doc:name="assetDeleted" doc:id="31e00f30-def7-4097-a47f-66e71023204b" variableName="assetDeleted" />
+							<set-variable value="false" doc:name="Set KeepLooping" doc:id="af81b347-c414-4c77-b2b7-ce19a58a85e5" variableName="KeepLooping" />
+							<remove-variable doc:name="Remove bulkInfo" doc:id="1e17b24f-50a3-4ce7-997b-999a9123465f" variableName="bulkInfo"/>
+							<logger level="ERROR" doc:name="Error Logger" doc:id="f56c81ab-9e4c-4125-9509-cfad732ed520" message="FRPPICPoller: ERROR on SF Batch. BatchStatus Received as: '#[payload.state]' for JobID:  #[vars.createJob.id]" />
+				
+				</when>
+			</choice>
+		</foreach>
+				<flow-ref doc:name="call again frppICPoller_whileLoop" doc:id="9ef5828f-00f8-40e9-b317-24c7ecda470b" name="frppICPoller_whileLoop" />
+			</when>
+			<otherwise >
+				<remove-variable doc:name="waitTemp" doc:id="1ffe3f51-8fd1-43b5-a3f7-8d42e9d999d3" variableName="waitTemp"/>
+				<remove-variable doc:name="KeepLooping" doc:id="838be35a-7019-499c-8165-cef19946b136" variableName="KeepLooping"/>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="frppICPoller_ErrorHandlerMain" doc:id="8f6a95bc-4fe2-40d7-869a-c7260c951d08" >
+		<logger level="ERROR" doc:name="Error Log" doc:id="f5360b83-035e-49c9-8f5b-9c227e38c7dc" message="ERROR: Error in frppICPoller Main Service: Error Type: #[error.errorType],  ErrorDescription: #[error.detailedDescription]." />
+		<ee:transform doc:name="set error Msg" doc:id="2a22ee45-8d43-46ea-9021-3d493d62fcf2">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="errorMsg"><![CDATA[%dw 2.0
+output application/java
+---
+[
+  ("ErrorType:   " ++ error.errorType.namespace ++ ":" ++ error.errorType.identifier), 	
+  ("Description: " ++ error.detailedDescription)
+]
+
+]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+		<set-variable value='#["Error occurred during processing frppICPoller Main Service. \n\nPlease find attached error details."]' doc:name="email Body" doc:id="06fb6bfb-8b84-4ed4-844a-bb6db82a538e" variableName="emailBody" />
+		<flow-ref doc:name="supportEmailNotificationFlow" doc:id="d58a197c-8eda-42d8-8d80-4d4da53eb3b4" name="supportEmailNotificationFlow" />
+		<set-payload value='#["ErrorType: " ++ error.errorType.namespace ++ ":" ++ error.errorType.identifier ++ ", ErrorDescription: " ++ error.detailedDescription]' doc:name="Set Error Payload" doc:id="9f75ccda-5590-4716-be10-9f95f8974cc1" />
+	</sub-flow>
+	
+	<sub-flow name="frppICPoller_ErrorHandler" doc:id="00686e83-f9b9-473b-97bf-55255885cb94" >
+		<ee:transform doc:name="Set CIStatus to STARTED" doc:id="7efed324-22a5-4b40-860f-16f1b01741ee">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="updateStatusReq"><![CDATA[%dw 2.0
+output application/json
+---
+[{
+	Id: vars.IC_FileId,
+	Status__c: p('status5') // // Error during processing
+}]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+				<flow-ref doc:name="SetFileStatus" doc:id="a1f265db-813e-4831-bbbe-719a372500c9" name="SetStatuses" />
+		<logger level="ERROR" doc:name="Error Log" doc:id="513eb123-76c6-4c15-b1e2-d4840c0bd1d7" message="ERROR: Error in frppICPoller Service: Error Type: #[error.errorType],  ErrorDescription: #[error.detailedDescription]." />
+		<flow-ref doc:name="LogPayload" doc:id="09757ab3-4666-4a83-80f1-3e163d1ed87d" name="frppICPollerSub_logPayload"/>
+		<ee:transform doc:name="set error Msg" doc:id="8a4dcfd9-8785-48ba-91e4-9e106e9b44d6">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="errorMsg"><![CDATA[%dw 2.0
+output application/java
+---
+[
+  ("ErrorType:   " ++ error.errorType.namespace ++ ":" ++ error.errorType.identifier), 	
+  ("Description: " ++ error.detailedDescription)
+]
+
+]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+		<set-variable value='#["Error occurred during processing frppICPoller Service. \n\nPlease find attached error details and check logs"]' doc:name="email Body" doc:id="948074c6-4afd-4d24-981f-5e9aba1ff121" variableName="emailBody" />
+		<flow-ref doc:name="supportEmailNotificationFlow" doc:id="11a0d157-cae9-4f97-8ef6-e959fb9070b3" name="supportEmailNotificationFlow" />
+		<choice doc:name="Choice" doc:id="f034e991-1428-48b8-8b94-3022e14c7d40" >
+			<when expression='#[vars.createJob != null and vars.createJob != "" and vars.closeJob == null]'>
+				<salesforce:close-job doc:name="Close job" doc:id="1e898535-8833-4d9a-8746-a21cbbd512b4" config-ref="SalesforceGeoFL3_Global" jobId="#[vars.createJob.id]" target="closeJob"/>
+				
+			</when>
+		</choice>
+	</sub-flow>
+	<sub-flow name="frppICPollerSub_logPayload" doc:id="3dc7873a-b367-4c95-aea1-e81371076312" >
+		<choice doc:name="1.createJob" doc:id="b780fc62-d539-4a04-b5e4-c59b27c8397a" >
+					<when expression='#[vars.createJob != null and vars.createJob != ""]'>
+						<ee:transform doc:name="Transform createJob To Json" doc:id="d479e273-6e38-47a3-bca3-df14925ffcc9">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="createJob" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.createJob]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<logger level="ERROR" doc:name="Log createJob" doc:id="6ecadf21-3cdf-49d2-aaf3-984f0442bdd1" message='File ID: #[vars.IC_FileId],  --&gt; Salesforce createJob Response: #[vars.createJob]'/>
+					</when>
+				</choice>
+				<choice doc:name="2. batchInfoList" doc:id="d8b02a8d-2a7f-42f8-87b5-be54374cdf39" >
+					<when expression='#[vars.batchInfoList != null and vars.batchInfoList != ""]'>
+						<ee:transform doc:name="Transform bulkInfoList To Json" doc:id="559cc3ec-01d0-4494-aa0e-a39a5396c3c2">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="batchInfoList" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.batchInfoList]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<logger level="ERROR" doc:name="Log batchInfoList" doc:id="cc8b956c-ba55-427e-b485-38c762204503" message="File ID: #[vars.IC_FileId],  --&gt; Salesforce bulkInfoList Response: #[vars.batchInfoList]" />
+					</when>
+				</choice>
+				<choice doc:name="3. jobInfo" doc:id="604567d7-3d3a-43ab-b04b-9a13d834bd3b" >
+					<when expression='#[vars.jobInfo != null and vars.jobInfo != ""]'>
+						<ee:transform doc:name="Transform jobInfo To Json" doc:id="7af1739a-13ec-4e17-bdf1-6b16e6b7a9cd">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="jobInfo" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.jobInfo]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<logger level="ERROR" doc:name="Log jobInfo" doc:id="6df0bd51-5606-45e5-b5a2-7acb95da2a10" message='File ID: #[vars.IC_FileId],  --&gt; Salesforce jobInfo Response: #[vars.jobInfo]'/>
+					</when>
+				</choice>
+	</sub-flow>
+	
+</mule>
