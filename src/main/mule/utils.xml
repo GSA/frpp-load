@@ -61,6 +61,22 @@ http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mu
 		<salesforce:update type="FRPP_FILE__c" doc:name="Update_FRPP_FILE" doc:id="84a08981-f265-4157-9c69-ac4c27924f53" config-ref="SalesforceGeoFL3_Global" target="updateStatusResp">
 			<salesforce:records ><![CDATA[#[vars.updateStatusReq]]]></salesforce:records>
 		</salesforce:update>
+		<choice doc:name="Choice" doc:id="5393c61a-9b0c-45be-9a19-dcfa6cb7162a">
+							<when expression="#[sizeOf (vars.updateStatusResp.*id filter ($ == null)) &gt; 0]" >
+								<ee:transform doc:name="Transform Message" doc:id="488c85c6-167e-440f-8baf-6d4d200008de" >
+									<ee:message >
+									</ee:message>
+									<ee:variables >
+						<ee:set-variable variableName="updateStatusResp" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.updateStatusResp]]></ee:set-variable>
+									</ee:variables>
+								</ee:transform>
+								<logger level="ERROR" doc:name="Logger" doc:id="948cf235-83e2-4c74-9000-a5776125b825" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR while updating file status."/>
+								<logger level="ERROR" doc:name="updateStatusResp" doc:id="65219365-c030-468e-be37-604f6243628f" message="#[vars.updateStatusResp]"/>
+							</when>
+						</choice>
 		<remove-variable doc:name="Remove Variable - updateStatusReq" doc:id="920a5f67-0576-4b0e-a4b7-2a68cfc987b8" variableName="updateStatusReq"/>
 		<remove-variable doc:name="Remove Variable - updateStatusResp" doc:id="e99bce0a-bcf7-4085-a1a4-ff2468dd15f7" variableName="updateStatusResp"/>
 	</sub-flow>
