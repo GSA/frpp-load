@@ -1193,6 +1193,22 @@ output application/java
 (vars.countErrorASTAdded) + (sizeOf (vars.sfErrorAssestsResponse.*id filter ($ != null)))]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
+						<choice doc:name="Choice" doc:id="751f8d39-1106-48aa-86f2-2cc44aff6b01">
+							<when expression="#[sizeOf (vars.sfErrorAssestsResponse.*id filter ($ == null)) &gt; 0]" >
+								<ee:transform doc:name="Transform Message" doc:id="94d0550f-8a5e-471a-afe6-b5549f2c5568" >
+									<ee:message >
+									</ee:message>
+									<ee:variables >
+										<ee:set-variable variableName="sfErrorAssestsResponse" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.sfErrorAssestsResponse]]></ee:set-variable>
+									</ee:variables>
+								</ee:transform>
+								<logger level="ERROR" doc:name="Logger" doc:id="1c0e6771-1c8c-450c-a76f-db231b1085aa" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR received from Salesforce while creating Error Assets."/>
+								<logger level="ERROR" doc:name="sfErrorAssetsResponse" doc:id="65443eb5-22ff-4d51-95e2-b929d1bb6dc4" message="#[vars.sfErrorAssestsResponse]"/>
+							</when>
+						</choice>
 						<ee:transform doc:name="flatten Payload" doc:id="cd4b2fbb-d138-45f7-b95e-ed8afd9e3c40">
 					<ee:message>
 					</ee:message>
@@ -1217,6 +1233,24 @@ payload]]></ee:set-variable>
 							<salesforce:create doc:name="Create Errors" doc:id="4fe3e0eb-8666-453a-a8c1-4f0d8fff0447" config-ref="SalesforceGeoFL3_Global" type="FRPP_ASSET_ERROR__c" target="sfErrorsResponse">
 								<salesforce:records ><![CDATA[#[vars.sfErrorsPayloadBatch]]]></salesforce:records>
 				</salesforce:create>
+				
+				<choice doc:name="Choice" doc:id="e10a1f21-44ca-4ae6-86f9-fd7e46dafb9b">
+							<when expression="#[sizeOf (vars.sfErrorsResponse.*id filter ($ == null)) &gt; 0]" >
+								<ee:transform doc:name="Transform Message" doc:id="a17dc5dd-a5ff-424a-b396-39e96ab8cfde" >
+									<ee:message >
+									</ee:message>
+									<ee:variables >
+											<ee:set-variable variableName="sfErrorsResponse" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.sfErrorsResponse]]></ee:set-variable>
+									</ee:variables>
+								</ee:transform>
+								<logger level="ERROR" doc:name="Logger" doc:id="73d15b46-944c-42ad-90d4-abeffbc4eca1" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR received from Salesforce while inserting Error to SF."/>
+								<logger level="ERROR" doc:name="sfErrorsResponse" doc:id="9609a425-c247-4fa9-9fbb-b4b79172d117" message="#[vars.sfErrorsResponse]"/>
+							</when>
+						</choice>
+				
 						</foreach>
 						<logger level="INFO" doc:name="Error Logger" doc:id="e7758db6-a240-4ebe-9510-921566679220" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 3b. #[vars.assetType] Batch No.: #[vars.counter] ALL Err records processed Succesfully."/>
 					</when>
