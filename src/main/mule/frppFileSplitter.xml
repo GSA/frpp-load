@@ -1219,7 +1219,7 @@ output application/json
 flatten (vars.sfErrorsPayload.errors)]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-						<foreach doc:name="For Each 200 Batch" doc:id="7f3d6819-3581-4b8f-99e5-e2a87e1c1023" collection="#[vars.sfErrorsPayload]" batchSize="200">
+						<foreach doc:name="For Each Batch" doc:id="7f3d6819-3581-4b8f-99e5-e2a87e1c1023" collection="#[vars.sfErrorsPayload]" batchSize="${batch.size.error}">
 							<ee:transform doc:name="Transform To JSON" doc:id="e804cf52-7fa5-4644-a89f-1aa77a598162" >
 								<ee:message >
 								</ee:message>
