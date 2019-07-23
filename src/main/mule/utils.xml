@@ -87,7 +87,7 @@ vars.updateStatusResp]]></ee:set-variable>
 				<salesforce:invoke-apex-rest-method className="FRPP_releaseMuleQueue" methodName="release^/OGPreleaseMuleQueue/^HttpPost^String^" doc:name="Release Queue" doc:id="21153f53-6f8b-4396-bbf9-31a26371a3de" config-ref="SalesforceGeoFL3_Global" />
 				<choice doc:name="Choice" doc:id="c2f4195c-545c-4d07-a3c7-6a2eff194bc1">
 			<when expression="#[payload[0] == 'Success']">
-				<logger level="INFO" doc:name="Logger" doc:id="d598313d-a90c-4dcb-bd8e-bf16af19dfa4" message="Queue:  #[vars.queueName]  released." />
+				<logger level="DEBUG" doc:name="Logger" doc:id="d598313d-a90c-4dcb-bd8e-bf16af19dfa4" message="Queue:  #[vars.queueName]  released." />
 			</when>
 			<otherwise>
 				<set-variable value='#["Error occured during processing the File:  " ++ vars.fileName ++". \n\n Queue: " ++ vars.queueName ++ " cannot be Released. Please check SF and release manually."]' doc:name="email Body" doc:id="67856480-a247-4466-b448-567a4d793a47" variableName="emailBody" />
@@ -97,7 +97,7 @@ vars.updateStatusResp]]></ee:set-variable>
 		</choice>
 			</when>
 			<otherwise >
-				<logger level="INFO" doc:name="Logger" doc:id="bb344766-6765-4784-b3eb-9a7fe2573045" message="Warning: No queueName available in pipeline to Release."/>
+				<logger level="WARN" doc:name="Logger" doc:id="bb344766-6765-4784-b3eb-9a7fe2573045" message="Warning: No queueName available in pipeline to Release."/>
 			</otherwise>
 		</choice>
 	</sub-flow>
@@ -198,6 +198,36 @@ vars.sfErrorsResponse]]></ee:set-variable>
 				<logger level="ERROR" doc:name="Log sfErrorsResponse" doc:id="8d467095-a774-432b-b89b-5f807b045f85" message='File ID: #[vars.file.Id], File Name: #[vars.fileName], Thread: #[vars.currentThread] --&gt; Got sfErrorsResponse: #[vars.sfErrorsResponse]'/>
 					</when>
 				</choice>
+	</sub-flow>
+	<sub-flow name="execTime" doc:id="990118aa-07bb-43a9-abfd-79a21f3165de" >
+		<choice doc:name="Choice" doc:id="c8971421-0d53-4048-8806-6afa9dc1039c" >
+			<when expression='#[vars.execTime != null]'>
+				<ee:transform doc:name="Difference" doc:id="f2b03a5d-b035-4fc6-98cc-2927662001a3">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="execTime"><![CDATA[%dw 2.0
+output application/java
+---
+(now () - vars.execTime) as String]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+				<logger level="DEBUG" doc:name="log execTime" doc:id="532ab32d-3387-4861-8bbe-e5e6cf30a8c7" message='#[if (vars.operation != null) (vars.operation ++ " totalTime:" ++  vars.execTime) else ("totalTime: " ++ vars.execTime)]'/>
+				<remove-variable doc:name="Remove Variable" doc:id="0c1abbba-f7b7-46b8-ae9b-166e849935b9" variableName="execTime"/>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="startTime" doc:id="ae445977-09af-46fd-a4a2-2a0ace755f18">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="execTime"><![CDATA[%dw 2.0
+output application/java
+---
+now ()]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+			</otherwise>
+		</choice>
 	</sub-flow>
 		
 	
