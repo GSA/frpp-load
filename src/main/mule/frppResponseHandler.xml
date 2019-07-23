@@ -65,4 +65,71 @@ output application/json
 	</sub-flow>
 	
 	
+</mule><?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	
+	
+	<sub-flow name="ProcessAllBatchReponses" doc:id="db4b8986-355b-4099-86fa-aadda694e334" >
+		<logger level="DEBUG" doc:name="Log Start Processing Response" doc:id="1a6ac1c1-8f18-4a18-81c6-58a8d716238f" message="Started processing responses" />
+		<set-variable value="#[p('thread.maxThreads') - vars.threadPoolSize]" doc:name="Set Response Counter" doc:id="a47599c6-5ef9-438f-bf76-8d37b7eda5b1" variableName="responseCounter" />
+		<flow-ref doc:name="ProcessThreadResponse" doc:id="9d7e26d5-82a0-496e-bbbc-c8a56df6d0b1" name="ProcessThreadResponse" />
+		<logger level="DEBUG" doc:name="Log Response Processing  Complete" doc:id="c4d375a9-3bde-4d5b-82e8-c416b36e70fc" message="Completed Processing Responses" />
+		<set-variable value="#[p('thread.maxThreads')]" doc:name="Reset Thread Pool" doc:id="5ecf8383-5985-4e2f-8ebd-047a59dae553" variableName="threadPoolSize" />
+	</sub-flow>
+	
+	
+	
+	<sub-flow name="ProcessThreadResponse" doc:id="2a1c5c12-680e-4000-90bf-86b624672f0c" >
+		<choice doc:name="Choice" doc:id="44629874-8585-4f00-803c-c733a9926aa6" >
+			<when expression="#[vars.responseCounter &gt; 0]">
+				<vm:consume queueName="#[vars.queueName]" doc:name="Consume" target="vmResponse" doc:id="45bbedde-fb23-423b-9756-7ba83e77eaa0" config-ref="VM_Batch_Config" timeout="300"/>
+				<choice doc:name="Choice" doc:id="0460160c-12e4-4d3e-891e-b0a074bc3462">
+					<when expression='#[vars.vmResponse.status == "success"]' >
+						<salesforce:query doc:name="Get Count of SF processed assets" doc:id="c6a56061-cf66-44fe-b04f-51e7a3c9d657" config-ref="SalesforceGeoFL3_Global" target="countSFProcessedAssets">
+					<salesforce:salesforce-query>select ID, Number_of_processed_assets__c from FRPP_File__c where ID = ':field'</salesforce:salesforce-query>
+					<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	"field" : vars.file.Id
+}]]]></salesforce:parameters>
+				</salesforce:query>
+						<ee:transform doc:name="update Counts" doc:id="6dcab8ad-0591-4409-b51e-05e655c1f59a">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="updateStatusReq"><![CDATA[%dw 2.0
+output application/json
+---
+[{
+	Id: vars.file.Id,
+	Number_of_processed_assets__c: (vars.countSFProcessedAssets[0].Number_of_processed_assets__c) + (vars.vmResponse.countRecordSuccessAdded) + (vars.vmResponse.countRecordErrorAdded)
+}
+]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+						<flow-ref doc:name="SetStatuses" doc:id="45895822-d645-48aa-97e4-18434b229ef3" name="SetStatuses" />
+						<logger level="DEBUG" doc:name="Logger" doc:id="d54b253e-c18f-4dd0-a42d-a4602bfbebec" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; Response from Thread : #[vars.vmResponse.threadId], Queue: #[vars.queueName]  Success Record Added: #[vars.vmResponse.countRecordSuccessAdded] Failure Record Added: #[vars.vmResponse.countRecordErrorAdded]" />
+						<set-variable value="#[vars.responseCounter -1]" doc:name="ReduceResponseCounter" doc:id="6ea670df-3584-4762-84cf-b9840c85e091" variableName="responseCounter" />
+						<flow-ref doc:name="ContinueProcessingResponse" doc:id="a183ea64-a508-4c73-9133-cb18d653a642" name="ProcessThreadResponse" />
+					</when>
+					<otherwise >
+						<logger level="ERROR" doc:name="Logger" doc:id="54ee7998-4df5-4a8b-bda1-75bfbe8fb8ac" message="Raising Error Condition to stop batch processing."/>
+						<set-variable value="false" doc:name="Set proceed? to false" doc:id="57495aab-9116-4af0-a329-0214b542aa4d" variableName="proceed?" />
+						<set-variable value="#[vars.responseCounter -1]" doc:name="ReduceResponseCounter" doc:id="28b46b88-5965-4d53-9fb7-077ea6ab40ce" variableName="responseCounter" />
+						<flow-ref doc:name="ContinueProcessingResponse" doc:id="a3a146d1-f682-4e4d-964d-40cd36102ddb" name="ProcessThreadResponse" />
+					</otherwise>
+				</choice>
+			</when>
+		</choice>
+	</sub-flow>
+	
+	
 </mule>
