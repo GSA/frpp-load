@@ -1314,11 +1314,12 @@ output application/java
 output application/java
 ---
 ["Received SF error other then Validation Error.",
-	"Check Mulesoft Logs"
+	"Check Mulesoft Logs",
+	"FileName: " ++ vars.fileName
 ]]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<set-variable value='Received SF error other then Validation Error.' doc:name="email Body" doc:id="ebdb6beb-7b3b-4c2a-b04e-77da301570b5" variableName="emailBody"/>
+				<set-variable value='#["Received SF error other then Validation Error for File: " ++ vars.fileName]' doc:name="email Body" doc:id="ebdb6beb-7b3b-4c2a-b04e-77da301570b5" variableName="emailBody"/>
 				<flow-ref doc:name="SupportEmail" doc:id="55487e39-4780-484e-bfcd-641f122a500d" name="supportEmailNotificationFlow" />
 				
 				</otherwise>
