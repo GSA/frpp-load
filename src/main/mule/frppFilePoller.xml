@@ -8,7 +8,7 @@ http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mu
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="filePoller_httpInvoke" doc:id="5c5b5b35-4508-428d-a32f-d2b56423e7f2">
 		<http:listener doc:name="Listener" doc:id="5e879ec9-48f9-4522-be06-e2168cff14cc" config-ref="HTTP_Listener_config_Global" path="/frppload" />
-		<logger level="INFO" doc:name="MuleX" doc:id="81deba6a-03d4-4743-bbdf-7e45ad5965bd" message="MuleX: FrppFilePoller Service Started."/>
+		<logger level="DEBUG" doc:name="MuleX" doc:id="81deba6a-03d4-4743-bbdf-7e45ad5965bd" message="FrppFilePoller Service Started."/>
 		<choice doc:name="Choice - fileName Provided?" doc:id="56c8cdd1-9325-4589-98e2-e155fb3f3950">
 			
 			<when expression="#[attributes.queryParams.fileName == 'ALL' or attributes.queryParams.fileName == 'all'  or  attributes.queryParams.fileName == 'All']">
@@ -51,7 +51,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 				<set-payload value="Incorrect query parameters provided. No files were processed." doc:name="Incorrect QueryParams" doc:id="fc3abbd6-154f-4dfe-8180-af747eec71f2" />
 			</otherwise>
 		</choice>
-		<logger level="INFO" doc:name="MuleX" doc:id="22bbe664-986a-4d67-96e7-f34212353906" message="MuleX: FrppFilePoller Service Completed."/>
+		<logger level="DEBUG" doc:name="MuleX" doc:id="22bbe664-986a-4d67-96e7-f34212353906" message="FrppFilePoller Service Completed."/>
 		<error-handler >
 			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="8f7628f3-3021-4d08-960f-96025a1a0e0f" >
 				<flow-ref doc:name="filePoller_ErrorHandler" doc:id="30c33694-2e5d-460d-b33e-c6f1070c2644" name="filePoller_ErrorHandler"/>
@@ -171,7 +171,7 @@ output application/java
 					<logger level="INFO" doc:name="log Results" doc:id="3106f214-e9e5-4867-9aaf-0f58402723a1" message="File: #[vars.fileName], Queue: #[vars.queueName]  launched processing." />
 				</when>
 				<when expression='#[startsWith(vars.queueName,"none")]' >
-					<logger level="INFO" doc:name="No Queue Log" doc:id="ccab45c4-3bf3-491f-ac99-39479d0154df" message="File: #[vars.fileName]. No Queues Available from SF." />
+					<logger level="ERROR" doc:name="No Queue Log" doc:id="ccab45c4-3bf3-491f-ac99-39479d0154df" message="File: #[vars.fileName]. No Queues Available from SF." />
 				</when>
 				<otherwise>
 				<set-variable value='#["Error occured during processing the File:  " ++ vars.fileName ++". \n\n Error: " ++ vars.queueName ++ ". Cannot get QueueName from SF."]' doc:name="email Body" doc:id="e378a2fa-5a24-45c5-89bb-abc99152de3e" variableName="emailBody" />
@@ -184,7 +184,7 @@ output application/java
 	</sub-flow>
 	<sub-flow name="filePoller_ErrorHandler" doc:id="bcb60c0c-d40c-4124-af01-bf4d8a3e14f2" >
 		<flow-ref doc:name="releaseQueue" doc:id="3738e0ff-a371-4b27-88f1-ead6439a2e1a" name="releaseQueue" />
-		<logger level="INFO" doc:name="Error Log" doc:id="0c52be7f-5348-4f19-bfd8-f9fd4791d6f3" message="ERROR: Error in filePoller Service: Error Type: #[error.errorType],  ErrorDescription: #[error.detailedDescription]." />
+		<logger level="ERROR" doc:name="Error Log" doc:id="0c52be7f-5348-4f19-bfd8-f9fd4791d6f3" message="ERROR: Error in filePoller Service: Error Type: #[error.errorType],  ErrorDescription: #[error.detailedDescription]." />
 		<ee:transform doc:name="set error Msg" doc:id="7b45718c-97ce-4ab2-bfa5-a1024527d966">
 					<ee:message>
 					</ee:message>
