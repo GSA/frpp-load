@@ -69,7 +69,7 @@ http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mu
 						<flow-ref doc:name="frppICData Call" doc:id="b217283a-a153-4f9f-abfa-671092f30f48" name="frppICData" />
 					</async>
 		</foreach>
-				<logger level="INFO" doc:name="Logger" doc:id="a19d83fd-0a0a-4995-9039-debad1d4e9b4" message="FRPPICPoller: MULE Started Processing #[sizeOf (vars.ICFileIDs)] Inventory clearance File(s)."/>
+				<logger level="DEBUG" doc:name="Logger" doc:id="a19d83fd-0a0a-4995-9039-debad1d4e9b4" message="FRPPICPoller: MULE Started Processing #[sizeOf (vars.ICFileIDs)] Inventory clearance File(s)."/>
 				<set-payload value='#["FRPPICPoller Flow Completed. Started processing " ++ sizeOf(vars.ICFileIDs) ++ " Inventory clearance File(s)."]' doc:name="set Http Response" doc:id="efc9f6cf-6ad5-479c-8644-4126b5ee1493" />
 			</when>
 			<otherwise >
