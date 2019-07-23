@@ -40,7 +40,7 @@ output application/json
 		</salesforce:invoke-apex-rest-method>
 		<choice doc:name="Choice" doc:id="75a7f262-8701-4a35-84db-5a83dcaae465" >
 			<when expression="#[vars.SFdoEmailResp.doEmailOutput != 'Success']">
-				<logger level="INFO" doc:name="Log Error" doc:id="c3b26602-383e-4f99-acd2-87650aaef278" message='File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; xx. ERROR: User Email Send Failure: #[vars.SFdoEmailResp.doEmailOutput]   User Email Payload:  #[vars.emailPayload]'/>
+				<logger level="ERROR" doc:name="Log Error" doc:id="c3b26602-383e-4f99-acd2-87650aaef278" message='File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; xx. ERROR: User Email Send Failure: #[vars.SFdoEmailResp.doEmailOutput]   User Email Payload:  #[vars.emailPayload]'/>
 				<ee:transform doc:name="set error Msg" doc:id="0ab9c14e-5d46-43a3-a046-f845679e19fa">
 					<ee:message>
 					</ee:message>
@@ -57,7 +57,7 @@ output application/java
 				<flow-ref doc:name="supportEmailNotificationFlow" doc:id="04fb3d48-2664-4d8e-8f7b-86514845fbb2" name="supportEmailNotificationFlow"/>
 			</when>
 			<otherwise >
-				<logger level="INFO" doc:name="User Email Sent." doc:id="ec01e88e-06f1-49c9-b4eb-a3cbe3734df7" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; xx. User Email Sent for template : #[vars.useTemplateName]"/>
+				<logger level="DEBUG" doc:name="User Email Sent." doc:id="ec01e88e-06f1-49c9-b4eb-a3cbe3734df7" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; xx. User Email Sent for template : #[vars.useTemplateName]"/>
 			</otherwise>
 		</choice>
 	</sub-flow>
@@ -94,10 +94,10 @@ output application/json
 		</salesforce:invoke-apex-rest-method>
 		<choice doc:name="Choice" doc:id="a6d80baf-932a-4831-9d39-dc52e771439e" >
 			<when expression="#[vars.SFdoEmailResp.doEmailOutput != 'Success']">
-				<logger level="INFO" doc:name="Log Email Failure" doc:id="10bf281a-19f4-4055-99af-c4e4c7427556" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; xx. ERROR: Support Email Failure: #[vars.SFdoEmailResp.doEmailOutput]  Support Email Payload:  #[vars.emailPayload]"/>
+				<logger level="ERROR" doc:name="Log Email Failure" doc:id="10bf281a-19f4-4055-99af-c4e4c7427556" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; xx. ERROR: Support Email Failure: #[vars.SFdoEmailResp.doEmailOutput]  Support Email Payload:  #[vars.emailPayload]"/>
 			</when>
 			<otherwise >
-				<logger level="INFO" doc:name="User Email Sent." doc:id="08de9eff-0115-42e9-a695-9574de47c81a" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; xx. Support Email Sent."/>
+				<logger level="DEBUG" doc:name="User Email Sent." doc:id="08de9eff-0115-42e9-a695-9574de47c81a" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; xx. Support Email Sent."/>
 			</otherwise>
 		</choice>
 	</sub-flow>
