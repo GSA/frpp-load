@@ -12,7 +12,8 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<choice doc:name="Choice - fileName Provided?" doc:id="56c8cdd1-9325-4589-98e2-e155fb3f3950">
 			
 			<when expression="#[attributes.queryParams.fileName == 'ALL' or attributes.queryParams.fileName == 'all'  or  attributes.queryParams.fileName == 'All']">
-				<flow-ref doc:name="call filePoller_main" doc:id="d71f71e2-03b7-41db-8b5a-3482ff74d8a6" name="filePoller_main" />
+				<flow-ref doc:name="call filePoller_smallFiles" doc:id="d71f71e2-03b7-41db-8b5a-3482ff74d8a6" name="filePoller_smallFiles" />
+				<flow-ref doc:name="call filePoller_main" doc:id="b8b9243b-88e8-4ca6-be3f-df527bfa74c5" name="filePoller_main" />
 			</when>
 			
 			
@@ -67,6 +68,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		</scheduler>
 		<choice doc:name="Choice - scheduler On?" doc:id="7c470acb-14bd-456e-b0fa-768ba8325f5e" >
 			<when expression="p('schedule.enabled') == &quot;true&quot;">
+				<flow-ref doc:name="call filePoller_smallFiles" doc:id="a8a4c08d-65f1-4109-a224-e97c12fd82b7" name="filePoller_smallFiles" />
 				<flow-ref doc:name="call filePoller_main" doc:id="4fc231a6-b61d-4a9b-975a-bb229736d982" name="filePoller_main"/>
 			</when>
 		</choice>
@@ -110,11 +112,115 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 				<set-payload value="FRPPFilePoller Flow Completed with Error: Reached Throttling Limit. No Files were processed this time." doc:name="set Http Response" doc:id="8305be69-ea75-4153-b72b-1492249928c4" />
 			</when>
 			<when expression="#[(sizeOf (vars.filePayloads) &gt; 0)]">
+				<logger level="INFO" doc:name="Log Files Processsed" doc:id="b28d51e7-45be-40df-be89-c73ec4475bc9" message='#["Processing " ++ sizeOf(vars.filePayloads) ++ " remaining Files."]' />
 				<flow-ref doc:name="forEachFile Call" doc:id="9ead16c8-2d73-4884-97e3-ec78f0932c4d" name="forEachFile" />
 				<set-payload value="FRPPFilePoller Flow Completed." doc:name="set Http Response" doc:id="fc3b7739-485e-476f-ad66-ef855a4be21d" />
 			</when>
 			<otherwise >
 				<set-payload value="FRPPFilePoller Flow completed. Did not have any files to process." doc:name="No Files Found." doc:id="f2752b10-1dd8-49a2-a035-6fddf30e2ddd" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+	
+	<sub-flow name="filePoller_smallFiles" doc:id="a53dee49-c53c-40ed-a5a5-ede0039a62d0" >
+		<choice doc:name="Choice - throttlingFlag?" doc:id="cc2d73f3-29b6-4899-98e5-0d6695302841">
+			<when expression="p('throttling.flag') == &quot;true&quot;">
+				<flow-ref doc:name="filePoller_throttlingCount" doc:id="ae3e66bf-2bda-4013-bf19-c7898d60a03c" name="filePoller_throttlingCount"/>
+				<choice doc:name="Choice - remainingCount?" doc:id="ef3cca7c-e878-46c4-86af-f1744c3bebac">
+					<when expression="#[vars.remainingCount &gt; 0]">
+						<salesforce:query doc:name="Query FRPPFile" doc:id="7dcf93d4-87ce-4741-aa98-c415a693f8ac" config-ref="SalesforceGeoFL3_Global" target="filePayloads">
+					<salesforce:salesforce-query>Select ID, File_Name__c, File_Type__c, File_Extension__c, Status__c, AGENCY_CODE__c,  Attachment_ID__c, createdby.email from FRPP_FILE__c where Active__c=True and File_Type__c='CR' and Status__c='Staging In Progress2' Order By CreatedDate</salesforce:salesforce-query>
+				</salesforce:query>
+				<set-variable value="''" doc:name="Set Variable" doc:id="5e038daf-fbb5-4f51-a313-17741fee2682" variableName="myString" />
+		
+		<foreach doc:name="For Each" doc:id="4c3fe4a8-8182-45f6-8fb5-b2a3348aa7e9" collection="vars.filePayloads">
+			<ee:transform doc:name="Transform Message" doc:id="8c113cae-d67d-42a6-b478-6969af0b9c86" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="myString" ><![CDATA[%dw 2.0
+output application/java
+---
+if (vars.myString != null) (vars.myString ++ ", '" ++ payload.Attachment_ID__c ++ "'") else "'" ++ payload.Attachment_ID__c ++ "'"]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</foreach>
+		<salesforce:query doc:name="Query attachments" doc:id="86e78631-610b-4e77-8989-96a25fa09bfe" config-ref="SalesforceGeoFL3_Global" target="attachments">
+					<salesforce:salesforce-query>select id, BodyLength from attachment where id in (:attachmentIds)</salesforce:salesforce-query>
+							<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	attachmentIds : vars.myString
+}]]]></salesforce:parameters>
+				</salesforce:query>
+		<ee:transform doc:name="Add AttachmentSize" doc:id="9352d94a-1dd0-432f-b964-919bc4508e2a" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="filePayloads" ><![CDATA[%dw 2.0
+output application/java
+fun grabSize(input2Id) = {(vars.attachments[?($.Id == input2Id)])}
+---
+vars.filePayloads filter (vars.filePayloads.id[$$] == null) map (
+	$ ++
+	{
+	  fileSize: grabSize($.Attachment_ID__c).BodyLength	
+	})
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Filter small files" doc:id="e98c8640-e7d8-4b69-a75b-19321ae407d7" >
+			<ee:message >
+			</ee:message>
+							<ee:variables >
+								<ee:set-variable variableName="filePayloads" ><![CDATA[%dw 2.0
+output application/java
+
+---
+vars.filePayloads filter ((vars.filePayloads.File_Extension__c[$$] == 'CSV' and vars.filePayloads.fileSize[$$] <= p('smallfile.csv.byte') as Number) or (vars.filePayloads.File_Extension__c[$$] == '.xml' and vars.filePayloads.fileSize[$$] <= p('smallfile.xml.byte') as Number) ) map (
+	$ 
+	- "fileSize" 
+	)
+]]></ee:set-variable>
+							</ee:variables>
+		</ee:transform>
+						<ee:transform doc:name="ristrict to throttling" doc:id="76a05d54-430a-46f5-9758-ce570a4e00ba">
+							<ee:message>
+							</ee:message>
+							<ee:variables >
+								<ee:set-variable variableName="filePayloads" ><![CDATA[%dw 2.0
+output application/java
+---
+if (vars.remainingCount > 0 and sizeOf(vars.filePayloads) <= vars.remainingCount) vars.filePayloads else if (vars.remainingCount > 0) vars.filePayloads[0 to (vars.remainingCount - 1)] else []]]></ee:set-variable>
+							</ee:variables>
+						</ee:transform>
+						<remove-variable doc:name="Remove myString" doc:id="7e51ce09-76f8-471c-bd7d-b9596cf6bb9f" variableName="myString"/>
+						<remove-variable doc:name="Remove attachments" doc:id="4e168ffe-724f-4a7c-9ec7-a8a87db505e5" variableName="attachments"/>
+						<remove-variable doc:name="Remove processingCount" doc:id="f8763571-1f76-48f4-823d-c683348191c0" variableName="processingCount" />
+						<remove-variable doc:name="Remove remainingCount" doc:id="ecec60dd-1c4d-4bd2-937d-7ab976b4b956" variableName="remainingCount" />
+					</when>
+					<otherwise >
+						<remove-variable doc:name="Remove Variable" doc:id="c8bd9b10-31d1-4f8c-b887-273142295a11" variableName="filePayloads"/>
+					</otherwise>
+				</choice>
+			</when>
+			<otherwise>
+				<salesforce:query doc:name="Query FRPPFile" doc:id="493bca0d-8cf5-4763-b60a-82bf89608b8c" config-ref="SalesforceGeoFL3_Global" target="filePayloads">
+					<salesforce:salesforce-query>Select ID, File_Name__c, File_Type__c, File_Extension__c, Status__c, AGENCY_CODE__c,  Attachment_ID__c, createdby.email from FRPP_FILE__c where Active__c=True and File_Type__c='CR' and Status__c='Staging In Progress2' Order By CreatedDate </salesforce:salesforce-query>
+				</salesforce:query>
+			</otherwise>
+		</choice>
+		<choice doc:name="Choice" doc:id="287c654f-4723-45ee-a8c2-6512d811abc2">
+			<when expression="#[(vars.filePayloads == null)]">
+				<set-payload value="FRPPFilePoller Flow Completed with Error: Reached Throttling Limit. No Files were processed this time." doc:name="set Http Response" doc:id="9e48a526-bec1-4d57-a707-c7832f92457b" />
+			</when>
+			<when expression="#[(sizeOf (vars.filePayloads) &gt; 0)]">
+				<logger level="INFO" doc:name="Log Files Processsed" doc:id="6d8859c3-2cf7-4c4f-9b71-1a37a9ee3a1d" message='#["Processing " ++ sizeOf(vars.filePayloads) ++ " small Files."]' />
+				<flow-ref doc:name="forEachFile Call" doc:id="9561a70f-eeaf-4884-acda-5ca955944364" name="forEachFile" />
+				<set-payload value="FRPPFilePoller Flow Completed." doc:name="set Http Response" doc:id="e5714cf1-9af9-4f9b-9fc8-448b95a4cf2d" />
+			</when>
+			<otherwise >
+				<set-payload value="FRPPFilePoller Flow completed. Did not have any files to process." doc:name="No Files Found." doc:id="d3a6ad90-48c5-4ae7-9268-c7766fc74d63" />
 			</otherwise>
 		</choice>
 	</sub-flow>
