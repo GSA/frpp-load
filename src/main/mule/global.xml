@@ -34,7 +34,8 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 		</salesforce:basic-connection>
 	</salesforce:sfdc-config>
 	<global-property doc:name="Global Property env" doc:id="8d7ae1c7-c891-4e3c-9077-3c85f780b205" name="mule.env" value="local" doc:description="Environment Property"/>
-	<global-property doc:name="Global Property key" doc:id="2ac33086-bccf-4bef-a873-00eedddf38d5" name="mule.key" value="thisIsMyFakeKey" doc:description="Mule Key"/>
+	<global-property doc:name="Global Property key" doc:id="2ac33086-bccf-4bef-a873-00eedddf38d5" name="mule.key" value="thisIsMyFakeKey43" doc:description="Mule Key"/>
+	
 	<configuration-properties doc:name="Configuration properties" doc:id="5829bb43-dcd2-4365-8834-ed93b1255915" file="frpp-load-${mule.env}.properties" />
 	<xml-module:config name="XML_Config" doc:name="XML Config" doc:id="a6e799dc-67e6-482f-a0ba-1ab6d8cc1c98" />
 	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="2049a1d6-0572-41b7-a80c-640ac8f8e677" file="frpp-load-${mule.env}.properties" key="${mule.key}" >
