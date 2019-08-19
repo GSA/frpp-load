@@ -543,7 +543,26 @@ output application/json
 		</choice>
 					</when>
 					<when expression='#[vars.setFinalStatus == "false"]'>
-				<ee:transform doc:name="setFinalStatus" doc:id="10112515-3eb9-43d0-968f-b81c7bacb126">
+				<choice doc:name="Choice" doc:id="e75f4b67-2c3d-40ee-9025-ea1eb26cefa5">
+					<when expression="#[vars.file.File_Extension__c == 'CSV']">
+						<ee:transform doc:name="setFinalStatus" doc:id="c09e939e-02e1-4016-95d7-897c351b5987">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="updateStatusReq"><![CDATA[%dw 2.0
+output application/json
+---
+[{
+	Id: vars.file.Id,
+	Status__c: p('status41'),  //status41=Invalid CSV File
+	CI_STATUS__c : p('CI.status31') // CI.status31=Invalid CSV File
+}
+]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+					</when>
+					<otherwise >
+						<ee:transform doc:name="setFinalStatus" doc:id="10112515-3eb9-43d0-968f-b81c7bacb126">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
@@ -558,6 +577,8 @@ output application/json
 ]]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
+					</otherwise>
+				</choice>
 				<flow-ref doc:name="SetFileStatus" doc:id="305089f0-1c06-4841-a3e5-801fc144c917" name="SetStatuses" />
 				<logger level="WARN" doc:name="Error Logger" doc:id="502e1b22-1888-4033-9256-985135795dc2" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 4c. fileSplitter completed processing with ERRORS." />
 					</when>
@@ -606,7 +627,7 @@ output application/java
 		<error-handler >
 			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="f5715e01-23c9-4f02-93cc-6d33b62ebe40" >
 				<flow-ref doc:name="releaseQueue" doc:id="cf2a3522-cfe5-422c-a0ec-e2301022ebdb" name="releaseQueue" />
-				<logger level="ERROR" doc:name="Error Log" doc:id="10bb5e7a-6c67-4aea-9019-ed7d8fb0ced1" message="ERROR:  Error Type: #[error.errorType],  ErrorDescription: #[error.detailedDescription], ErrorCause: #[error.exception.cause]  for FileName:  #[vars.fileName]" />
+				<logger level="ERROR" doc:name="Error Log" doc:id="10bb5e7a-6c67-4aea-9019-ed7d8fb0ced1" message="ERROR: frppFileSplitter_mainFlow: Error Type: #[error.errorType],  ErrorDescription: #[error.detailedDescription], ErrorCause: #[error.exception.cause]  for FileName:  #[vars.fileName]" />
 				<ee:transform doc:name="setFinalStatus" doc:id="2bb1d9bc-2cc5-41ef-8dc7-800cce75734d">
 			<ee:message>
 			</ee:message>
@@ -811,9 +832,10 @@ output application/java
 	
 	<flow name="processSingleBatch" doc:id="bac71665-7b62-4f96-bf39-c11c0089f0b7" >
 		<set-variable value="#[(p('thread.maxThreads') - vars.threadPoolSize + 1)]" doc:name="currentThread" doc:id="ece6e42d-f0e1-4d17-8162-f9550dd2dfe9" variableName="currentThread"/>
-		<logger level="DEBUG" doc:name="Thread Started" doc:id="7f071fa1-e8ca-4376-9c0a-aa78f4fddb32" message="Thread: #[vars.currentThread]  Started" />
+		<set-variable value='processSingleBatch Started.' doc:name="Set Current step" doc:id="2cc41b10-6c73-42d1-b0ac-2e0786841669" variableName="currentProcessingStep"/>
+		<logger level="DEBUG" doc:name="Thread Started" doc:id="7f071fa1-e8ca-4376-9c0a-aa78f4fddb32" message="File Name: #[vars.fileName], Thread: #[vars.currentThread] Started" />
 		<flow-ref doc:name="buildSFPayloads" doc:id="ef06b189-7cb7-4d34-8f0b-434b1fb82d3b" name="buildSFPayloads" />
-		
+		<set-variable value='publishing Thread Results.' doc:name="Set Current step" doc:id="ff87de02-6216-4c3f-99ab-36a88e130eca" variableName="currentProcessingStep"/>
 		<choice doc:name="Choice" doc:id="39011c00-c565-4abe-98a2-5f7b6177640d" >
 						<when expression="#[vars.'proceed?' == null]">
 				<ee:transform doc:name="Transform Message" doc:id="7fa0eec0-3504-4e59-a789-0a0955dd45d6">
@@ -831,7 +853,7 @@ output application/java
 }]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<logger level="INFO" doc:name="Thread publishes" doc:id="d0d15b12-6c01-4514-86f1-ebc5192aef8b" message="Thread: #[vars.currentThread]  Publishes: #[vars.vmResponse]" />
+				<logger level="INFO" doc:name="Thread publishes" doc:id="d0d15b12-6c01-4514-86f1-ebc5192aef8b" message="File Name: #[vars.fileName], Thread: #[vars.currentThread] Publishes: #[vars.vmResponse]" />
 				<vm:publish doc:name="Publish Thread Response" doc:id="cb9704a2-d471-48ed-b950-f4d5fdabb231" config-ref="VM_Batch_Config" sendCorrelationId="AUTO" queueName="#[vars.queueName]" timeout="60">
 					<vm:content><![CDATA[#[vars.vmResponse]]]></vm:content>	
 				</vm:publish>
@@ -850,7 +872,7 @@ output application/java
 }]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-		<logger level="ERROR" doc:name="Thread publishes" doc:id="2f51f1a6-cc43-4f8c-a5d3-bb5d1877b692" message="Thread: #[vars.currentThread]  Error Publish: #[vars.vmResponse]" />
+		<logger level="ERROR" doc:name="Thread publishes" doc:id="2f51f1a6-cc43-4f8c-a5d3-bb5d1877b692" message="File Name: #[vars.fileName], Thread: #[vars.currentThread] Error Publish: #[vars.vmResponse]" />
 		<vm:publish doc:name="Publish Thread Response" doc:id="7403643e-cac6-4bb6-8fd2-c0778dbcf6f5" config-ref="VM_Batch_Config" sendCorrelationId="AUTO" queueName="#[vars.queueName]" timeout="60">
 			<vm:content><![CDATA[#[vars.vmResponse]]]></vm:content>
 		</vm:publish>
@@ -859,7 +881,7 @@ output application/java
 		<remove-variable doc:name="Remove currentThread" doc:id="e3ba4615-a218-4a62-8106-fb8346aef905" variableName="currentThread" />
 		<error-handler >
 			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="1021ff34-2f0d-4453-9845-44b9d711d611" >
-				<logger level="ERROR" doc:name="Error Log" doc:id="a0b6d599-4c73-4fc8-b225-43f6aa4d1e7a" message="ERRORs on Thread: #[vars.currentThread] reported."/>
+				<logger level="ERROR" doc:name="Error Log" doc:id="a0b6d599-4c73-4fc8-b225-43f6aa4d1e7a" message="ERROR: File Name: #[vars.fileName], Thread: #[vars.currentThread], Error condition reported. Last Current step recorded: #[vars.currentProcessingStep]" />
 				<flow-ref doc:name="Call logPayloads" doc:id="90b31755-622e-48bc-ad7c-475091731fa5" name="logPayloads" />
 				
 				<ee:transform doc:name="Transform Message" doc:id="c51d89c0-f326-48f5-88d2-16d7cd2424c6">
@@ -875,7 +897,7 @@ output application/java
 }]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-		<logger level="ERROR" doc:name="Thread publishes" doc:id="1b60751e-cc8f-43c2-b632-05a0e2f2a3dc" message="Thread: #[vars.currentThread]  Error Publish: #[vars.vmResponse]" />
+		<logger level="ERROR" doc:name="Thread publishes" doc:id="1b60751e-cc8f-43c2-b632-05a0e2f2a3dc" message="File Name: #[vars.fileName], Thread: #[vars.currentThread] Error Publish: #[vars.vmResponse]" />
 		<vm:publish doc:name="Publish Thread Response" doc:id="9bd59f6a-5f43-4cdc-bb87-b6be48c02c6c" config-ref="VM_Batch_Config" sendCorrelationId="AUTO" queueName="#[vars.queueName]" timeout="60">
 			<vm:content><![CDATA[#[vars.vmResponse]]]></vm:content>
 		</vm:publish>
@@ -886,6 +908,8 @@ output application/java
 	</flow>
 		
 	<sub-flow name="buildSFPayloads" doc:id="37c08932-af7b-4a12-9d10-c9f4e6239320" >
+		<set-variable value='buildSFPayloads Started.' doc:name="Set Current step" doc:id="f9eea7d9-183c-4f6a-b533-b3cb6ee7b0a7" variableName="currentProcessingStep"/>
+		
 		<choice doc:name="Build SF Payload" doc:id="66832cb0-ddf6-4715-9072-b992a8131c1e">
 			<when expression="#[vars.'proceed?' == null]">
 				<ee:transform doc:name="Set CIStatus to STARTED" doc:id="84544293-d28d-4dac-b9dc-06cb2548cd36">
@@ -1130,7 +1154,7 @@ payload.*Type40Structure filter ($ != null) map {
 			</ee:transform>
 					</when>
 					<otherwise >
-						<logger level="WARN" doc:name="Logger" doc:id="9f1d6fa3-251e-4b56-a590-4187590d3091" message="No AssetType Set.  "/>
+						<logger level="WARN" doc:name="Logger" doc:id="9f1d6fa3-251e-4b56-a590-4187590d3091" message="No AssetType Set."/>
 					</otherwise>
 				</choice>
 				<flow-ref doc:name="payload to SF" doc:id="2019e3a6-9762-4769-b143-d329ee46bfbb" name="sendSFPayload" />
@@ -1139,10 +1163,11 @@ payload.*Type40Structure filter ($ != null) map {
 	</sub-flow>
 	<sub-flow name="sendSFPayload" doc:id="de8a3d1d-f06b-4673-b405-818eec85c85e" >
 			<flow-ref doc:name="execTime for startTime" doc:id="7d9e89f0-76a4-4c89-abaa-491594180283" name="execTime"/>
-			<salesforce:create type="FRPP_ASSET__c" doc:name="Create Assets" doc:id="9dbca2bb-9237-4718-8728-7cd02cdd0c58" config-ref="SalesforceGeoFL3_Global" target="sfResponse">
+			<set-variable value='Calling SF-Create Assets.' doc:name="Set Current step" doc:id="229bc106-6072-4d59-ae1b-b41f822faee5" variableName="currentProcessingStep" />
+		<salesforce:create type="FRPP_ASSET__c" doc:name="Create Assets" doc:id="9dbca2bb-9237-4718-8728-7cd02cdd0c58" config-ref="SalesforceGeoFL3_Global" target="sfResponse">
 				<salesforce:records ><![CDATA[#[vars.sfAssetsPayload]]]></salesforce:records>
 			</salesforce:create>
-			<set-variable value='#["Thread: " ++ vars.currentThread ++": Create Assets"]' doc:name="Set Variable" doc:id="a8152a4a-5adb-44e9-81bb-119b50a92201" variableName="operation"/>
+			<set-variable value='#["Thread: " ++ vars.currentThread ++": Calling SF-Create Assets"]' doc:name="Set Variable" doc:id="a8152a4a-5adb-44e9-81bb-119b50a92201" variableName="operation"/>
 			<flow-ref doc:name="execTime for logging" doc:id="df553c00-ced4-4ba3-9832-f73dde181560" name="execTime"/>
 		<choice doc:name="Choice" doc:id="0fc11e68-b76a-4405-9fa7-639cc6454155" >
 				<when expression='sizeOf (flatten(vars.sfResponse.errors) filter ($.statusCode != "FIELD_CUSTOM_VALIDATION_EXCEPTION" )) &lt; 1'>
@@ -1169,6 +1194,7 @@ vars.sfAssetsPayload filter (vars.sfResponse.id[$$] == null) map (
 				<choice doc:name="Choice" doc:id="85aff5ac-509a-4a62-8337-40baec06d32a">
 					<when expression="#[sizeOf (vars.sfResponse.*id filter ($ == null)) &gt; 0]">
 						<flow-ref doc:name="execTime for startTime" doc:id="83209e8c-6e74-4238-bf0c-01378b46bd9e" name="execTime"/>
+						<set-variable value='Calling SF-Create Error Assets.' doc:name="Set Current step" doc:id="bbbd8a12-435c-474a-9c82-568ef12b298b" variableName="currentProcessingStep" />
 						<salesforce:create doc:name="Create Error Assets" doc:id="bab42c0e-1a86-4dd6-b07a-2c20d62c52d7" config-ref="SalesforceGeoFL3_Global" type="FRPP_ASSET__c" target="sfErrorAssestsResponse">
 							<salesforce:records><![CDATA[#[vars.sfErrorAssestsPayload]]]></salesforce:records>
 						</salesforce:create>
@@ -1214,7 +1240,7 @@ output application/json
 vars.sfErrorAssestsResponse]]></ee:set-variable>
 									</ee:variables>
 								</ee:transform>
-								<logger level="ERROR" doc:name="Logger" doc:id="1c0e6771-1c8c-450c-a76f-db231b1085aa" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR received from Salesforce while creating Error Assets."/>
+								<logger level="ERROR" doc:name="Logger" doc:id="1c0e6771-1c8c-450c-a76f-db231b1085aa" message="ERROR: File Name: #[vars.fileName], Thread: #[vars.currentThread] --&gt; ERROR received from Salesforce call2 while inserting Error Assets to SF."/>
 								<logger level="ERROR" doc:name="sfErrorAssetsResponse" doc:id="65443eb5-22ff-4d51-95e2-b929d1bb6dc4" message="#[vars.sfErrorAssestsResponse]"/>
 							</when>
 						</choice>
@@ -1240,6 +1266,7 @@ payload]]></ee:set-variable>
 								</ee:variables>
 							</ee:transform>
 							<flow-ref doc:name="execTime for startTime" doc:id="adba5693-ccd5-4afa-bd61-13840a17fcf5" name="execTime"/>
+							<set-variable value='Calling SF-Create Errors.' doc:name="Set Current step" doc:id="60d75e3b-e7fb-4edf-8601-fbc6e3fae8e6" variableName="currentProcessingStep" />
 							<salesforce:create doc:name="Create Errors" doc:id="4fe3e0eb-8666-453a-a8c1-4f0d8fff0447" config-ref="SalesforceGeoFL3_Global" type="FRPP_ASSET_ERROR__c" target="sfErrorsResponse">
 								<salesforce:records ><![CDATA[#[vars.sfErrorsPayloadBatch]]]></salesforce:records>
 							</salesforce:create>
@@ -1258,17 +1285,17 @@ output application/json
 vars.sfErrorsResponse]]></ee:set-variable>
 									</ee:variables>
 								</ee:transform>
-								<logger level="ERROR" doc:name="Logger" doc:id="73d15b46-944c-42ad-90d4-abeffbc4eca1" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; ERROR received from Salesforce while inserting Error to SF."/>
+								<logger level="ERROR" doc:name="Logger" doc:id="73d15b46-944c-42ad-90d4-abeffbc4eca1" message="ERROR: File Name: #[vars.fileName], Thread: #[vars.currentThread] --&gt; ERROR received from Salesforce call3 while inserting Errors to SF."/>
 								<logger level="ERROR" doc:name="sfErrorsResponse" doc:id="9609a425-c247-4fa9-9fbb-b4b79172d117" message="#[vars.sfErrorsResponse]"/>
 							</when>
 						</choice>
 				
 						</foreach>
-						<logger level="DEBUG" doc:name="Error Logger" doc:id="e7758db6-a240-4ebe-9510-921566679220" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 3b. #[vars.assetType] Batch No.: #[vars.counter] ALL Err records processed Succesfully."/>
+						<logger level="DEBUG" doc:name="Error Logger" doc:id="e7758db6-a240-4ebe-9510-921566679220" message="File Name: #[vars.fileName], Thread: #[vars.currentThread] --&gt; 3b. #[vars.assetType] Batch No.: #[vars.counter] ALL Err records processed Succesfully."/>
 					</when>
 					<otherwise >
 						<remove-variable doc:name="Remove sfErrorAssestsPayload" doc:id="483a7c4b-9ad7-43ac-853f-34e9c748df3c" variableName="sfErrorAssestsPayload"/>
-						<logger level="DEBUG" doc:name="Success Logger" doc:id="6ca48a60-0d0b-404c-92c7-d6ee5ddcfa95" message="File ID: #[vars.file.Id], File Name: #[vars.fileName] --&gt; 3a. #[vars.assetType] Batch No.: #[vars.counter] ALL records processed Succesfully."/>
+						<logger level="DEBUG" doc:name="Success Logger" doc:id="6ca48a60-0d0b-404c-92c7-d6ee5ddcfa95" message="File Name: #[vars.fileName], Thread: #[vars.currentThread] --&gt; 3a. #[vars.assetType] Batch No.: #[vars.counter] ALL records processed Succesfully."/>
 					</otherwise>
 				</choice>
 				<ee:transform doc:name="Set BatchCompletion Statuses" doc:id="3de963a4-0508-42e0-b1c4-62cecf049d40">
@@ -1289,7 +1316,8 @@ output application/json
 					<flow-ref doc:name="SetFileStatus" doc:id="a447f53d-928d-4ec6-9d82-e397c67a4a35" name="SetStatuses" />
 				</when>
 				<otherwise >
-				<logger level="ERROR" doc:name="Validation Errors" doc:id="721a3c6b-3361-4bfd-ac55-fb89d0208628" message="File ID: #[vars.file.Id], File Name: #[vars.fileName], Thread: #[vars.currentThread] --&gt; ERROR:  Received SF error other then 'FIELD_CUSTOM_VALIDATION_EXCEPTION'.  Need to Exit." />
+				<set-variable value='Error Other then Validation Error from SF Flow.' doc:name="Set Current step" doc:id="ea5ac95f-a452-48f5-9356-4784f4b97272" variableName="currentProcessingStep"/>
+				<logger level="ERROR" doc:name="Validation Errors" doc:id="721a3c6b-3361-4bfd-ac55-fb89d0208628" message="File Name: #[vars.fileName], Thread: #[vars.currentThread] --&gt; ERROR:  Received SF error other then 'FIELD_CUSTOM_VALIDATION_EXCEPTION'.  Need to Exit." />
 				<flow-ref doc:name="Call logPayloads" doc:id="c9bf474b-a40e-4fdc-9591-386b4d32ec1f" name="logPayloads" />
 				<remove-variable doc:name="Remove sfAssetsPayload" doc:id="90dc7cd2-df25-44c3-8794-bef5d1d714c0" variableName="sfAssetsPayload" />
 				<set-variable value="false" doc:name="Set proceed? to false" doc:id="18c1bdec-65f3-4072-ad2c-c625beca4d62" variableName="proceed?" />
