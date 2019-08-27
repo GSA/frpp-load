@@ -1156,11 +1156,8 @@
 							</xs:restriction>
 						</xs:simpleType>
 						<xs:simpleType>
-							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="12"/>
-								<xs:fractionDigits value="7"/>
-								<xs:minInclusive value="-90.00000001"/>
-								<xs:maxInclusive value="90.00000001"/>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="12"/>
 							</xs:restriction>
 						</xs:simpleType>
 					</xs:union>
@@ -1176,11 +1173,8 @@
 							</xs:restriction>
 						</xs:simpleType>
 						<xs:simpleType>
-							<xs:restriction base="xs:decimal">
-								<xs:totalDigits value="12"/>
-								<xs:fractionDigits value="7"/>
-								<xs:minInclusive value="-180.00000001"/>
-								<xs:maxInclusive value="180.00000001"/>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="12"/>
 							</xs:restriction>
 						</xs:simpleType>
 					</xs:union>
