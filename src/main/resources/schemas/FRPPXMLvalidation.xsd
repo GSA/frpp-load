@@ -201,7 +201,7 @@
 	</xs:simpleType>
 	<xs:simpleType name="AssetHeightType">
         <xs:restriction base="xs:integer">
-            <xs:minInclusive value="1"/>
+            <xs:minInclusive value="0"/>
             <xs:maxInclusive value="10000"/>
         </xs:restriction>
     </xs:simpleType>
