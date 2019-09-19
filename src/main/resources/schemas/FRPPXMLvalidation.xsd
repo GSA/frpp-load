@@ -53,9 +53,9 @@
 			<xs:element minOccurs="0" name="HistoricalStatus" type="HistoricalStatusType"/>
 			<xs:element minOccurs="0" ref="ReportingAgency"/>
 			<xs:element minOccurs="0" ref="UsingOrganization"/>
-			<xs:element minOccurs="0" ref="LeaseExpirationDate"/>
-			<xs:element ref="LeaseStartDate"/>
-			<xs:element ref="LeaseOccupancyDate"/>
+			<xs:element name="LeaseExpirationDate" type="PastCurrentAndFutureDateType"/>
+			<xs:element name="LeaseStartDate" type="PastAndCurrentFiscalYearDateType"/>
+			<xs:element name="LeaseOccupancyDate" type="AfterCurrentFiscalYearDateType"/>
 			<xs:element ref="IsAssetExcluded"/>
 			<xs:element ref="ReasonForExclusion"/>
 			<xs:element minOccurs="0" name="Size" type="SizeLand"/>
@@ -95,9 +95,9 @@
 			<xs:element minOccurs="0" name="HistoricalStatus" type="HistoricalStatusType"/>
 			<xs:element minOccurs="0" ref="ReportingAgency"/>
 			<xs:element minOccurs="0" ref="UsingOrganization"/>
-			<xs:element minOccurs="0" ref="LeaseExpirationDate"/>
-			<xs:element ref="LeaseStartDate"/>
-			<xs:element ref="LeaseOccupancyDate"/>
+			<xs:element name="LeaseExpirationDate" type="PastCurrentAndFutureDateType"/>
+			<xs:element name="LeaseStartDate" type="PastAndCurrentFiscalYearDateType"/>
+			<xs:element name="LeaseOccupancyDate" type="AfterCurrentFiscalYearDateType"/>
 			<xs:element minOccurs="0" name="Size" type="SizeBuilding"/>
 			<xs:element minOccurs="0" name="AssetHeight" type="AssetHeightType"/>
 			<xs:element minOccurs="0" name="AssetHeightRange" type="AssetHeightRangeType"/>
@@ -147,9 +147,9 @@
 			<xs:element minOccurs="0" name="HistoricalStatus" type="HistoricalStatusType"/>
 			<xs:element ref="ReportingAgency"/>
 			<xs:element minOccurs="0" ref="UsingOrganization"/>
-			<xs:element minOccurs="0" ref="LeaseExpirationDate"/>
-			<xs:element ref="LeaseStartDate"/>
-			<xs:element ref="LeaseOccupancyDate"/>
+			<xs:element name="LeaseExpirationDate" type="PastCurrentAndFutureDateType"/>
+			<xs:element name="LeaseStartDate" type="PastAndCurrentFiscalYearDateType"/>
+			<xs:element name="LeaseOccupancyDate" type="AfterCurrentFiscalYearDateType"/>
 			<xs:element ref="IsAssetExcluded"/>
 			<xs:element ref="ReasonForExclusion"/>
 			<xs:element ref="YearOfAssetConstruction"/>
@@ -334,11 +334,11 @@
 	<xs:complexType name="StatusType">
 		<xs:choice maxOccurs="9">
 			<xs:element name="StatusIndicator" type="StatusIndicatorType"/>
-			<xs:element minOccurs="0" name="SurplusDeclarationDate" type="SurplusDeclarationDateType"/>
-			<xs:element minOccurs="0" name="ReportOfExcessSubmittedDate" type="ReportOfExcessSubmittedDateType"/>
-			<xs:element minOccurs="0" name="ReportOfExcessAcceptedDate" type="ReportOfExcessAcceptedDateType"/>
-			<xs:element minOccurs="0" name="DeterminationToDisposeDate" type="DeterminationToDisposeDateType"/>
-			<xs:element minOccurs="0" name="CannotCurrentlyBeDisposedDate" type="CannotCurrentlyBeDisposedDateType"/>
+			<xs:element minOccurs="0" name="SurplusDeclarationDate" type="PastAndCurrentFiscalYearDateType"/>
+			<xs:element minOccurs="0" name="ReportOfExcessSubmittedDate" type="PastAndCurrentFiscalYearDateType"/>
+			<xs:element minOccurs="0" name="ReportOfExcessAcceptedDate" type="PastAndCurrentFiscalYearDateType"/>
+			<xs:element minOccurs="0" name="DeterminationToDisposeDate" type="PastAndCurrentFiscalYearDateType"/>
+			<xs:element minOccurs="0" name="CannotCurrentlyBeDisposedDate" type="PastAndCurrentFiscalYearDateType"/>
 			<xs:element minOccurs="0" name="OutgrantIndicator" type="OutgrantIndicatorType"/>
 			<xs:element minOccurs="0" name="CannotCurrentlyBeDisposed" type="CannotCurrentlyBeDisposedType"/>
 		</xs:choice>
@@ -378,81 +378,6 @@
 			<xs:enumeration value="i"/>
 			<xs:enumeration value="s"/>
 		</xs:restriction>
-	</xs:simpleType>
-	<xs:simpleType name="SurplusDeclarationDateType">
-		<xs:union>
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:whiteSpace value="collapse"/>
-					<xs:enumeration value=""/>
-				</xs:restriction>
-			</xs:simpleType>
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:pattern value="(1[0-2]|0?[1-9]|1[012])[/](1[0-2]|0?[1-9]|[12][0-9]|3[01])[/](19|20|21)\d\d"/>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:union>
-	</xs:simpleType>
-	<xs:simpleType name="ReportOfExcessSubmittedDateType">
-		<xs:union>
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:whiteSpace value="collapse"/>
-					<xs:enumeration value=""/>
-				</xs:restriction>
-			</xs:simpleType>
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:pattern value="(1[0-2]|0?[1-9]|1[012])[/](1[0-2]|0?[1-9]|[12][0-9]|3[01])[/](19|20|21)\d\d"/>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:union>
-	</xs:simpleType>
-	<xs:simpleType name="ReportOfExcessAcceptedDateType">
-		<xs:union>
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:whiteSpace value="collapse"/>
-					<xs:enumeration value=""/>
-				</xs:restriction>
-			</xs:simpleType>
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:pattern value="(1[0-2]|0?[1-9]|1[012])[/](1[0-2]|0?[1-9]|[12][0-9]|3[01])[/](19|20|21)\d\d"/>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:union>
-	</xs:simpleType>
-	<xs:simpleType name="DeterminationToDisposeDateType">
-		<xs:union>
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:whiteSpace value="collapse"/>
-					<xs:enumeration value=""/>
-				</xs:restriction>
-			</xs:simpleType>
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:pattern value="(1[0-2]|0?[1-9]|1[012])[/](1[0-2]|0?[1-9]|[12][0-9]|3[01])[/](19|20|21)\d\d"/>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:union>
-	</xs:simpleType>
-	<xs:simpleType name="CannotCurrentlyBeDisposedDateType">
-		<xs:union>
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:whiteSpace value="collapse"/>
-					<xs:enumeration value=""/>
-				</xs:restriction>
-			</xs:simpleType>
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:pattern value="(((1[0-2]|0?[1-9])[/](0?[1-9]|[12][0-9]|3[01])[/](19\d\d|20[0][0-9]|20[1][0-7]))|((0?[1-9])[/](0?[1-9]|[12][0-9]|3[01x])[/]2018))"/>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:union>
 	</xs:simpleType>
 	<xs:simpleType name="OutgrantIndicatorType">
 		<xs:restriction base="xs:string">
@@ -498,41 +423,22 @@
 			<xs:enumeration value="pC"/>
 		</xs:restriction>
 	</xs:simpleType>
-	<xs:element name="LeaseExpirationDate">
-		<xs:simpleType>
-			<xs:union>
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:enumeration value=""/>
-					</xs:restriction>
-				</xs:simpleType>
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:pattern value="(1[0-2]|0?[1-9]|1[012])[/](1[0-2]|0?[1-9]|[12][0-9]|3[01])[/](19|20|21)\d\d"/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:union>
-		</xs:simpleType>
-	</xs:element>
-	<xs:element name="LeaseStartDate">
-		<xs:simpleType>
-			<xs:union>
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:whiteSpace value="collapse"/>
-						<xs:enumeration value=""/>
-					</xs:restriction>
-				</xs:simpleType>
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:pattern value="(((1[0-2]|0?[1-9])[/](0?[1-9]|[12][0-9]|3[01])[/](1[4-9]\d\d|20[0][0-9]|20[1][0-7]))|((0?[1-9])[/](0?[1-9]|[12][0-9]|3[01])[/]2018))"/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:union>
-		</xs:simpleType>
-	</xs:element>
-	<xs:element name="LeaseOccupancyDate">
-		<xs:simpleType>
+	<xs:simpleType name="AfterCurrentFiscalYearDateType">
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:whiteSpace value="collapse"/>
+					<xs:enumeration value=""/>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="((1[0-2][/](0?[1-9]|[12][0-9]|3[01])[/]2019)|((1[0-2]|0?[1-9])[/](0?[1-9]|[12][0-9]|3[01])[/](20[2-9][0-9])))"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="PastAndCurrentFiscalYearDateType">
 			<xs:union>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -542,12 +448,41 @@
 				</xs:simpleType>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:pattern value="(((1[0-2]|0?[1-9])[/](0?[1-9]|[12][0-9]|3[01])[/](19\d\d|20\d\d)))"/>
+						<xs:pattern value="(((1[0-2]|0?[1-9])[/](0?[1-9]|[12][0-9]|3[01])[/](1[4-9]\d\d|20[0][0-9]|20[1][0-8]))|((0?[1-9])[/](0?[1-9]|[12][0-9]|3[01])[/]2019))"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:union>
-		</xs:simpleType>
-	</xs:element>
+	</xs:simpleType>
+	<xs:simpleType name="CurrentFiscalYearDateType">
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:whiteSpace value="collapse"/>
+					<xs:enumeration value=""/>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="((1[0-2][/](0?[1-9]|[12][0-9]|3[01])[/]2018)|(0?[1-9][/](0?[1-9]|[12][0-9]|3[01])[/]2019))"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="PastCurrentAndFutureDateType">
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:whiteSpace value="collapse"/>
+					<xs:enumeration value=""/>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="(1[0-2]|0?[1-9])[/](0?[1-9]|[12][0-9]|3[01])[/](19|20|21)\d\d"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
 	<xs:element name="IsAssetExcluded">
 		<xs:simpleType>
 			<xs:restriction base="xs:string">
@@ -1494,23 +1429,7 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:element name="DispositionDate">
-				<xs:simpleType>
-					<xs:union>
-						<xs:simpleType>
-							<xs:restriction base="xs:string">
-								<xs:whiteSpace value="collapse"/>
-								<xs:enumeration value=""/>
-							</xs:restriction>
-						</xs:simpleType>
-						<xs:simpleType>
-							<xs:restriction base="xs:string">
-								<xs:pattern value="(1[0-2]|0?[1-9]|1[012])[/](1[0-2]|0?[1-9]|[12][0-9]|3[01])[/](19|20|21)\d\d"/>
-							</xs:restriction>
-						</xs:simpleType>
-					</xs:union>
-				</xs:simpleType>
-			</xs:element>
+			<xs:element name="DispositionDate" type="CurrentFiscalYearDateType"/>
 			<xs:element name="DispositionValue">
 				<xs:simpleType>
 					<xs:union>
