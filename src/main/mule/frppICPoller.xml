@@ -95,7 +95,7 @@ output application/json
 		<choice doc:name="Choice" doc:id="1a72448e-2ef3-4494-8d91-d8ea1e93b17b" >
 			<when expression='#[payload.BUREAU_CODE__c == null or payload.BUREAU_CODE__c == ""]'>
 				<salesforce:query doc:name="Query FRPP_ASSET__c" doc:id="8ed08b3d-243f-45fe-bcab-2114b18544eb" config-ref="SalesforceGeoFL3_Global" target="assetIDs">
-			<salesforce:salesforce-query>Select Id from FRPP_ASSET__c where ReportingAgencyCode__c = ':agencyCode' and FiscalYear__c = ':fiscalYr' and ASSET_RECORD_TYPE__c='UPLOADED' and Active__c = true</salesforce:salesforce-query>
+			<salesforce:salesforce-query>Select Id from FRPP_ASSET__c where FiscalYear__c = ':fiscalYr' and ReportingAgencyCode__c = ':agencyCode' and ASSET_RECORD_TYPE__c='UPLOADED' and Active__c = true</salesforce:salesforce-query>
 			<salesforce:parameters><![CDATA[#[output application/java
 ---
 {
@@ -106,7 +106,7 @@ output application/json
 			</when>
 			<otherwise >
 				<salesforce:query doc:name="Query FRPP_ASSET__c" doc:id="7142e0a6-054a-4f51-9c57-2bbfa0346eb7" config-ref="SalesforceGeoFL3_Global" target="assetIDs">
-			<salesforce:salesforce-query>Select Id from FRPP_ASSET__c where ReportingAgencyCode__c = ':agencyCode' and FiscalYear__c = ':fiscalYr' and ReportingBureauCode__c= ':bureauCode'  and ASSET_RECORD_TYPE__c='UPLOADED' and Active__c = true</salesforce:salesforce-query>
+			<salesforce:salesforce-query>Select Id from FRPP_ASSET__c where FiscalYear__c = ':fiscalYr' and ReportingAgencyCode__c = ':agencyCode' and ASSET_RECORD_TYPE__c='UPLOADED' and Active__c = true and  ReportingBureauCode__c= ':bureauCode'</salesforce:salesforce-query>
 			<salesforce:parameters><![CDATA[#[output application/java
 ---
 {
